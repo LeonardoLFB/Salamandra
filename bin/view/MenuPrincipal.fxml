@@ -13,14 +13,10 @@
 
 <!-- CONTROLADOR CONFIGURADO AQUI -->
 
-<AnchorPane prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuController1">
+<AnchorPane prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuController">
 
    <children>
-<<<<<<< HEAD
-      <BorderPane layoutX="146.0" layoutY="65.0" prefHeight="419.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-=======
       <BorderPane layoutX="146.0" layoutY="65.0" prefHeight="419.0" prefWidth="730.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
->>>>>>> c7a8089 (Versão 1.0.1)
 
          <top>
             <AnchorPane prefHeight="65.0" prefWidth="200.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">

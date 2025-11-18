@@ -8,49 +8,131 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ProdutoController">
    <top>
-      <AnchorPane prefHeight="500.0" prefWidth="700.0" style="-fx-background-color: #b27700;" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="600.0" prefWidth="700.0" style="-fx-background-color: #b27700;" BorderPane.alignment="CENTER">
          <children>
-            <Label layoutX="238.0" layoutY="44.0" text="Cadastar Produto Novo" textFill="#f2f2f2">
+            <!-- Título -->
+            <Label layoutX="220.0" layoutY="30.0" text="Cadastrar Produto Novo" textFill="#f2f2f2">
                <font>
-                  <Font name="Berlin Sans FB" size="20.0" />
+                  <Font name="Berlin Sans FB" size="24.0" />
                </font>
             </Label>
-            <Label layoutX="57.0" layoutY="135.0" text="Nome do produto:" textFill="#f2f2f2" />
-            <TextField layoutX="115.0" layoutY="405.0" prefHeight="26.0" prefWidth="254.0" />
-            <TextField cache="true" layoutX="161.0" layoutY="130.0" prefHeight="26.0" prefWidth="213.0" AnchorPane.bottomAnchor="343.6" AnchorPane.leftAnchor="160.79999999999998" AnchorPane.rightAnchor="325.4" AnchorPane.topAnchor="129.6">
-               <opaqueInsets>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </opaqueInsets></TextField>
-            <TextField layoutX="102.0" layoutY="166.0" prefHeight="26.0" prefWidth="271.0">
-               <opaqueInsets>
-                  <Insets bottom="10.0" top="10.0" />
-               </opaqueInsets></TextField>
-            <TextField layoutX="172.0" layoutY="206.0" prefHeight="26.0" prefWidth="200.0" />
-            <TextField layoutX="96.0" layoutY="242.0" prefHeight="26.0" prefWidth="274.0" />
-            <Label layoutX="55.0" layoutY="171.0" text="Código:" textFill="#f4f2f2" />
-            <Label layoutX="51.0" layoutY="211.0" text="Quantidade de itens:" textFill="#fffdfd" />
-            <Label layoutX="52.0" layoutY="246.0" text="Preço:" textFill="#f2eaea" />
-            <Label layoutX="47.0" layoutY="288.0" text="Categoria: " textFill="#ece8e8" />
-            <Label layoutX="55.0" layoutY="328.0" text="Lote:" textFill="#fafafa" />
-            <Label layoutX="44.0" layoutY="369.0" text="Fornecedor:" textFill="#f4efef" />
-            <Label layoutX="48.0" layoutY="409.0" text="Descrição:" textFill="#f2eded" />
-            <TextField layoutX="110.0" layoutY="284.0" prefHeight="26.0" prefWidth="262.0" />
-            <TextField layoutX="97.0" layoutY="324.0" />
-            <TextField layoutX="115.0" layoutY="365.0" />
-            <Button layoutX="302.0" layoutY="447.0" mnemonicParsing="false" text="Salvar">
-               <font>
-                  <Font name="Berlin Sans FB Bold" size="12.0" />
-               </font></Button>
-            <Button layoutX="365.0" layoutY="447.0" mnemonicParsing="false" text="Cancelar" />
-            <ImageView fitHeight="154.0" fitWidth="148.0" layoutX="552.0">
+            
+            <!-- Logo -->
+            <ImageView fitHeight="120.0" fitWidth="120.0" layoutX="560.0" layoutY="20.0" preserveRatio="true">
                <image>
-                  <Image url="@../../../../../Downloads/LogoBranco.png" />
+                  <Image url="@../img/LogoBranco.png" />
                </image>
             </ImageView>
+            
+            <!-- Formulário -->
+            <VBox layoutX="50.0" layoutY="100.0" prefWidth="600.0" spacing="20.0">
+               
+               <!-- Nome do Produto -->
+               <HBox alignment="CENTER_LEFT" spacing="10.0">
+                  <Label text="Nome do produto:" textFill="#f2f2f2" prefWidth="150.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="txtNome" prefWidth="400.0" promptText="Digite o nome do produto" />
+               </HBox>
+               
+               <!-- Código -->
+               <HBox alignment="CENTER_LEFT" spacing="10.0">
+                  <Label text="Código:" textFill="#f2f2f2" prefWidth="150.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="txtCodigo" prefWidth="400.0" promptText="Digite o código" />
+               </HBox>
+               
+               <!-- Quantidade -->
+               <HBox alignment="CENTER_LEFT" spacing="10.0">
+                  <Label text="Quantidade:" textFill="#f2f2f2" prefWidth="150.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="txtQuantidade" prefWidth="400.0" promptText="Digite a quantidade em estoque" />
+               </HBox>
+               
+               <!-- Preço -->
+               <HBox alignment="CENTER_LEFT" spacing="10.0">
+                  <Label text="Preço:" textFill="#f2f2f2" prefWidth="150.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="txtPreco" prefWidth="400.0" promptText="Digite o preço (ex: 19.90)" />
+               </HBox>
+               
+               <!-- Categoria -->
+               <HBox alignment="CENTER_LEFT" spacing="10.0">
+                  <Label text="Categoria:" textFill="#f2f2f2" prefWidth="150.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="txtCategoria" prefWidth="400.0" promptText="Digite a categoria do produto" />
+               </HBox>
+               
+               <!-- Lote -->
+               <HBox alignment="CENTER_LEFT" spacing="10.0">
+                  <Label text="Lote:" textFill="#f2f2f2" prefWidth="150.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="txtLote" prefWidth="400.0" promptText="Digite o lote" />
+               </HBox>
+               
+               <!-- Fornecedor -->
+               <HBox alignment="CENTER_LEFT" spacing="10.0">
+                  <Label text="Fornecedor:" textFill="#f2f2f2" prefWidth="150.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="txtFornecedor" prefWidth="400.0" promptText="Digite o fornecedor" />
+               </HBox>
+               
+               <!-- Descrição -->
+               <HBox alignment="CENTER_LEFT" spacing="10.0">
+                  <Label text="Descrição:" textFill="#f2f2f2" prefWidth="150.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="txtDescricao" prefWidth="400.0" promptText="Digite uma descrição do produto" />
+               </HBox>
+               
+            </VBox>
+            
+            <!-- Botões -->
+            <HBox alignment="CENTER" layoutX="200.0" layoutY="530.0" spacing="20.0">
+               <Button fx:id="btnSalvar" onAction="#salvarProduto" mnemonicParsing="false" 
+                       text="Salvar" prefWidth="120.0" prefHeight="35.0"
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;">
+                  <font>
+                     <Font name="Berlin Sans FB Bold" size="14.0" />
+                  </font>
+               </Button>
+               <Button fx:id="btnCancelar" onAction="#cancelar" mnemonicParsing="false" 
+                       text="Cancelar" prefWidth="120.0" prefHeight="35.0"
+                       style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;">
+                  <font>
+                     <Font name="Berlin Sans FB Bold" size="14.0" />
+                  </font>
+               </Button>
+            </HBox>
+            
          </children>
       </AnchorPane>
    </top>
