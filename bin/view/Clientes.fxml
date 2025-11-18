@@ -1,8 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1">
-	<!-- TODO Add Nodes -->
+<BorderPane prefHeight="700" prefWidth="900" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/24.0.1" fx:controller="controller.ClienteController">
+
+
+    <top>
+        <HBox prefHeight="64" styleClass="page-header">
+            <padding>
+                <Insets bottom="12" left="20" right="20" top="12" />
+            </padding>
+            <children>
+                <Label styleClass="page-title" text="Gestão de Clientes" />
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <AnchorPane>
+            <children>
+                <VBox spacing="16.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+
+                    <VBox spacing="12.0" styleClass="card">
+                        <padding>
+                            <Insets bottom="16" left="16" right="16" top="16" />
+                        </padding>    
+
+                        <Label styleClass="card-title" text="Cadastrar Novo Cliente" />
+
+                        <GridPane hgap="12" vgap="12">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="55" />
+                                <ColumnConstraints percentWidth="25" />
+                                <ColumnConstraints percentWidth="20" />
+                            </columnConstraints>
+
+                            <!-- Nome completo / Razão Social -->
+                            <Label text="Nome Completo/Razão Social" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <TextField fx:id="tfNome" promptText="Insira o nome ou razão social" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+
+                            <!-- CPF/CNPJ -->
+                            <Label text="CPF/CNPJ" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                            <TextField fx:id="tfDocumento" promptText="000.000.000-00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                            <!-- Telefone -->
+                            <Label text="Telefone de Contato" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                            <TextField fx:id="tfTelefone" promptText="(00) 90000-0000" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+
+                            <!-- E-mail -->
+                            <Label text="E-mail" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                            <TextField fx:id="tfEmail" promptText="contato@email.com" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                     <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                     </rowConstraints>
+
+                        </GridPane>
+
+                        <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                            <Button fx:id="btnLimpar" text="Limpar Campos" />
+                            <Button fx:id="btnSalvar" styleClass="primary-button" text="Salvar Cliente" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- CARD: Clientes Cadastrados -->
+                    <VBox spacing="12.0" styleClass="card" VBox.vgrow="ALWAYS">
+                        <padding>
+                            <Insets bottom="12" left="12" right="12" top="12" />
+                        </padding>
+
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                            <Label styleClass="card-title" text="Clientes Cadastrados" HBox.hgrow="ALWAYS" />
+                            <TextField fx:id="tfSearch" prefWidth="300" promptText="Buscar por nome ou CPF/CNPJ..." />
+                        </HBox>
+
+                        <TableView fx:id="tableClientes" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn prefWidth="300" text="NOME" />
+                                <TableColumn prefWidth="160" text="DOCUMENTO" />
+                                <TableColumn prefWidth="160" text="CONTATO" />
+                                <TableColumn prefWidth="220" text="E-MAIL" />
+                                <TableColumn prefWidth="80" text="AÇÕES" />
+                            </columns>
+                        </TableView>
+
+                        <!-- Rodapé opcional (paginador / contagem) -->
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                            <Label styleClass="small-muted" text="Mostrando 1-10 de 100" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <HBox alignment="CENTER_RIGHT" spacing="6.0">
+                                <Button text="Anterior" />
+                                <Button text="1" />
+                                <Button text="2" />
+                                <Button styleClass="active-page" text="3" />
+                                <Button text="Próximo" />
+                            </HBox>
+                        </HBox>
+
+                    </VBox>
+
+                </VBox>
+            </children>
+        </AnchorPane>
+    </center>
+
 </BorderPane>
-
