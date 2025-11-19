@@ -1,139 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.text.Font?>
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.2"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controller.EstoqueController"
+            prefWidth="1200" prefHeight="760"
+            style="-fx-background-color: #F3F4F6;">
 
-<BorderPane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ProdutoController">
-   <top>
-      <AnchorPane prefHeight="600.0" prefWidth="700.0" style="-fx-background-color: #b27700;" BorderPane.alignment="CENTER">
-         <children>
-            <!-- Título -->
-            <Label layoutX="220.0" layoutY="30.0" text="Cadastrar Produto Novo" textFill="#f2f2f2">
-               <font>
-                  <Font name="Berlin Sans FB" size="24.0" />
-               </font>
-            </Label>
-            
-            <!-- Logo -->
-            <ImageView fitHeight="120.0" fitWidth="120.0" layoutX="560.0" layoutY="20.0" preserveRatio="true">
-               <image>
-                  <Image url="@../img/LogoBranco.png" />
-               </image>
-            </ImageView>
-            
-            <!-- Formulário -->
-            <VBox layoutX="50.0" layoutY="100.0" prefWidth="600.0" spacing="20.0">
-               
-               <!-- Nome do Produto -->
-               <HBox alignment="CENTER_LEFT" spacing="10.0">
-                  <Label text="Nome do produto:" textFill="#f2f2f2" prefWidth="150.0">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="txtNome" prefWidth="400.0" promptText="Digite o nome do produto" />
-               </HBox>
-               
-               <!-- Código -->
-               <HBox alignment="CENTER_LEFT" spacing="10.0">
-                  <Label text="Código:" textFill="#f2f2f2" prefWidth="150.0">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="txtCodigo" prefWidth="400.0" promptText="Digite o código" />
-               </HBox>
-               
-               <!-- Quantidade -->
-               <HBox alignment="CENTER_LEFT" spacing="10.0">
-                  <Label text="Quantidade:" textFill="#f2f2f2" prefWidth="150.0">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="txtQuantidade" prefWidth="400.0" promptText="Digite a quantidade em estoque" />
-               </HBox>
-               
-               <!-- Preço -->
-               <HBox alignment="CENTER_LEFT" spacing="10.0">
-                  <Label text="Preço:" textFill="#f2f2f2" prefWidth="150.0">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="txtPreco" prefWidth="400.0" promptText="Digite o preço (ex: 19.90)" />
-               </HBox>
-               
-               <!-- Categoria -->
-               <HBox alignment="CENTER_LEFT" spacing="10.0">
-                  <Label text="Categoria:" textFill="#f2f2f2" prefWidth="150.0">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="txtCategoria" prefWidth="400.0" promptText="Digite a categoria do produto" />
-               </HBox>
-               
-               <!-- Lote -->
-               <HBox alignment="CENTER_LEFT" spacing="10.0">
-                  <Label text="Lote:" textFill="#f2f2f2" prefWidth="150.0">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="txtLote" prefWidth="400.0" promptText="Digite o lote" />
-               </HBox>
-               
-               <!-- Fornecedor -->
-               <HBox alignment="CENTER_LEFT" spacing="10.0">
-                  <Label text="Fornecedor:" textFill="#f2f2f2" prefWidth="150.0">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="txtFornecedor" prefWidth="400.0" promptText="Digite o fornecedor" />
-               </HBox>
-               
-               <!-- Descrição -->
-               <HBox alignment="CENTER_LEFT" spacing="10.0">
-                  <Label text="Descrição:" textFill="#f2f2f2" prefWidth="150.0">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="txtDescricao" prefWidth="400.0" promptText="Digite uma descrição do produto" />
-               </HBox>
-               
-            </VBox>
-            
-            <!-- Botões -->
-            <HBox alignment="CENTER" layoutX="200.0" layoutY="530.0" spacing="20.0">
-               <Button fx:id="btnSalvar" onAction="#salvarProduto" mnemonicParsing="false" 
-                       text="Salvar" prefWidth="120.0" prefHeight="35.0"
-                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;">
-                  <font>
-                     <Font name="Berlin Sans FB Bold" size="14.0" />
-                  </font>
-               </Button>
-               <Button fx:id="btnCancelar" onAction="#cancelar" mnemonicParsing="false" 
-                       text="Cancelar" prefWidth="120.0" prefHeight="35.0"
-                       style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;">
-                  <font>
-                     <Font name="Berlin Sans FB Bold" size="14.0" />
-                  </font>
-               </Button>
+    <!-- Container principal -->
+    <VBox spacing="18" AnchorPane.topAnchor="18" AnchorPane.leftAnchor="18" AnchorPane.rightAnchor="18" AnchorPane.bottomAnchor="18">
+
+        <!-- Cabeçalho -->
+        <VBox spacing="6">
+            <Label text="Estoque" style="-fx-font-size:28px; -fx-font-weight:bold;" />
+            <Label text="Gerencie os produtos, quantidades e preços do seu inventário." style="-fx-text-fill:#6B7280;"/>
+        </VBox>
+
+        <!-- Card: Formulário de cadastro -->
+        <VBox spacing="12"
+              style="-fx-background-color:white; -fx-padding:18; -fx-background-radius:8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+
+            <Label text="Cadastrar Novo Produto" style="-fx-font-size:16px; -fx-font-weight:600;" />
+
+            <GridPane hgap="12" vgap="12">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="60" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <!-- Linha 0 -->
+                <Label text="Nome do Produto" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <Label text="Código" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label text="Quantidade" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+
+                <TextField fx:id="txtNomeProduto" promptText="Ex: Incenso de Sândalo" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <TextField fx:id="txtCodigo" promptText="Ex: INC001" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <TextField fx:id="txtQuantidade" promptText="Ex: 50" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+
+                <!-- Linha 2 -->
+                <Label text="Preço de Custo (R$)" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Label text="Preço de Venda (R$)" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Label text="Status de Estoque" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+
+                <TextField fx:id="txtPrecoCusto" promptText="Ex: 5.50" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <TextField fx:id="txtPrecoVenda" promptText="Ex: 9.90" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <ComboBox fx:id="cbStatusProduto" promptText="Em estoque / Baixo / Fora" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+
+                <!-- Botão cadastrar alinhado à direita -->
+                <HBox GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="3" alignment="CENTER_RIGHT">
+                    <Button fx:id="btnCadastrarProduto" text="Cadastrar Produto"
+                            style="-fx-background-color:#B1812C; -fx-text-fill:white; -fx-background-radius:8; -fx-padding:8 16;" />
+                </HBox>
+            </GridPane>
+        </VBox>
+
+        <!-- Card: Busca / filtros -->
+        <VBox spacing="10" style="-fx-background-color:white; -fx-padding:12; -fx-background-radius:8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 6, 0, 0, 1);">
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color:#F8FAFB; -fx-padding:10; -fx-background-radius:6;" HBox.hgrow="ALWAYS">
+                    <TextField fx:id="txtBuscar" promptText="Buscar por nome ou código..." HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <ComboBox fx:id="cbFiltroStatus" promptText="Filtrar Status" prefWidth="160"/>
+                <Button fx:id="btnNovoProduto" text="+ Novo Produto" style="-fx-background-color:#B1812C; -fx-text-fill:white; -fx-background-radius:8; -fx-padding:8 14;"/>
             </HBox>
-            
-         </children>
-      </AnchorPane>
-   </top>
-</BorderPane>
+        </VBox>
+
+        <!-- Tabela de produtos -->
+        <TableView fx:id="productTable" prefHeight="420" style="-fx-background-radius:8; -fx-background-color:white;">
+            <columns>
+                <TableColumn fx:id="colNomeProduto" text="Nome do Produto" prefWidth="420"/>
+                <TableColumn fx:id="colCodigo" text="Código" prefWidth="140"/>
+                <TableColumn fx:id="colQuantidade" text="Quantidade" prefWidth="110"/>
+                <TableColumn fx:id="colPreco" text="Preço (R$)" prefWidth="120"/>
+                <TableColumn fx:id="colStatus" text="Status" prefWidth="160"/>
+                <TableColumn fx:id="colAcoes" text="Ações" prefWidth="120"/>
+            </columns>
+        </TableView>
+
+        <!-- Rodapé resumo -->
+        <HBox spacing="12" alignment="CENTER_LEFT" style="-fx-background-color:white; -fx-padding:10; -fx-background-radius:8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.02), 4, 0, 0, 1);">
+            <Label fx:id="lblStatus" text="Pronto" />
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Total de itens:" />
+            <Label fx:id="lblTotalItens" text="0" />
+            <Separator orientation="VERTICAL"/>
+            <Label text="Valor total em estoque: R$" />
+            <Label fx:id="lblValorTotal" text="0.00" />
+        </HBox>
+
+    </VBox>
+
+</AnchorPane>
