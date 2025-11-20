@@ -1,156 +1,207 @@
 package controller;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import model.Fornecedor;
+
+import java.util.Optional;
 
 public class FornecedorController {
 
+    // Campos do formulário
     @FXML private TextField tfNome;
     @FXML private TextField tfCnpj;
     @FXML private TextField tfContato;
+    @FXML private TextField tfEmail;
     @FXML private TextField tfEndereco;
     @FXML private Button btnCadastrar;
-    @FXML private TextField tfSearch;
-    @FXML private TableView<Fornecedor> tableFornecedores;
 
-    // Dados observáveis
-    private final ObservableList<Fornecedor> masterData = FXCollections.observableArrayList();
+    // Filtros / busca
+    @FXML private TextField tfBusca;
+    @FXML private ComboBox<String> cbStatusFiltro;
+    @FXML private Button btnNovo;
+
+    // Tabela
+    @FXML private TableView<Fornecedor> tableFornecedores;
+    @FXML private TableColumn<Fornecedor, String> colNome;
+    @FXML private TableColumn<Fornecedor, String> colCnpj;
+    @FXML private TableColumn<Fornecedor, String> colContato;
+    @FXML private TableColumn<Fornecedor, String> colStatus;
+    @FXML private TableColumn<Fornecedor, Void> colAcoes;
+
+    private final ObservableList<Fornecedor> fornecedores = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        // Configura colunas (assume que as colunas foram declaradas no FXML e estão na ordem)
-        // Se preferir, você pode definir fx:id nas TableColumn no FXML e injetá-las aqui.
-        if (tableFornecedores.getColumns().size() >= 5) {
-            @SuppressWarnings("unchecked")
-			TableColumn<Fornecedor, String> colNome = (TableColumn<Fornecedor, String>) tableFornecedores.getColumns().get(0);
-            @SuppressWarnings("unchecked")
-			TableColumn<Fornecedor, String> colCnpj = (TableColumn<Fornecedor, String>) tableFornecedores.getColumns().get(1);
-            @SuppressWarnings("unchecked")
-			TableColumn<Fornecedor, String> colContato = (TableColumn<Fornecedor, String>) tableFornecedores.getColumns().get(2);
-            @SuppressWarnings("unchecked")
-			TableColumn<Fornecedor, String> colEndereco = (TableColumn<Fornecedor, String>) tableFornecedores.getColumns().get(3);
-            @SuppressWarnings("unchecked")
-			TableColumn<Fornecedor, String> colAcoes = (TableColumn<Fornecedor, String>) tableFornecedores.getColumns().get(4);
 
-            colNome.setCellValueFactory(cell -> cell.getValue().nomeProperty());
-            colCnpj.setCellValueFactory(cell -> cell.getValue().cnpjProperty());
-            colContato.setCellValueFactory(cell -> cell.getValue().contatoProperty());
-            colEndereco.setCellValueFactory(cell -> cell.getValue().enderecoProperty());
+        // Configurar colunas
+        colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colCnpj.setCellValueFactory(new PropertyValueFactory<>("cnpjCpf"));
+        colContato.setCellValueFactory(new PropertyValueFactory<>("contato"));
+        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-            // A coluna 'AÇÕES' ficará vazia por enquanto; você pode customizar com cellFactory depois.
-            colAcoes.setCellValueFactory(cell -> new SimpleStringProperty(""));
-        }
+        // Badge de status
+        colStatus.setCellFactory(column -> new TableCell<>() {
+            private final Label badge = new Label();
 
-        // Search: FilteredList -> SortedList -> bind to table
-        FilteredList<Fornecedor> filtered = new FilteredList<>(masterData, p -> true);
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
 
-        tfSearch.textProperty().addListener((obs, oldVal, newVal) -> {
-            String lower = newVal == null ? "" : newVal.toLowerCase().trim();
-            filtered.setPredicate(f -> {
-                if (lower.isEmpty()) return true;
-                if (f.getNome().toLowerCase().contains(lower)) return true;
-                if (f.getCnpj().toLowerCase().contains(lower)) return true;
-                if (f.getContato().toLowerCase().contains(lower)) return true;
-                if (f.getEndereco().toLowerCase().contains(lower)) return true;
-                return false;
-            });
-        });
+                if (empty || status == null) {
+                    setGraphic(null);
+                    return;
+                }
 
-        SortedList<Fornecedor> sorted = new SortedList<>(filtered);
-        sorted.comparatorProperty().bind(tableFornecedores.comparatorProperty());
-        tableFornecedores.setItems(sorted);
+                badge.setText(status);
+                badge.setStyle("-fx-padding: 4 10; -fx-background-radius: 20; -fx-font-size: 12;");
 
-        // Botão cadastrar
-        btnCadastrar.setOnAction(e -> handleCadastrar());
+                if (status.equalsIgnoreCase("Ativo")) {
+                    badge.setStyle(badge.getStyle()
+                            + "-fx-background-color: #dff3e6; -fx-text-fill: #1f7a3a;");
+                } else {
+                    badge.setStyle(badge.getStyle()
+                            + "-fx-background-color: #ffe6e9; -fx-text-fill: #a21d2b;");
+                }
 
-        // Enter no campo de busca: não faz nada especial, mas evita comportamento inesperado
-        tfSearch.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            switch (event.getCode()) {
-                case ENTER:
-                    event.consume();
-                    break;
-                default:
-                    break;
+                setGraphic(badge);
             }
         });
 
-        // (Opcional) pre-popular com exemplos
-        masterData.add(new Fornecedor("Fornecedor Exemplo Ltda", "12.345.678/0001-90", "contato@fornecedor.com", "Rua das Flores, 123, São Paulo - SP"));
-        masterData.add(new Fornecedor("Distribuidora Alfa", "98.765.432/0001-10", "(21) 98765-4321", "Av. Brasil, 456, Rio de Janeiro - RJ"));
+        // Coluna de ações (editar e excluir)
+        colAcoes.setCellFactory(column -> new TableCell<>() {
+            private final Button btnEdit = new Button("✏");
+            private final Button btnDelete = new Button("🗑");
+            private final HBox box = new HBox(10, btnEdit, btnDelete);
+
+            {
+                btnEdit.setStyle("-fx-background-color: transparent; -fx-font-size: 14;");
+                btnDelete.setStyle("-fx-background-color: transparent; -fx-font-size: 14;");
+
+                btnEdit.setOnAction(event -> editar(getTableView().getItems().get(getIndex())));
+                btnDelete.setOnAction(event -> excluir(getTableView().getItems().get(getIndex())));
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : box);
+            }
+        });
+
+        // Dados de exemplo
+        fornecedores.addAll(
+                new Fornecedor("Incensos do Oriente Ltda", "12.345.678/0001-90", "(11) 98765-4321", "contato@incensos.com", "Rua das Especiarias, SP", "Ativo"),
+                new Fornecedor("Aromas da Terra", "98.765.432/0001-10", "(21) 91234-5678", "aromas@gmail.com", "Av. das Flores, RJ", "Ativo"),
+                new Fornecedor("Essências Pura Magia", "123.456.789-00", "(31) 99999-8888", "pura@magia.com", "Rua Luz, MG", "Inativo")
+        );
+
+        tableFornecedores.setItems(fornecedores);
+
+        // Configurar filtro de status
+        cbStatusFiltro.getItems().addAll("Todos", "Ativo", "Inativo");
+        cbStatusFiltro.getSelectionModel().select("Todos");
+        cbStatusFiltro.setOnAction(e -> filtrar());
+
+        // Busca em tempo real
+        tfBusca.textProperty().addListener((obs, oldV, newV) -> filtrar());
     }
 
-    private void handleCadastrar() {
-        String nome = safeText(tfNome);
-        String cnpj = safeText(tfCnpj);
-        String contato = safeText(tfContato);
-        String endereco = safeText(tfEndereco);
-
-        if (nome.isEmpty()) {
-            alertWarning("Nome obrigatório", "Informe o nome/razão social do fornecedor.");
+    // Cadastro
+    @FXML
+    private void onCadastrarFornecedor() {
+        if (tfNome.getText().isBlank() || tfCnpj.getText().isBlank()) {
+            alert("Preencha Nome e CNPJ/CPF para cadastrar.");
             return;
         }
 
-        // Adiciona ao list e limpa campos
-        Fornecedor novo = new Fornecedor(nome, cnpj, contato, endereco);
-        masterData.add(novo);
-        clearFields();
+        fornecedores.add(
+                new Fornecedor(
+                        tfNome.getText(),
+                        tfCnpj.getText(),
+                        tfContato.getText(),
+                        tfEmail.getText(),
+                        tfEndereco.getText(),
+                        "Ativo"
+                )
+        );
+
+        limparCampos();
+        filtrar();
     }
 
-    private String safeText(TextField tf) {
-        return tf == null ? "" : (tf.getText() == null ? "" : tf.getText().trim());
+    // Novo
+    @FXML
+    private void onAbrirFormNovo() {
+        limparCampos();
+        tfNome.requestFocus();
     }
 
-    private void clearFields() {
-        if (tfNome != null) tfNome.clear();
-        if (tfCnpj != null) tfCnpj.clear();
-        if (tfContato != null) tfContato.clear();
-        if (tfEndereco != null) tfEndereco.clear();
-        if (tfNome != null) tfNome.requestFocus();
+    // Edição
+    private void editar(Fornecedor f) {
+        tfNome.setText(f.getNome());
+        tfCnpj.setText(f.getCnpjCpf());
+        tfContato.setText(f.getContato());
+        tfEmail.setText(f.getEmail());
+        tfEndereco.setText(f.getEndereco());
+
+        fornecedores.remove(f); // remove temporariamente para sobrescrever
     }
 
-    private void alertWarning(String title, String message) {
-        Alert a = new Alert(Alert.AlertType.WARNING);
-        a.setTitle(title);
-        a.setHeaderText(null);
-        a.setContentText(message);
-        a.showAndWait();
+    // Exclusão
+    private void excluir(Fornecedor f) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar exclusão");
+        confirm.setHeaderText("Excluir fornecedor?");
+        confirm.setContentText("Fornecedor: " + f.getNome());
+
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            fornecedores.remove(f);
+            filtrar();
+        }
     }
 
-    // Modelo simples interno — você pode mover para outra classe se quiser
-    public static class Fornecedor {
-        private final SimpleStringProperty nome = new SimpleStringProperty("");
-        private final SimpleStringProperty cnpj = new SimpleStringProperty("");
-        private final SimpleStringProperty contato = new SimpleStringProperty("");
-        private final SimpleStringProperty endereco = new SimpleStringProperty("");
+    // Filtro
+    private void filtrar() {
+        String busca = tfBusca.getText().toLowerCase().trim();
+        String statusFiltro = cbStatusFiltro.getValue();
 
-        public Fornecedor() {}
-        public Fornecedor(String nome, String cnpj, String contato, String endereco) {
-            this.nome.set(nome);
-            this.cnpj.set(cnpj);
-            this.contato.set(contato);
-            this.endereco.set(endereco);
+        ObservableList<Fornecedor> filtrados = FXCollections.observableArrayList();
+
+        for (Fornecedor f : fornecedores) {
+
+            boolean matchBusca =
+                    busca.isEmpty()
+                            || f.getNome().toLowerCase().contains(busca)
+                            || f.getCnpjCpf().toLowerCase().contains(busca);
+
+            boolean matchStatus =
+                    statusFiltro.equals("Todos")
+                            || ((String) f.getStatus()).equalsIgnoreCase(statusFiltro);
+
+            if (matchBusca && matchStatus) {
+                filtrados.add(f);
+            }
         }
 
-        public String getNome() { return nome.get(); }
-        public void setNome(String v) { nome.set(v); }
-        public SimpleStringProperty nomeProperty() { return nome; }
+        tableFornecedores.setItems(filtrados);
+    }
 
-        public String getCnpj() { return cnpj.get(); }
-        public void setCnpj(String v) { cnpj.set(v); }
-        public SimpleStringProperty cnpjProperty() { return cnpj; }
+    // Utilitários
+    private void limparCampos() {
+        tfNome.clear();
+        tfCnpj.clear();
+        tfContato.clear();
+        tfEmail.clear();
+        tfEndereco.clear();
+    }
 
-        public String getContato() { return contato.get(); }
-        public void setContato(String v) { contato.set(v); }
-        public SimpleStringProperty contatoProperty() { return contato; }
-
-        public String getEndereco() { return endereco.get(); }
-        public void setEndereco(String v) { endereco.set(v); }
-        public SimpleStringProperty enderecoProperty() { return endereco; }
+    private void alert(String msg) {
+        new Alert(Alert.AlertType.WARNING, msg, ButtonType.OK).showAndWait();
     }
 }

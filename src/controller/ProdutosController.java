@@ -27,7 +27,8 @@ public class ProdutosController {
     @FXML private TableColumn<Product, Void> colAcoes;
 
     private final ObservableList<Product> data = FXCollections.observableArrayList();
-    private final NumberFormat currency = NumberFormat.getCurrencyInstance(new Locale("pt","BR"));
+    @SuppressWarnings("deprecation")
+	private final NumberFormat currency = NumberFormat.getCurrencyInstance(new Locale("pt","BR"));
 
     @FXML
     private void initialize() {

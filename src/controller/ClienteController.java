@@ -1,163 +1,222 @@
 package controller;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import model.Cliente;
 
+import java.util.Optional;
+
+/**
+ * Controller para Clientes.fxml
+ *
+ * Requisitos do modelo (model.Cliente):
+ * - getters: getId(), getNome(), getCpfCnpj(), getContato(), getEmail(), getStatus()
+ * - setters correspondentes se quiser persistir edição
+ *
+ * Salve este arquivo em src/controller/ClienteController.java
+ */
 public class ClienteController {
 
+    // Formulário
     @FXML private TextField tfNome;
-    @FXML private TextField tfDocumento;
-    @FXML private TextField tfTelefone;
+    @FXML private TextField tfCpfCnpj;
+    @FXML private TextField tfContato;
     @FXML private TextField tfEmail;
-    @FXML private Button btnLimpar;
-    @FXML private Button btnSalvar;
-    @FXML private TextField tfSearch;
-    @FXML private TableView<Cliente> tableClientes;
+    @FXML private TextField tfEndereco;
+    @FXML private ComboBox<String> cbStatus;
+    @FXML private Button btnCadastrar;
 
-    private final ObservableList<Cliente> masterData = FXCollections.observableArrayList();
+    // Busca / filtros
+    @FXML private TextField tfBusca;
+    @FXML private ComboBox<String> cbStatusFiltro;
+    @FXML private Button btnNovo;
+
+    // Tabela
+    @FXML private TableView<Cliente> tableClientes;
+    @FXML private TableColumn<Cliente, String> colId;
+    @FXML private TableColumn<Cliente, String> colNome;
+    @FXML private TableColumn<Cliente, String> colCpf;
+    @FXML private TableColumn<Cliente, String> colContato;
+    @FXML private TableColumn<Cliente, String> colEmail;
+    @FXML private TableColumn<Cliente, String> colStatus;
+    @FXML private TableColumn<Cliente, Void> colAcoes;
+
+    // Dados em memória (substitua por DAO/BD quando integrar)
+    private final ObservableList<Cliente> masterList = FXCollections.observableArrayList();
+
+    // contador simples para gerar IDs (string com #)
+    private int idCounter = 1000;
 
     @FXML
     public void initialize() {
-        // Configure table columns (assumes order in FXML)
-        if (tableClientes != null && tableClientes.getColumns().size() >= 5) {
-            @SuppressWarnings("unchecked")
-            TableColumn<Cliente, String> colNome = (TableColumn<Cliente, String>) tableClientes.getColumns().get(0);
-            @SuppressWarnings("unchecked")
-            TableColumn<Cliente, String> colDocumento = (TableColumn<Cliente, String>) tableClientes.getColumns().get(1);
-            @SuppressWarnings("unchecked")
-            TableColumn<Cliente, String> colContato = (TableColumn<Cliente, String>) tableClientes.getColumns().get(2);
-            @SuppressWarnings("unchecked")
-            TableColumn<Cliente, String> colEmail = (TableColumn<Cliente, String>) tableClientes.getColumns().get(3);
-            @SuppressWarnings("unchecked")
-            TableColumn<Cliente, String> colAcoes = (TableColumn<Cliente, String>) tableClientes.getColumns().get(4);
+        // Mapear colunas com nomes de propriedades (getters do model.Cliente)
+        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colCpf.setCellValueFactory(new PropertyValueFactory<>("cpfCnpj"));
+        colContato.setCellValueFactory(new PropertyValueFactory<>("contato"));
+        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-            colNome.setCellValueFactory(cell -> cell.getValue().nomeProperty());
-            colDocumento.setCellValueFactory(cell -> cell.getValue().documentoProperty());
-            colContato.setCellValueFactory(cell -> cell.getValue().contatoProperty());
-            colEmail.setCellValueFactory(cell -> cell.getValue().emailProperty());
-
-            // coluna ações vazia por enquanto (pode ser customizada com cell factory)
-            colAcoes.setCellValueFactory(cell -> new SimpleStringProperty(""));
-        }
-
-        // Filtered + Sorted for search
-        FilteredList<Cliente> filtered = new FilteredList<>(masterData, p -> true);
-
-        if (tfSearch != null) {
-            tfSearch.textProperty().addListener((obs, oldVal, newVal) -> {
-                String lower = newVal == null ? "" : newVal.toLowerCase().trim();
-                filtered.setPredicate(c -> {
-                    if (lower.isEmpty()) return true;
-                    if (c.getNome().toLowerCase().contains(lower)) return true;
-                    if (c.getDocumento().toLowerCase().contains(lower)) return true;
-                    if (c.getContato().toLowerCase().contains(lower)) return true;
-                    if (c.getEmail().toLowerCase().contains(lower)) return true;
-                    return false;
-                });
-            });
-        }
-
-        SortedList<Cliente> sorted = new SortedList<>(filtered);
-        if (tableClientes != null) {
-            sorted.comparatorProperty().bind(tableClientes.comparatorProperty());
-            tableClientes.setItems(sorted);
-        }
-
-        // Buttons
-        if (btnSalvar != null) btnSalvar.setOnAction(e -> handleSalvar());
-        if (btnLimpar != null) btnLimpar.setOnAction(e -> clearFields());
-
-        if (tfSearch != null) {
-            tfSearch.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                switch (event.getCode()) {
-                    case ENTER:
-                        event.consume();
-                        break;
-                    default:
-                        break;
+        // Badge visual para Status
+        colStatus.setCellFactory(col -> new TableCell<>() {
+            private final Label lbl = new Label();
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
+                    setGraphic(null);
+                } else {
+                    lbl.setText(status);
+                    lbl.setStyle("-fx-padding: 4 10; -fx-background-radius: 16; -fx-font-size: 12;");
+                    String s = status.toLowerCase();
+                    if (s.contains("ativo")) {
+                        lbl.setStyle(lbl.getStyle() + "-fx-background-color: #dff3e6; -fx-text-fill: #1f7a3a;");
+                    } else {
+                        lbl.setStyle(lbl.getStyle() + "-fx-background-color: #ffe6e9; -fx-text-fill: #a21d2b;");
+                    }
+                    setGraphic(lbl);
                 }
-            });
-        }
+            }
+        });
 
-        // Sample data
-        masterData.add(new Cliente("Ana Clara Souza", "123.456.789-00", "(11) 98765-4321", "ana.souza@example.com"));
-        masterData.add(new Cliente("Bruno Mendes Comércio LTDA", "98.765.432/0001-10", "(21) 91234-5678", "contato@brunomendes.com"));
-        masterData.add(new Cliente("Carlos Eduardo Lima", "111.222.333-44", "(31) 95555-4444", "carlos.lima@example.com"));
-        masterData.add(new Cliente("Daniela Ferreira", "555.666.777-88", "(41) 98888-7777", "daniela.f@example.com"));
+        // Coluna de Ações (editar / excluir)
+        colAcoes.setCellFactory(col -> new TableCell<>() {
+            private final Button btnEdit = new Button("✏");
+            private final Button btnDelete = new Button("🗑");
+            private final HBox box = new HBox(8, btnEdit, btnDelete);
+
+            {
+                btnEdit.setStyle("-fx-background-color: transparent; -fx-font-size: 14;");
+                btnDelete.setStyle("-fx-background-color: transparent; -fx-font-size: 14;");
+
+                btnEdit.setOnAction(e -> {
+                    Cliente c = getTableView().getItems().get(getIndex());
+                    if (c != null) editarCliente(c);
+                });
+
+                btnDelete.setOnAction(e -> {
+                    Cliente c = getTableView().getItems().get(getIndex());
+                    if (c != null) excluirCliente(c);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : box);
+            }
+        });
+
+        // Dados de exemplo
+        masterList.addAll(
+                new Cliente(generateId(), "João da Silva", "123.456.789-00", "(11) 98765-4321", "joao@mail.com", "Ativo"),
+                new Cliente(generateId(), "Maria Oliveira", "12.345.678/0001-90", "(21) 91234-5678", "maria@mail.com", "Ativo"),
+                new Cliente(generateId(), "Carlos Pereira", "987.654.321-00", "(31) 99999-8888", "carlos@mail.com", "Inativo")
+        );
+
+        tableClientes.setItems(FXCollections.observableArrayList(masterList));
+
+        // Configurar cbStatus (form) e cbStatusFiltro (filtro)
+        cbStatus.getItems().addAll("Ativo", "Inativo");
+        cbStatus.getSelectionModel().select("Ativo");
+
+        cbStatusFiltro.getItems().addAll("Todos", "Ativo", "Inativo");
+        cbStatusFiltro.getSelectionModel().select("Todos");
+        cbStatusFiltro.setOnAction(e -> filtrar());
+
+        // Busca em tempo real
+        tfBusca.textProperty().addListener((obs, oldV, newV) -> filtrar());
     }
 
-    private void handleSalvar() {
-        String nome = safeText(tfNome);
-        String documento = safeText(tfDocumento);
-        String telefone = safeText(tfTelefone);
-        String email = safeText(tfEmail);
+    // botão cadastrar (onAction="#onCadastrarCliente")
+    @FXML
+    private void onCadastrarCliente() {
+        String nome = tfNome.getText() == null ? "" : tfNome.getText().trim();
+        String cpf = tfCpfCnpj.getText() == null ? "" : tfCpfCnpj.getText().trim();
+        String contato = tfContato.getText() == null ? "" : tfContato.getText().trim();
+        String email = tfEmail.getText() == null ? "" : tfEmail.getText().trim();
+        String status = cbStatus.getValue() == null ? "Ativo" : cbStatus.getValue();
 
-        if (nome.isEmpty()) {
-            alertWarning("Nome obrigatório", "Informe o nome completo ou razão social do cliente.");
+        if (nome.isEmpty() || cpf.isEmpty()) {
+            alert("Nome e CPF/CNPJ são obrigatórios.");
             return;
         }
 
-        Cliente novo = new Cliente(nome, documento, telefone, email);
-        masterData.add(novo);
-        clearFields();
+        Cliente novo = new Cliente(generateId(), nome, cpf, contato, email, status);
+        masterList.add(novo);
+        limparFormulario();
+        filtrar();
     }
 
-    private String safeText(TextField tf) {
-        return tf == null ? "" : (tf.getText() == null ? "" : tf.getText().trim());
+    // botão "+ Novo Cliente" — limpa e foca
+    @FXML
+    private void onAbrirFormNovo() {
+        limparFormulario();
+        tfNome.requestFocus();
     }
 
-    private void clearFields() {
-        if (tfNome != null) tfNome.clear();
-        if (tfDocumento != null) tfDocumento.clear();
-        if (tfTelefone != null) tfTelefone.clear();
-        if (tfEmail != null) tfEmail.clear();
-        if (tfNome != null) tfNome.requestFocus();
+    // editar: preenche o formulário e remove temporariamente da lista
+    private void editarCliente(Cliente c) {
+        tfNome.setText(c.getNome());
+        tfCpfCnpj.setText(c.getCpfCnpj());
+        tfContato.setText(c.getContato());
+        tfEmail.setText(c.getEmail());
+        cbStatus.setValue(c.getStatus());
+
+        // remove para que, ao salvar, o item seja re-adicionado (estratégia simples)
+        masterList.remove(c);
+        filtrar();
     }
 
-    private void alertWarning(String title, String message) {
-        Alert a = new Alert(Alert.AlertType.WARNING);
-        a.setTitle(title);
-        a.setHeaderText(null);
-        a.setContentText(message);
-        a.showAndWait();
-    }
-
-    // Modelo interno simples
-    public static class Cliente {
-        private final SimpleStringProperty nome = new SimpleStringProperty("");
-        private final SimpleStringProperty documento = new SimpleStringProperty("");
-        private final SimpleStringProperty contato = new SimpleStringProperty("");
-        private final SimpleStringProperty email = new SimpleStringProperty("");
-
-        public Cliente() {}
-
-        public Cliente(String nome, String documento, String contato, String email) {
-            this.nome.set(nome);
-            this.documento.set(documento);
-            this.contato.set(contato);
-            this.email.set(email);
+    // excluir com confirmação
+    private void excluirCliente(Cliente c) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setTitle("Confirmar exclusão");
+        a.setHeaderText("Excluir cliente?");
+        a.setContentText("Deseja realmente excluir " + c.getNome() + "?");
+        Optional<ButtonType> res = a.showAndWait();
+        if (res.isPresent() && res.get() == ButtonType.OK) {
+            masterList.remove(c);
+            filtrar();
         }
+    }
 
-        public String getNome() { return nome.get(); }
-        public void setNome(String v) { nome.set(v); }
-        public SimpleStringProperty nomeProperty() { return nome; }
+    // filtra por busca e status
+    private void filtrar() {
+        String q = tfBusca.getText() == null ? "" : tfBusca.getText().toLowerCase().trim();
+        String statusFiltro = cbStatusFiltro.getValue() == null ? "Todos" : cbStatusFiltro.getValue();
 
-        public String getDocumento() { return documento.get(); }
-        public void setDocumento(String v) { documento.set(v); }
-        public SimpleStringProperty documentoProperty() { return documento; }
+        ObservableList<Cliente> shown = FXCollections.observableArrayList();
+        for (Cliente c : masterList) {
+            boolean matchBusca = q.isEmpty()
+                    || (c.getNome() != null && c.getNome().toLowerCase().contains(q))
+                    || (c.getCpfCnpj() != null && c.getCpfCnpj().toLowerCase().contains(q))
+                    || (c.getId() != null && c.getId().toLowerCase().contains(q));
+            boolean matchStatus = statusFiltro.equals("Todos") || (c.getStatus() != null && c.getStatus().equalsIgnoreCase(statusFiltro));
+            if (matchBusca && matchStatus) shown.add(c);
+        }
+        tableClientes.setItems(shown);
+    }
 
-        public String getContato() { return contato.get(); }
-        public void setContato(String v) { contato.set(v); }
-        public SimpleStringProperty contatoProperty() { return contato; }
+    private void limparFormulario() {
+        tfNome.clear();
+        tfCpfCnpj.clear();
+        tfContato.clear();
+        tfEmail.clear();
+        tfEndereco.clear();
+        cbStatus.getSelectionModel().select("Ativo");
+    }
 
-        public String getEmail() { return email.get(); }
-        public void setEmail(String v) { email.set(v); }
-        public SimpleStringProperty emailProperty() { return email; }
+    private void alert(String msg) {
+        new Alert(Alert.AlertType.WARNING, msg, ButtonType.OK).showAndWait();
+    }
+
+    private String generateId() {
+        idCounter++;
+        return "#C" + idCounter;
     }
 }
