@@ -9,122 +9,94 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controller.VendaController"
-            prefWidth="1000" prefHeight="720">
+<AnchorPane prefHeight="720" prefWidth="1000" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VendaController">
 
     <children>
 
-        <VBox spacing="16"
-              AnchorPane.topAnchor="10"
-              AnchorPane.leftAnchor="10"
-              AnchorPane.rightAnchor="10"
-              AnchorPane.bottomAnchor="10">
+        <VBox layoutX="4.8" layoutY="8.0" prefHeight="702.0" prefWidth="985.0" spacing="16" AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="8.0">
 
             <padding>
-                <Insets top="12" right="12" bottom="12" left="12"/>
+                <Insets bottom="12" left="12" right="12" top="12" />
             </padding>
-
-            <!-- TÍTULO -->
-            <Label text="Vendas" style="-fx-font-size:22px; -fx-font-weight:bold;"/>
-            <Label text="Gerencie, registre e visualize as vendas realizadas."
-                   style="-fx-text-fill:#555;"/>
+         <Label text="Vendas">
+            <font>
+               <Font name="System Bold" size="28.0" />
+            </font>
+         </Label>
+            <Label prefHeight="18.0" prefWidth="266.0" style="-fx-text-fill:#555;" text="Gerencie, registre e visualize as vendas realizadas." />
 
             <!-- CARD DE REGISTRO -->
-            <VBox spacing="12"
-                  style="-fx-background-color:white; -fx-padding:16;
-                         -fx-border-color:#ddd; -fx-border-radius:6;
-                         -fx-background-radius:6;">
+            <VBox spacing="12" style="-fx-background-color:white; -fx-padding:16;                          -fx-border-color:#ddd; -fx-border-radius:6;                          -fx-background-radius:6;">
 
-                <Label text="Registrar Nova Venda" style="-fx-font-size:16px; -fx-font-weight:bold;"/>
-                <Label text="Preencha os campos abaixo para registrar uma nova venda."
-                       style="-fx-text-fill:#777;"/>
+                <Label style="-fx-font-size:16px; -fx-font-weight:bold;" text="Registrar Nova Venda" />
+                <Label style="-fx-text-fill:#777;" text="Preencha os campos abaixo para registrar uma nova venda." />
 
                 <GridPane hgap="12" vgap="12">
 
                     <columnConstraints>
-                        <ColumnConstraints percentWidth="25"/>
-                        <ColumnConstraints percentWidth="25"/>
-                        <ColumnConstraints percentWidth="25"/>
-                        <ColumnConstraints percentWidth="25"/>
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
                     </columnConstraints>
 
                     <!-- LINHA 1 -->
-                    <Label text="Cliente:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtCliente"
-                               promptText="Nome do cliente"
-                               GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <Label text="Cliente:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <TextField fx:id="txtCliente" promptText="Nome do cliente" GridPane.columnIndex="0" GridPane.rowIndex="1" />
 
-                    <Label text="Produtos:"
-                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtProdutos"
-                               promptText="Ex: Vela Aromática, Incenso"
-                               GridPane.columnIndex="1" GridPane.rowIndex="1"
-                               GridPane.columnSpan="3"/>
+                    <Label text="Produtos:" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <TextField fx:id="txtProdutos" promptText="Ex: Vela Aromática, Incenso" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1" />
 
                     <!-- LINHA 2 -->
-                    <Label text="Quantidade:"
-                           GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                    <TextField fx:id="txtQuantidade"
-                               promptText="Ex: 2"
-                               GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <Label text="Quantidade:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <TextField fx:id="txtQuantidade" promptText="Ex: 2" GridPane.columnIndex="0" GridPane.rowIndex="3" />
 
-                    <Label text="Valor Total (R$):"
-                           GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                    <TextField fx:id="txtValor"
-                               promptText="Ex: 25,50"
-                               GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                    <Label text="Valor Total (R$):" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <TextField fx:id="txtValor" promptText="Ex: 25,50" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                    <Label text="Data:"
-                           GridPane.columnIndex="2" GridPane.rowIndex="2"/>
-                    <DatePicker fx:id="datePickerVenda"
-                                GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+                    <Label text="Data:" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                    <DatePicker fx:id="datePickerVenda" GridPane.columnIndex="2" GridPane.rowIndex="3" />
 
-                    <Label text="Forma de Pagamento:"
-                           GridPane.columnIndex="3" GridPane.rowIndex="2"/>
-                    <ComboBox fx:id="comboPagamento"
-                              promptText="Selecione"
-                              GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+                    <Label text="Forma de Pagamento:" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                    <ComboBox fx:id="comboPagamento" promptText="Selecione" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
 
                 </GridPane>
 
                 <!-- BOTÃO FUNCIONANDO -->
                 <HBox alignment="CENTER">
-                    <Button fx:id="btnAdicionar"
-                            text="+ Adicionar Venda"
-                            onAction="#onAdicionar"
-                            style="-fx-background-color:#c48b0b; -fx-text-fill:white;
-                                   -fx-font-weight:bold; -fx-padding:12 24;
-                                   -fx-background-radius:6;"/>
+                    <Button fx:id="btnAdicionar" onAction="#onAdicionar" style="-fx-background-color:#c48b0b; -fx-text-fill:white;                                    -fx-font-weight:bold; -fx-padding:12 24;                                    -fx-background-radius:6;" text="+ Adicionar Venda" />
                 </HBox>
 
             </VBox>
 
             <!-- CAMPO DE BUSCA -->
             <HBox spacing="10">
-                <TextField fx:id="txtBusca"
-                           promptText="Buscar por cliente ou ID…"
-                           prefWidth="750"/>
-                <ComboBox fx:id="comboFiltroStatus"
-                          promptText="Filtrar Status"/>
+                <TextField fx:id="txtBusca" prefWidth="750" promptText="Buscar por cliente ou ID…" />
+                <ComboBox fx:id="comboFiltroStatus" promptText="Filtrar Status" />
             </HBox>
 
             <!-- TABELA -->
             <TableView fx:id="tableVendas" prefHeight="360">
                 <columns>
-                    <TableColumn fx:id="colId" text="ID DA VENDA" prefWidth="120"/>
-                    <TableColumn fx:id="colCliente" text="CLIENTE" prefWidth="260"/>
-                    <TableColumn fx:id="colData" text="DATA" prefWidth="140"/>
-                    <TableColumn fx:id="colValor" text="VALOR TOTAL" prefWidth="140"/>
-                    <TableColumn fx:id="colStatus" text="STATUS" prefWidth="120"/>
-                    <TableColumn fx:id="colAcoes" text="AÇÕES" prefWidth="120"/>
+                    <TableColumn fx:id="colId" prefWidth="120" text="ID DA VENDA" />
+                    <TableColumn fx:id="colCliente" prefWidth="260" text="CLIENTE" />
+                    <TableColumn fx:id="colData" prefWidth="140" text="DATA" />
+                    <TableColumn fx:id="colValor" prefWidth="140" text="VALOR TOTAL" />
+                    <TableColumn fx:id="colStatus" prefWidth="120" text="STATUS" />
+                    <TableColumn fx:id="colAcoes" prefWidth="120" text="AÇÕES" />
                 </columns>
             </TableView>
 

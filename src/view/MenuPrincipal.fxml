@@ -13,7 +13,7 @@
 
 <!-- CONTROLADOR CONFIGURADO AQUI -->
 
-<AnchorPane prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuController">
+<AnchorPane prefHeight="680.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuController">
 
    <children>
       <BorderPane layoutX="146.0" layoutY="65.0" prefHeight="419.0" prefWidth="730.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -30,7 +30,7 @@
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../../../Downloads/usuario.png" />
+                                    <Image url="@../img/usuario.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -39,7 +39,7 @@
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../../../Downloads/fornecedor%20(1).png" />
+                                    <Image url="@../img/fornecedor.png" />
                                  </image>
                               </ImageView>
                            </graphic></JFXButton>
@@ -47,7 +47,7 @@
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../../../Downloads/central-de-atendimento.png" />
+                                    <Image url="@../img/adicionar-amigo.png" />
                                  </image>
                               </ImageView>
                            </graphic></JFXButton>
@@ -55,7 +55,7 @@
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../../../Downloads/verificar.png" />
+                                    <Image url="@../img/venda.png" />
                                  </image>
                               </ImageView>
                            </graphic></JFXButton>
@@ -123,7 +123,7 @@
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../../../Downloads/fornecedor%20(1).png" />
+                                    <Image url="@../img/fornecedor.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -132,7 +132,7 @@
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../../../Downloads/usuario.png" />
+                                    <Image url="@../img/usuario.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -144,7 +144,7 @@
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../../../Downloads/central-de-atendimento.png" />
+                                    <Image url="@../img/adicionar-amigo.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -156,7 +156,7 @@
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../../../Downloads/verificar.png" />
+                                    <Image url="@../img/venda.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -169,9 +169,12 @@
                </children>
             </AnchorPane>
          </left>
-
          <center>
-            <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+            <ImageView fitHeight="255.0" fitWidth="259.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+               <image>
+                  <Image url="@../img/LogoPreto.png" />
+               </image>
+            </ImageView>
          </center>
       </BorderPane>
    </children>

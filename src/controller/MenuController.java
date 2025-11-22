@@ -3,43 +3,56 @@ package controller;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import com.jfoenix.controls.JFXButton;
+
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public class MenuController implements Initializable {
 
-    @FXML private Label Menu;         // ícone ☰ abrir sidebar
-    @FXML private Label MenuClose;    // ícone ✕ fechar sidebar
+ 
+	@FXML private Label Menu;
+    @FXML private Label MenuClose;
     @FXML private AnchorPane Slider;
+    @FXML private JFXButton btClientes;
+    @FXML private JFXButton btEstoque;
+    @FXML private JFXButton btFornecedores;
+    @FXML private JFXButton btProdutos;
+    @FXML private JFXButton btUsuarios;
+    @FXML private JFXButton btVendas;
 
-    @FXML private Button btProdutos;
-    @FXML private Button btEstoque;
+	
+// fx:id="Slider"     (sidebar)
 
-    private static final double SIDEBAR_WIDTH = 176;
+    private static final double SIDEBAR_WIDTH = 176; // ajuste se a largura for outra
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
+        // começa fora da tela
         Slider.setTranslateX(-SIDEBAR_WIDTH);
 
+        // ponteiros de clique (opcional)
         Menu.setCursor(Cursor.HAND);
         MenuClose.setCursor(Cursor.HAND);
+       
 
+        // estado inicial: mostra abrir, esconde fechar
         Menu.setVisible(true);
         MenuClose.setVisible(false);
+
+        
 
         Menu.setOnMouseClicked(e -> openSidebar());
         MenuClose.setOnMouseClicked(e -> closeSidebar());
@@ -48,7 +61,7 @@ public class MenuController implements Initializable {
     private void openSidebar() {
         TranslateTransition slide = new TranslateTransition(Duration.seconds(0.4), Slider);
         slide.setToX(0);
-        slide.setOnFinished(e -> {
+        slide.setOnFinished((ActionEvent e) -> {
             Menu.setVisible(false);
             MenuClose.setVisible(true);
         });
@@ -58,63 +71,98 @@ public class MenuController implements Initializable {
     private void closeSidebar() {
         TranslateTransition slide = new TranslateTransition(Duration.seconds(0.4), Slider);
         slide.setToX(-SIDEBAR_WIDTH);
-        slide.setOnFinished(e -> {
+        slide.setOnFinished((ActionEvent e) -> {
             Menu.setVisible(true);
             MenuClose.setVisible(false);
         });
         slide.play();
     }
+        
+        public void OnBtProdutosClick (ActionEvent event) {
+			try {
+			           
+			    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Produtos.fxml"));
+			    Parent root = loader.load();
+			    Stage stage = new Stage();
+			    stage.setTitle("Nova Tela");
+			    stage.setScene(new Scene(root));
+			    stage.show();
 
-    // Método utilitário para abrir uma nova view com barra de título (X)
-    private void openView(String fxmlPath, String title, ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
+			    } catch (IOException e) {
+			            e.printStackTrace();
+			    }
+			    }
+			
+			public void OnBtEstoqueClick (ActionEvent event) {
+				try {
+				           
+				    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Estoque.fxml"));
+				    Parent root = loader.load();
+				    Stage stage = new Stage();
+				    stage.setTitle("Nova Tela");
+				    stage.setScene(new Scene(root));
+				    stage.show();
 
-            Stage stage = new Stage();
-            stage.setTitle(title);
-            stage.setScene(scene);
+				    } catch (IOException e) {
+				            e.printStackTrace();
+				    }
+			}
+			public void OnBtFornecedoresClick (ActionEvent event) {
+				try {
+				           
+				    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Fornecedores.fxml"));
+				    Parent root = loader.load();
+				    Stage stage = new Stage();
+				    stage.setTitle("Nova Tela");
+				    stage.setScene(new Scene(root));
+				    stage.show();
 
-            // garante barra com X
-            stage.initStyle(StageStyle.DECORATED);
+				    } catch (IOException e) {
+				            e.printStackTrace();
+				    }
+				    }
+			public void OnBtClientesClick (ActionEvent event) {
+				try {
+				           
+				    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Clientes.fxml"));
+				    Parent root = loader.load();
+				    Stage stage = new Stage();
+				    stage.setTitle("Nova Tela");
+				    stage.setScene(new Scene(root));
+				    stage.show();
 
-            // define janela pai (melhor comportamento de foco)
-            if (event != null && event.getSource() instanceof Node) {
-                Stage owner = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                stage.initOwner(owner);
-            }
+				    } catch (IOException e) {
+				            e.printStackTrace();
+				    }
+				    }
+			public void OnBtUsuariosClick (ActionEvent event) {
+				try {
+				           
+				    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Usuarios.fxml"));
+				    Parent root = loader.load();
+				    Stage stage = new Stage();
+				    stage.setTitle("Nova Tela");
+				    stage.setScene(new Scene(root));
+				    stage.show();
 
-            stage.show();
+				    } catch (IOException e) {
+				            e.printStackTrace();
+				    }
+				    }
+			public void OnBtVendasClick (ActionEvent event) {
+				try {
+				           
+				    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Vendas.fxml"));
+				    Parent root = loader.load();
+				    Stage stage = new Stage();
+				    stage.setTitle("Nova Tela");
+				    stage.setScene(new Scene(root));
+				    stage.show();
 
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+				    } catch (IOException e) {
+				            e.printStackTrace();
+				    }
+				    }
+			
     }
 
-    // BOTÕES DO MENU – todos usando openView()
-
-    public void OnBtProdutosClick(ActionEvent event) {
-        openView("/view/Produtos.fxml", "Produtos", event);
-    }
-
-    public void OnBtEstoqueClick(ActionEvent event) {
-        openView("/view/Estoque.fxml", "Estoque", event);
-    }
-
-    public void OnBtFornecedoresClick(ActionEvent event) {
-        openView("/view/Fornecedores.fxml", "Fornecedores", event);
-    }
-
-    public void OnBtClientesClick(ActionEvent event) {
-        openView("/view/Clientes.fxml", "Clientes", event);
-    }
-
-    public void OnBtUsuariosClick(ActionEvent event) {
-        openView("/view/Usuarios.fxml", "Usuários", event);
-    }
-
-    public void OnBtVendasClick(ActionEvent event) {
-        openView("/view/Vendas.fxml", "Vendas", event);
-    }
-}

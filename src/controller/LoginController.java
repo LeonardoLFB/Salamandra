@@ -1,6 +1,6 @@
 package controller;
 
-import java.awt.MenuItem;
+import javafx.scene.control.MenuItem;
 import java.io.IOException;
 import java.util.Optional;
 import javax.swing.JOptionPane;
@@ -33,11 +33,6 @@ public class LoginController {
     private TextField tfLogin;
     @FXML
     private Hyperlink btEsqueciSenha;
-    @FXML
-    private MenuItem btAdministrador;
-    @FXML
-    private MenuItem btFuncionario;
-
 
 
     @FXML
