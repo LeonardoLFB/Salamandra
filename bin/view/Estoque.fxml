@@ -8,11 +8,8 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane prefHeight="680.0" prefWidth="900.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.EstoqueController">
@@ -26,50 +23,6 @@
             <Label style="-fx-text-fill:#6B7280;" text="Gerencie os produtos, quantidades e preços do seu inventário." />
         </VBox>
 
-        <!-- Card: Formulário de cadastro -->
-        <VBox spacing="12" style="-fx-background-color:white; -fx-padding:18; -fx-background-radius:8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 8, 0, 0, 2);">
-
-            <Label style="-fx-font-size:16px; -fx-font-weight:600;" text="Cadastrar Novo Produto" />
-
-            <GridPane hgap="12" vgap="12">
-                <columnConstraints>
-                    <ColumnConstraints hgrow="ALWAYS" percentWidth="60" />
-                    <ColumnConstraints hgrow="ALWAYS" percentWidth="20" />
-                    <ColumnConstraints hgrow="ALWAYS" percentWidth="20" />
-                </columnConstraints>
-
-                <!-- Linha 0 -->
-                <Label text="Nome do Produto" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <Label text="Código" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                <Label text="Quantidade" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-
-                <TextField fx:id="txtNomeProduto" promptText="Ex: Incenso de Sândalo" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                <TextField fx:id="txtCodigo" promptText="Ex: INC001" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <TextField fx:id="txtQuantidade" promptText="Ex: 50" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-
-                <!-- Linha 2 -->
-                <Label text="Preço de Custo (R$)" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                <Label text="Preço de Venda (R$)" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                <Label text="Status de Estoque" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-
-                <TextField fx:id="txtPrecoCusto" promptText="Ex: 5.50" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                <TextField fx:id="txtPrecoVenda" promptText="Ex: 9.90" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                <ComboBox fx:id="cbStatusProduto" promptText="Em estoque / Baixo / Fora" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-
-                <!-- Botão cadastrar alinhado à direita -->
-                <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4">
-                    <Button fx:id="btnCadastrarProduto" style="-fx-background-color:#B1812C; -fx-text-fill:white; -fx-background-radius:8; -fx-padding:8 16;" text="Cadastrar Produto" />
-                </HBox>
-            <rowConstraints>
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-            </rowConstraints>
-            </GridPane>
-        </VBox>
-
         <!-- Card: Busca / filtros -->
         <VBox spacing="10" style="-fx-background-color:white; -fx-padding:12; -fx-background-radius:8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 6, 0, 0, 1);">
             <HBox alignment="CENTER_LEFT" spacing="12">
@@ -78,19 +31,20 @@
                 </HBox>
 
                 <ComboBox fx:id="cbFiltroStatus" prefWidth="160" promptText="Filtrar Status" />
-                <Button fx:id="btnNovoProduto" style="-fx-background-color:#B1812C; -fx-text-fill:white; -fx-background-radius:8; -fx-padding:8 14;" text="+ Novo Produto" />
+                <Button fx:id="btnAtualizar" style="-fx-background-color:#B1812C; -fx-text-fill:white; -fx-background-radius:8; -fx-padding:8 14;" text="🔄 Atualizar" />
             </HBox>
         </VBox>
 
         <!-- Tabela de produtos -->
-        <TableView fx:id="productTable" prefHeight="420" style="-fx-background-radius:8; -fx-background-color:white;">
+        <TableView fx:id="productTable" prefHeight="500" style="-fx-background-radius:8; -fx-background-color:white;" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="colNomeProduto" prefWidth="350.40002477169037" text="Nome do Produto" />
-                <TableColumn fx:id="colCodigo" prefWidth="155.20004272460938" text="Código" />
-                <TableColumn fx:id="colQuantidade" prefWidth="139.19992065429688" text="Quantidade" />
-                <TableColumn fx:id="colPreco" minWidth="0.0" prefWidth="103.199951171875" text="Preço (R$)" />
-                <TableColumn fx:id="colStatus" prefWidth="205.60009765625" text="Status" />
-                <TableColumn fx:id="colAcoes" prefWidth="120" text="Ações" />
+                <TableColumn fx:id="colNomeProduto" prefWidth="280" text="Nome do Produto" />
+                <TableColumn fx:id="colCodigo" prefWidth="120" text="Código" />
+                <TableColumn fx:id="colQuantidade" prefWidth="100" text="Quantidade" />
+                <TableColumn fx:id="colPrecoCusto" prefWidth="110" text="Preço Custo" />
+                <TableColumn fx:id="colPrecoVenda" prefWidth="110" text="Preço Venda" />
+                <TableColumn fx:id="colLote" prefWidth="100" text="Lote" />
+                <TableColumn fx:id="colAcoes" prefWidth="80" text="Ações" />
             </columns>
         </TableView>
 
@@ -98,7 +52,7 @@
         <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-background-color:white; -fx-padding:10; -fx-background-radius:8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.02), 4, 0, 0, 1);">
             <Label fx:id="lblStatus" text="Pronto" />
             <Region HBox.hgrow="ALWAYS" />
-            <Label text="Total de itens:" />
+            <Label text="Total de produtos:" />
             <Label fx:id="lblTotalItens" text="0" />
             <Separator orientation="VERTICAL" />
             <Label text="Valor total em estoque: R$" />

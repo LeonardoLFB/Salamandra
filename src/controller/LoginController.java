@@ -1,28 +1,22 @@
 package controller;
 
-import javafx.scene.control.MenuItem;
-import java.io.IOException;
 import java.util.Optional;
-import javax.swing.JOptionPane;
-import application.Main; // ✅ IMPORTANTE
 
+import application.Main;
+import database.UsuarioDAO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.stage.Stage;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-
+import model.Usuario;
 
 public class LoginController {
-
+    
     @FXML
     private Button btCancelar;
     @FXML
@@ -33,8 +27,16 @@ public class LoginController {
     private TextField tfLogin;
     @FXML
     private Hyperlink btEsqueciSenha;
-
-
+    
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    
+    // Método chamado automaticamente quando a tela carrega
+    @FXML
+    public void initialize() {
+        // Garante que existe um usuário admin
+        usuarioDAO.criarUsuarioPadrao();
+    }
+    
     @FXML
     void onClickCancelar(ActionEvent event) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -42,44 +44,56 @@ public class LoginController {
         alert.setHeaderText("Deseja realmente sair?");
         alert.setContentText("Clique em OK para confirmar.");
         Optional<ButtonType> result = alert.showAndWait();
-
+        
         if (result.isPresent() && result.get() == ButtonType.OK) {
             System.exit(0);
         }
     }
-
+    
     @FXML
     void onClickLogar(ActionEvent event) {
-        if (tfLogin.getText().isEmpty() || pfSenha.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Preencha os dois campos!");
-        } 
-        else if (tfLogin.getText().equals("fatec") && pfSenha.getText().equals("fatec")) {
-
-            // Troca de tela 
-            Main.goTo("/view/MenuPrincipal.fxml");
-
-        } 
-        else {
-            JOptionPane.showMessageDialog(null, "Credenciais inválidas");
-            tfLogin.requestFocus();
-        }
+        String login = tfLogin.getText();
+        String senha = pfSenha.getText();
+        
+        if (login.isEmpty() || senha.isEmpty()) {
+            Alert alert = new Alert(AlertType.WARNING);
+            alert.setTitle("Campos Vazios");
+            alert.setHeaderText(null);
+            alert.setContentText("Por favor, preencha login e senha!");
+            alert.showAndWait();
+            return;
         }
         
-        @FXML
-        void onClickEsqueciSenha(ActionEvent event) {
-        	try {
-		           
-		        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Recuperação de Senha.fxml"));
-		        Parent root = loader.load();
-		        Stage stage = new Stage();
-		        stage.setTitle("Nova Tela");
-		        stage.setScene(new Scene(root));
-		        stage.show();
-
-		        } catch (IOException e) {
-		            e.printStackTrace();
-		        }
-		   }
-		        
+        try {
+            Usuario usuario = usuarioDAO.autenticar(login, senha);
+            
+            if (usuario != null) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Login");
+                alert.setHeaderText("Bem-vindo!");
+                alert.setContentText("Login realizado com sucesso!\nUsuário: " + usuario.getNome());
+                alert.showAndWait();
+                
+                Main.goTo("/view/MenuPrincipal.fxml");
+                
+            } else {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Erro de Login");
+                alert.setHeaderText("Credenciais Inválidas");
+                alert.setContentText("Login ou senha incorretos!");
+                alert.showAndWait();
+                
+                pfSenha.clear();
+                tfLogin.requestFocus();
+            }
+            
+        } catch (Exception e) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText("Erro ao conectar ao banco de dados");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+            e.printStackTrace();
+        }
     }
-
+}

@@ -15,78 +15,123 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="680.0" prefWidth="900.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.UsuariosController">
+<AnchorPane prefHeight="680.0" prefWidth="900.0"
+	style="-fx-background-color: #F3F4F6;"
+	xmlns="http://javafx.com/javafx/24.0.1"
+	xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="controller.UsuariosController">
 
-    <!-- CONTAINER PRINCIPAL -->
-    <VBox spacing="18" AnchorPane.bottomAnchor="18" AnchorPane.leftAnchor="18" AnchorPane.rightAnchor="18" AnchorPane.topAnchor="18">
+	<!-- CONTAINER PRINCIPAL -->
+	<VBox spacing="18" AnchorPane.bottomAnchor="18"
+		AnchorPane.leftAnchor="18" AnchorPane.rightAnchor="18"
+		AnchorPane.topAnchor="18">
 
-        <!-- CABEÇALHO -->
-        <VBox spacing="6">
-         <Label text="Usuário">
-            <font>
-               <Font name="System Bold" size="28.0" />
-            </font>
-         </Label>
-            <Label style="-fx-text-fill:#6B7280;" text="Gerencie os usuários e suas permissões de acesso ao sistema." />
-        </VBox>
+		<!-- CABEÇALHO -->
+		<VBox spacing="6">
+			<Label text="Usuário">
+				<font>
+					<Font name="System Bold" size="28.0" />
+				</font>
+			</Label>
+			<Label style="-fx-text-fill:#6B7280;"
+				text="Gerencie os usuários e suas permissões de acesso ao sistema." />
+		</VBox>
 
-        <!-- FORMULÁRIO DE CADASTRO (card) -->
-        <VBox spacing="12" style="-fx-background-color:white; -fx-padding:18; -fx-background-radius:8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 8, 0, 0, 2);">
-            <Label style="-fx-font-size:16px; -fx-font-weight:600;" text="Cadastrar Novo Usuário" />
+		<!-- FORMULÁRIO DE CADASTRO (card) -->
+		<VBox spacing="12"
+			style="-fx-background-color:white; -fx-padding:18; -fx-background-radius:8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+			<Label style="-fx-font-size:16px; -fx-font-weight:600;"
+				text="Cadastrar Novo Usuário" />
 
-            <GridPane hgap="12" vgap="12">
-                <columnConstraints>
-                    <ColumnConstraints hgrow="ALWAYS" percentWidth="45" />
-                    <ColumnConstraints hgrow="ALWAYS" percentWidth="30" />
-                    <ColumnConstraints hgrow="ALWAYS" percentWidth="25" />
-                </columnConstraints>
+			<GridPane hgap="12" vgap="12">
+				<columnConstraints>
+					<ColumnConstraints hgrow="ALWAYS"
+						percentWidth="45" />
+					<ColumnConstraints hgrow="ALWAYS"
+						percentWidth="30" />
+					<ColumnConstraints hgrow="ALWAYS"
+						percentWidth="25" />
+				</columnConstraints>
 
-                <!-- Linha 0 -->
-                <Label text="Nome Completo" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <Label text="E-mail" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                <Label text="Senha" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+				<!-- Linha 0 -->
+				<Label text="Nome Completo" GridPane.columnIndex="0"
+					GridPane.rowIndex="0" />
+				<Label text="Login" GridPane.columnIndex="1"
+					GridPane.rowIndex="0" />
+				<Label text="Senha" GridPane.columnIndex="2"
+					GridPane.rowIndex="0" />
 
-                <TextField fx:id="txtNome" promptText="Ex: Maria da Silva" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                <TextField fx:id="txtEmail" promptText="Ex: maria.silva@email.com" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <PasswordField fx:id="txtSenha" promptText="••••••" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+				<TextField fx:id="txtNome" promptText="Ex: Maria da Silva"
+					GridPane.columnIndex="0" GridPane.rowIndex="1" />
+				<TextField fx:id="txtLogin" promptText="Ex: maria.silva"
+					GridPane.columnIndex="1" GridPane.rowIndex="1" />
+				<PasswordField fx:id="txtSenha" promptText="••••••"
+					GridPane.columnIndex="2" GridPane.rowIndex="1" />
 
-                <!-- Linha 2 -->
-                <Label text="Nível de Acesso" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                <HBox spacing="10" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="3">
-                    <ComboBox fx:id="cbNivelAcesso" prefWidth="260" promptText="Selecione o nível" />
-                    <Button fx:id="btnCadastrar" style="-fx-background-color:#B1812C; -fx-text-fill:white; -fx-background-radius:8; -fx-padding:8 14;" text="Cadastrar Usuário" />
-                </HBox>
-            <rowConstraints>
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-            </rowConstraints>
-            </GridPane>
-        </VBox>
+				<!-- Linha 2 -->
+				<Label text="Nível de Acesso" GridPane.columnIndex="0"
+					GridPane.rowIndex="2" />
+				<Label text="E-mail" GridPane.columnIndex="1"
+					GridPane.rowIndex="2" />
 
-        <!-- BUSCA / FILTROS (card) -->
-        <VBox spacing="12" style="-fx-background-color:white; -fx-padding:14; -fx-background-radius:8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 6, 0, 0, 1);">
-            <HBox alignment="CENTER_LEFT" spacing="12">
-                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color:#F8FAFB; -fx-padding:10; -fx-background-radius:6;" HBox.hgrow="ALWAYS">
-                    <TextField fx:id="txtBuscar" promptText="Buscar por nome ou e-mail..." HBox.hgrow="ALWAYS" />
-                </HBox>
+				<ComboBox fx:id="cbTipo" prefWidth="260"
+					promptText="Selecione o nível" GridPane.columnIndex="0"
+					GridPane.rowIndex="3" />
 
-                <ComboBox fx:id="cbFiltroNivel" prefWidth="160" promptText="Nível de Acesso" />
-                <ComboBox fx:id="cbFiltroStatus" prefWidth="140" promptText="Status" />
-            </HBox>
-        </VBox>
+				<TextField fx:id="txtEmail"
+					promptText="Ex: maria@email.com" GridPane.columnIndex="1"
+					GridPane.rowIndex="3" />
 
-        <!-- TABELA DE USUÁRIOS -->
-        <TableView fx:id="tableUsuarios" prefHeight="360" style="-fx-background-radius:8; -fx-background-color:white;">
-            <columns>
-                <TableColumn fx:id="colNome" prefWidth="260" text="Nome" />
-                <TableColumn fx:id="colEmail" prefWidth="320" text="E-mail" />
-                <TableColumn fx:id="colNivel" prefWidth="180" text="Nível de Acesso" />
-                <TableColumn fx:id="colStatus" prefWidth="120" text="Status" />
-                <TableColumn fx:id="colAcoes" prefWidth="120" text="Ações" />
-            </columns>
-        </TableView>
+				<!-- Botão Cadastrar ao lado dos campos -->
+				<Button fx:id="btnCadastrar"
+					style="-fx-background-color:#B1812C; -fx-text-fill:white; -fx-background-radius:8; -fx-padding:8 14;"
+					text="Cadastrar Usuário" GridPane.columnIndex="2"
+					GridPane.rowIndex="3" />
 
-    </VBox>
+
+
+				<rowConstraints>
+					<RowConstraints />
+					<RowConstraints />
+					<RowConstraints />
+					<RowConstraints />
+				</rowConstraints>
+			</GridPane>
+		</VBox>
+
+		<!-- BUSCA / FILTROS (card) -->
+		<VBox spacing="12"
+			style="-fx-background-color:white; -fx-padding:14; -fx-background-radius:8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 6, 0, 0, 1);">
+			<HBox alignment="CENTER_LEFT" spacing="12">
+				<HBox alignment="CENTER_LEFT" spacing="8"
+					style="-fx-background-color:#F8FAFB; -fx-padding:10; -fx-background-radius:6;"
+					HBox.hgrow="ALWAYS">
+					<TextField fx:id="txtBuscar"
+						promptText="Buscar por nome ou e-mail..." HBox.hgrow="ALWAYS" />
+				</HBox>
+
+				<ComboBox fx:id="cbFiltroTipo" prefWidth="160"
+					promptText="Nível de Acesso" />
+				<ComboBox fx:id="cbFiltroStatus" prefWidth="140"
+					promptText="Status" />
+			</HBox>
+		</VBox>
+
+		<!-- TABELA DE USUÁRIOS -->
+		<TableView fx:id="tableUsuarios" prefHeight="360"
+			style="-fx-background-radius:8; -fx-background-color:white;">
+			<columns>
+				<TableColumn fx:id="colNome" prefWidth="260" text="Nome" />
+				<TableColumn fx:id="colUsuario" prefWidth="120"
+					text="Usuario" />
+				<TableColumn fx:id="colEmail" prefWidth="320"
+					text="E-mail" />
+				<TableColumn fx:id="colTipo" prefWidth="180"
+					text="Nível de Acesso" />
+				<TableColumn fx:id="colAcoes" prefWidth="120"
+					text="Ações" />
+			</columns>
+		</TableView>
+
+	</VBox>
 </AnchorPane>
