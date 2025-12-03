@@ -13,6 +13,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import model.Usuario;
 
 public class LoginController {
@@ -35,7 +36,14 @@ public class LoginController {
     public void initialize() {
         // Garante que existe um usuário admin
         usuarioDAO.criarUsuarioPadrao();
+        
+        // Pressionar Enter no campo de login vai para o campo de senha
+        tfLogin.setOnAction(e -> pfSenha.requestFocus());
+        
+        // Pressionar Enter no campo de senha faz o login
+        pfSenha.setOnAction(e -> onClickLogar(null));
     }
+
     
     @FXML
     void onClickCancelar(ActionEvent event) {

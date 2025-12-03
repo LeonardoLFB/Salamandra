@@ -1,96 +1,139 @@
 package model;
 
-/**
- * Modelo que representa um cliente no sistema.
- * Compatível com ClienteController e com a tabela do FXML.
- */
+import java.time.LocalDateTime;
+
 public class Cliente {
+	private int id;
+	private String nome;
+	private String email;
+	private String cpf;
+	private String rua;
+	private String numero;
+	private String bairro;
+	private String cidade;
+	private String estado;
+	private String cep;
+	private LocalDateTime dataCadastro;
+	
+	public Cliente() {
+	}
+	public Cliente(String nome, String email, String cpf, String rua, String numero, String bairro, String cidade,
+			String estado, String cep) {
+		this.nome = nome;
+		this.email = email;
+		this.cpf = cpf;
+		this.rua = rua;
+		this.numero = numero;
+		this.bairro = bairro;
+		this.cidade = cidade;
+		this.estado = estado;
+		this.cep = cep;
+	}
 
-    private String id;
-    private String nome;
-    private String cpfCnpj;
-    private String contato;
-    private String email;
-    private String status;
+	public Cliente(int id, String nome, String email, String cpf, String rua, String numero, String bairro,
+			String cidade, String estado, String cep, LocalDateTime dataCadastro) {
+		this.id = id;
+		this.nome = nome;
+		this.email = email;
+		this.cpf = cpf;
+		this.rua = rua;
+		this.numero = numero;
+		this.bairro = bairro;
+		this.cidade = cidade;
+		this.estado = estado;
+		this.cep = cep;
+		this.dataCadastro = dataCadastro;
+	}
 
-    /** Construtor vazio (requerido para FXML e frameworks). */
-    public Cliente() {}
+	public int getId() {
+		return id;
+	}
 
-    /**
-     * Construtor completo.
-     *
-     * @param id ID único do cliente (ex: #C1001)
-     * @param nome Nome do cliente
-     * @param cpfCnpj CPF ou CNPJ
-     * @param contato Telefone
-     * @param email E-mail
-     * @param status Status ("Ativo" ou "Inativo")
-     */
-    public Cliente(String id, String nome, String cpfCnpj, String contato, String email, String status) {
-        this.id = id;
-        this.nome = nome;
-        this.cpfCnpj = cpfCnpj;
-        this.contato = contato;
-        this.email = email;
-        this.status = status;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    // ---------------------------------------------------------
-    // GETTERS E SETTERS
-    // ---------------------------------------------------------
+	public String getNome() {
+		return nome;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public String getNome() {
-        return nome;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+	public String getCpf() {
+		return cpf;
+	}
 
-    public String getCpfCnpj() {
-        return cpfCnpj;
-    }
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
+	}
 
-    public void setCpfCnpj(String cpfCnpj) {
-        this.cpfCnpj = cpfCnpj;
-    }
+	public String getRua() {
+		return rua;
+	}
 
-    public String getContato() {
-        return contato;
-    }
+	public void setRua(String rua) {
+		this.rua = rua;
+	}
 
-    public void setContato(String contato) {
-        this.contato = contato;
-    }
+	public String getNumero() {
+		return numero;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public String getBairro() {
+		return bairro;
+	}
 
-    public String getStatus() {
-        return status;
-    }
+	public void setBairro(String bairro) {
+		this.bairro = bairro;
+	}
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+	public String getCidade() {
+		return cidade;
+	}
 
-    // ---------------------------------------------------------
+	public void setCidade(String cidade) {
+		this.cidade = cidade;
+	}
 
-    @Override
-    public String toString() {
-        return nome + " (" + cpfCnpj + ")";
-    }
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public String getCep() {
+		return cep;
+	}
+
+	public void setCep(String cep) {
+		this.cep = cep;
+	}
+
+	public LocalDateTime getDataCadastro() {
+		return dataCadastro;
+	}
+
+	public void setDataCadastro(LocalDateTime dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
+
+	public String getEnderecoCompleto() {
+		return rua + ", " + numero + " - " + bairro + ", " + cidade + "/" + estado + " - CEP: " + cep;
+	}
 }

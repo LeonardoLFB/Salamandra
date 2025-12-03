@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -36,73 +35,77 @@
             <!-- Formulário -->
             <GridPane hgap="12" vgap="12">
                 <columnConstraints>
-                    <ColumnConstraints percentWidth="40" />
-                    <ColumnConstraints percentWidth="30" />
-                    <ColumnConstraints percentWidth="30" />
+                    <ColumnConstraints percentWidth="50" />
+                    <ColumnConstraints percentWidth="25" />
+                    <ColumnConstraints percentWidth="25" />
                 </columnConstraints>
 
-                <!-- Linha 0 -->
-                <Label text="Nome" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <TextField fx:id="tfNome" promptText="Nome completo" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <!-- Linha 0: Nome, CPF, Email -->
+                <Label text="Nome Completo" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="tfNome" promptText="Ex: João da Silva" GridPane.columnIndex="0" GridPane.rowIndex="1" />
 
-                <Label text="CPF/CNPJ" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                <TextField fx:id="tfCpfCnpj" promptText="Ex: 123.456.789-00 / 12.345.678/0001-90" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="CPF" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <TextField fx:id="tfCpf" promptText="000.000.000-00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                <Label text="Contato" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-                <TextField fx:id="tfContato" promptText="Ex: (11) 98765-4321" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <Label text="E-mail" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                <TextField fx:id="tfEmail" promptText="email@exemplo.com" GridPane.columnIndex="2" GridPane.rowIndex="1" />
 
-                <!-- Linha 2 -->
-                <Label text="E-mail" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                <TextField fx:id="tfEmail" promptText="email@exemplo.com" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                <!-- Linha 2: Rua, Número, Bairro -->
+                <Label text="Rua" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <TextField fx:id="tfRua" promptText="Ex: Rua das Flores" GridPane.columnIndex="0" GridPane.rowIndex="3" />
 
-                <Label text="Endereço" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                <TextField fx:id="tfEndereco" promptText="Rua, número, bairro - Cidade/UF" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                <Label text="Número" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <TextField fx:id="tfNumero" promptText="123" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                <!-- Linha 4: status e botão -->
-                <Label text="Status" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                <!-- items do ComboBox serão adicionados pelo controller -->
-                <ComboBox fx:id="cbStatus" prefWidth="220" promptText="Ativo / Inativo" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                <Label text="Bairro" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                <TextField fx:id="tfBairro" promptText="Ex: Centro" GridPane.columnIndex="2" GridPane.rowIndex="3" />
 
-                <!-- Botão cadastrar (direita) -->
-                <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="6">
+                <!-- Linha 4: Cidade, Estado, CEP -->
+                <Label text="Cidade" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <TextField fx:id="tfCidade" promptText="Ex: São Paulo" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+
+                <Label text="Estado (UF)" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <TextField fx:id="tfEstado" promptText="SP" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                <Label text="CEP" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                <TextField fx:id="tfCep" promptText="00000-000" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+
+                <!-- Linha 6: Botões -->
+                <HBox alignment="CENTER_RIGHT" spacing="12" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="6">
+                    <Button fx:id="btnLimpar" onAction="#onLimparFormulario" style="-fx-background-color: #E5E7EB; -fx-text-fill: #374151; -fx-background-radius: 8; -fx-padding: 8 16;" text="Limpar" />
                     <Button fx:id="btnCadastrar" onAction="#onCadastrarCliente" style="-fx-background-color: #B1812C; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 16;" text="Cadastrar Cliente" />
                 </HBox>
-            <rowConstraints>
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-            </rowConstraints>
-
+            
+                <rowConstraints>
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                </rowConstraints>
             </GridPane>
         </VBox>
 
-        <!-- BARRA DE BUSCA / FILTRO / NOVO -->
+        <!-- BARRA DE BUSCA -->
         <HBox alignment="CENTER_LEFT" spacing="12">
-
             <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 8;" HBox.hgrow="ALWAYS">
-                <TextField fx:id="tfBusca" promptText="Buscar por nome, CPF/CNPJ ou ID..." style="-fx-background-color: transparent; -fx-border-color: transparent;" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="tfBusca" promptText="Buscar por nome ou CPF..." style="-fx-background-color: transparent; -fx-border-color: transparent;" HBox.hgrow="ALWAYS" />
             </HBox>
-
-            <!-- filtro de status (itens adicionados no controller) -->
-            <ComboBox fx:id="cbStatusFiltro" prefWidth="160" promptText="Filtrar Status" style="-fx-background-radius: 8;" />
-            <Button fx:id="btnNovo" onAction="#onAbrirFormNovo" style="-fx-background-color: #B1812C; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 16;" text="+ Novo Cliente" />
+            <Button fx:id="btnAtualizar" onAction="#onAtualizar" style="-fx-background-color: #B1812C; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 16;" text="🔄 Atualizar" />
         </HBox>
 
         <!-- TABELA DE CLIENTES -->
-        <VBox spacing="8" style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 10;">
-            <TableView fx:id="tableClientes" prefHeight="135.0" prefWidth="836.0">
+        <VBox spacing="8" style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 10;" VBox.vgrow="ALWAYS">
+            <TableView fx:id="tableClientes" prefHeight="300.0">
                 <columns>
-                    <TableColumn fx:id="colId" prefWidth="100" text="ID" />
-                    <TableColumn fx:id="colNome" prefWidth="300" text="NOME" />
-                    <TableColumn fx:id="colCpf" prefWidth="200" text="CPF/CNPJ" />
-                    <TableColumn fx:id="colContato" prefWidth="160" text="CONTATO" />
-                    <TableColumn fx:id="colEmail" prefWidth="200" text="E-MAIL" />
-                    <TableColumn fx:id="colStatus" prefWidth="120" text="STATUS" />
-                    <TableColumn fx:id="colAcoes" prefWidth="120" text="AÇÕES" />
+                    <TableColumn fx:id="colId" prefWidth="60" text="ID" />
+                    <TableColumn fx:id="colNome" prefWidth="200" text="NOME" />
+                    <TableColumn fx:id="colCpf" prefWidth="130" text="CPF" />
+                    <TableColumn fx:id="colEmail" prefWidth="180" text="E-MAIL" />
+                    <TableColumn fx:id="colEndereco" prefWidth="250" text="ENDEREÇO" />
+                    <TableColumn fx:id="colAcoes" prefWidth="80" text="AÇÕES" />
                 </columns>
             </TableView>
         </VBox>

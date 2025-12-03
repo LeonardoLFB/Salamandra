@@ -1,52 +1,104 @@
 package model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Venda {
-
-    private String id;
-    private String cliente;
-    private LocalDate data;
-    private double valor;
+    private int idVenda;
+    private int idCliente;
+    private String nomeCliente; // Para exibição na tabela
+    private LocalDateTime data;
+    private double valorTotal;
     private String status;
-
-    private String produtos;
-    private int quantidade;
-    private String formaPagamento;
-
-    public Venda(int idNumerico, String cliente, LocalDate data, double valor, String status) {
-        this.id = String.format("#%05d", idNumerico);
-        this.cliente = cliente;
+    private String observacao;
+    
+    public Venda() {
+    }
+    
+    public Venda(int idVenda, int idCliente, LocalDateTime data, double valorTotal, String status) {
+        this.idVenda = idVenda;
+        this.idCliente = idCliente;
         this.data = data;
-        this.valor = valor;
+        this.valorTotal = valorTotal;
+        this.status = status;
+    }
+    
+    public Venda(int idVenda, int idCliente, String nomeCliente, LocalDateTime data, double valorTotal, String status, String observacao) {
+        this.idVenda = idVenda;
+        this.idCliente = idCliente;
+        this.nomeCliente = nomeCliente;
+        this.data = data;
+        this.valorTotal = valorTotal;
+        this.status = status;
+        this.observacao = observacao;
+    }
+
+    public int getIdVenda() {
+        return idVenda;
+    }
+
+    public void setIdVenda(int idVenda) {
+        this.idVenda = idVenda;
+    }
+
+    public int getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(int idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public String getNomeCliente() {
+        return nomeCliente;
+    }
+
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
+    }
+
+    public LocalDateTime getData() {
+        return data;
+    }
+
+    public void setData(LocalDateTime data) {
+        this.data = data;
+    }
+
+    public double getValorTotal() {
+        return valorTotal;
+    }
+
+    public void setValorTotal(double valorTotal) {
+        this.valorTotal = valorTotal;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public String getId() { return id; }
-    public String getCliente() { return cliente; }
-    public void setCliente(String cliente) { this.cliente = cliente; }
+    public String getObservacao() {
+        return observacao;
+    }
 
-    public LocalDate getData() { return data; }
-    public void setData(LocalDate data) { this.data = data; }
-
-    public double getValor() { return valor; }
-    public void setValor(double valor) { this.valor = valor; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    public String getProdutos() { return produtos; }
-    public void setProdutos(String produtos) { this.produtos = produtos; }
-
-    public int getQuantidade() { return quantidade; }
-    public void setQuantidade(int quantidade) { this.quantidade = quantidade; }
-
-    public String getFormaPagamento() { return formaPagamento; }
-    public void setFormaPagamento(String formaPagamento) { this.formaPagamento = formaPagamento; }
-
-    public String getDataStr() {
-        if (data == null) return "";
-        return data.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
+    
+    // Métodos auxiliares para exibição na tabela
+    public String getDataFormatada() {
+        if (data != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            return data.format(formatter);
+        }
+        return "";
+    }
+    
+    public String getValorFormatado() {
+        return String.format("R$ %.2f", valorTotal);
     }
 }
