@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import java.net.URL?>
 
-<AnchorPane prefHeight="680.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuController">
+<AnchorPane prefHeight="680.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuController">
 
    <stylesheets>
       <URL value="@application.css" />
@@ -149,28 +149,44 @@
 
                   <VBox alignment="CENTER" spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
                      <padding><Insets bottom="18" left="14" right="14" top="18" /></padding>
-                     <Label styleClass="stat-icon" text="👥" />
+                     <ImageView fitHeight="28.0" fitWidth="28.0" preserveRatio="true">
+    				 	<image>
+        			 		<Image url="@../img/usuario.png" />
+    				 	</image>
+					 </ImageView>
                      <Label fx:id="lblQtdClientes" styleClass="stat-value" text="—" />
                      <Label styleClass="stat-label" text="CLIENTES" />
                   </VBox>
 
                   <VBox alignment="CENTER" spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
                      <padding><Insets bottom="18" left="14" right="14" top="18" /></padding>
-                     <Label styleClass="stat-icon" text="📦" />
+                     <ImageView fitHeight="28.0" fitWidth="28.0" preserveRatio="true">
+   					 	<image>
+        					<Image url="@../img/Products.png" />
+    					</image>
+					 </ImageView>
                      <Label fx:id="lblQtdProdutos" styleClass="stat-value, stat-value-azul" text="—" />
                      <Label styleClass="stat-label" text="PRODUTOS" />
                   </VBox>
 
                   <VBox alignment="CENTER" spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
                      <padding><Insets bottom="18" left="14" right="14" top="18" /></padding>
-                     <Label styleClass="stat-icon" text="⚠" />
+                     <ImageView fitHeight="28.0" fitWidth="28.0" preserveRatio="true">
+    				 	<image>
+        					<Image url="@../img/Stock.png" />
+    					</image>
+					 </ImageView>
                      <Label fx:id="lblEstoqueBaixo" styleClass="stat-value, stat-value-alerta" text="—" />
                      <Label styleClass="stat-label" text="ESTOQUE BAIXO" />
                   </VBox>
 
                   <VBox alignment="CENTER" spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
                      <padding><Insets bottom="18" left="14" right="14" top="18" /></padding>
-                     <Label styleClass="stat-icon" text="🧾" />
+                     <ImageView fitHeight="28.0" fitWidth="28.0" preserveRatio="true">
+    				 	<image>
+        					<Image url="@../img/venda.png" />
+    					</image>
+					 </ImageView>
                      <Label fx:id="lblQtdVendas" styleClass="stat-value, stat-value-verde" text="—" />
                      <Label styleClass="stat-label" text="VENDAS" />
                   </VBox>
@@ -178,19 +194,71 @@
                </HBox>
 
                <!-- Faturamento -->
-               <HBox alignment="CENTER_LEFT" spacing="14" styleClass="card">
-                  <padding><Insets bottom="16" left="20" right="20" top="16" /></padding>
-                  <Label styleClass="stat-icon" text="💰" />
-                  <VBox spacing="2">
-                     <Label styleClass="stat-label" text="FATURAMENTO (VENDAS CONCLUÍDAS)" />
-                     <Label fx:id="lblFaturamento" style="-fx-font-size:22px; -fx-font-weight:bold; -fx-text-fill:#15803D;" text="R$ 0,00" />
-                  </VBox>
-                  <Region HBox.hgrow="ALWAYS" />
-                  <VBox alignment="CENTER_RIGHT" spacing="2">
-                     <Label styleClass="stat-label" text="VENDAS PENDENTES" />
-                     <Label fx:id="lblPendentes" style="-fx-font-size:22px; -fx-font-weight:bold; -fx-text-fill:#C2410C;" text="0" />
-                  </VBox>
-               </HBox>
+              <HBox alignment="CENTER_LEFT" spacing="14" styleClass="card">
+    <padding>
+        <Insets bottom="16" left="20" right="20" top="16" />
+    </padding>
+
+    <VBox spacing="2">
+        <Label styleClass="stat-label"
+               text="FATURAMENTO (VENDAS CONCLUÍDAS)" />
+
+        <Label fx:id="lblFaturamento"
+               style="-fx-font-size:22px; -fx-font-weight:bold; -fx-text-fill:#15803D;"
+               text="R$ 0,00" />
+    </VBox>
+
+    <Region HBox.hgrow="ALWAYS" />
+
+    <VBox alignment="CENTER_RIGHT" spacing="2">
+        <Label styleClass="stat-label"
+               text="VENDAS PENDENTES" />
+
+        <Label fx:id="lblPendentes"
+               style="-fx-font-size:22px; -fx-font-weight:bold; -fx-text-fill:#C2410C;"
+               text="0" />
+    </VBox>
+</HBox>
+
+<HBox spacing="18">
+
+    <!-- ÚLTIMAS VENDAS -->
+    <VBox spacing="12"
+          styleClass="dashboard-section"
+          HBox.hgrow="ALWAYS">
+
+        <Label styleClass="dashboard-section-title"
+               text="Últimas vendas" />
+
+        <VBox fx:id="boxUltimasVendas"
+              spacing="4">
+
+            <Label styleClass="dashboard-empty"
+                   text="Nenhuma venda encontrada." />
+
+        </VBox>
+
+    </VBox>
+
+    <!-- ESTOQUE BAIXO -->
+    <VBox spacing="12"
+          styleClass="dashboard-section"
+          HBox.hgrow="ALWAYS">
+
+        <Label styleClass="dashboard-section-title"
+               text="Produtos com estoque baixo" />
+
+        <VBox fx:id="boxEstoqueBaixo"
+              spacing="4">
+
+            <Label styleClass="dashboard-empty"
+                   text="Nenhum produto com estoque baixo." />
+
+        </VBox>
+
+    </VBox>
+
+</HBox>
 
                <Region VBox.vgrow="ALWAYS" />
 

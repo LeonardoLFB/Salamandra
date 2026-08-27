@@ -1,9 +1,11 @@
 package controller;
 
 import java.io.IOException;
+
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+
 
 import com.jfoenix.controls.JFXButton;
 
@@ -27,6 +29,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.util.Comparator;
+
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+
 public class MenuController implements Initializable {
 
  
@@ -48,6 +56,8 @@ public class MenuController implements Initializable {
     @FXML private Label lblFaturamento;
     @FXML private Label lblPendentes;
 
+    @FXML private VBox boxUltimasVendas;
+    @FXML private VBox boxEstoqueBaixo;
 	
 // fx:id="Slider"     (sidebar)
 
@@ -86,29 +96,252 @@ public class MenuController implements Initializable {
             List<Venda> vendas = new VendaDAO().getAll();
 
             int estoqueBaixo = 0;
+
             for (Produto p : produtos) {
-                if (p.getQtdeEstoque() <= 10) estoqueBaixo++;
+                if (p.getQtdeEstoque() <= 10) {
+                    estoqueBaixo++;
+                }
             }
 
             int pendentes = 0;
             double faturamento = 0.0;
+
             for (Venda v : vendas) {
-                if ("Pendente".equals(v.getStatus())) pendentes++;
-                if ("Concluída".equals(v.getStatus())) faturamento += v.getValorTotal();
+                if ("Pendente".equals(v.getStatus())) {
+                    pendentes++;
+                }
+
+                if ("Concluída".equals(v.getStatus())) {
+                    faturamento += v.getValorTotal();
+                }
             }
 
-            lblQtdClientes.setText(String.valueOf(new ClienteDAO().getAll().size()));
-            lblQtdProdutos.setText(String.valueOf(produtos.size()));
-            lblEstoqueBaixo.setText(String.valueOf(estoqueBaixo));
-            lblQtdVendas.setText(String.valueOf(vendas.size()));
-            lblPendentes.setText(String.valueOf(pendentes));
-            lblFaturamento.setText(String.format("R$ %.2f", faturamento));
+            lblQtdClientes.setText(
+                String.valueOf(new ClienteDAO().getAll().size())
+            );
+
+            lblQtdProdutos.setText(
+                String.valueOf(produtos.size())
+            );
+
+            lblEstoqueBaixo.setText(
+                String.valueOf(estoqueBaixo)
+            );
+
+            lblQtdVendas.setText(
+                String.valueOf(vendas.size())
+            );
+
+            lblPendentes.setText(
+                String.valueOf(pendentes)
+            );
+
+            lblFaturamento.setText(
+                String.format("R$ %.2f", faturamento)
+            );
+
+            carregarUltimasVendas(vendas);
+            carregarProdutosEstoqueBaixo(produtos);
 
         } catch (Exception e) {
-            System.err.println("Não foi possível carregar os indicadores: " + e.getMessage());
+            System.err.println(
+                "Não foi possível carregar os indicadores: "
+                + e.getMessage()
+            );
+
+            e.printStackTrace();
         }
     }
+    
+    private void carregarUltimasVendas(List<Venda> vendas) {
 
+        boxUltimasVendas.getChildren().clear();
+
+        if (vendas.isEmpty()) {
+
+            Label vazio = new Label("Nenhuma venda encontrada.");
+            vazio.getStyleClass().add("dashboard-empty");
+
+            boxUltimasVendas.getChildren().add(vazio);
+
+            return;
+        }
+
+        vendas.sort(
+            Comparator.comparing(Venda::getData,
+                Comparator.nullsLast(
+                    Comparator.naturalOrder()
+                )
+            ).reversed()
+        );
+
+        int limite = Math.min(vendas.size(), 5);
+
+        for (int i = 0; i < limite; i++) {
+
+            Venda venda = vendas.get(i);
+
+            VBox informacoes = new VBox(2);
+
+            String cliente = venda.getNomeCliente();
+
+            if (cliente == null || cliente.isBlank()) {
+                cliente = "Cliente não informado";
+            }
+
+            Label titulo = new Label(
+                "Venda #" + venda.getIdVenda()
+                + " - " + cliente
+            );
+
+            titulo.getStyleClass().add(
+                "dashboard-item-title"
+            );
+
+            Label detalhes = new Label(
+                venda.getDataFormatada()
+                + " • "
+                + venda.getStatus()
+            );
+
+            detalhes.getStyleClass().add(
+                "dashboard-item-sub"
+            );
+
+            informacoes.getChildren().addAll(
+                titulo,
+                detalhes
+            );
+
+            Label valor = new Label(
+                venda.getValorFormatado()
+            );
+
+            valor.getStyleClass().add(
+                "dashboard-item-title"
+            );
+
+            HBox linha = new HBox();
+
+            linha.setSpacing(10);
+
+            Region espaco = new Region();
+
+            HBox.setHgrow(
+                espaco,
+                javafx.scene.layout.Priority.ALWAYS
+            );
+
+            linha.getChildren().addAll(
+                informacoes,
+                espaco,
+                valor
+            );
+
+            linha.getStyleClass().add(
+                "dashboard-item"
+            );
+
+            boxUltimasVendas
+                .getChildren()
+                .add(linha);
+        }
+    }
+    
+    private void carregarProdutosEstoqueBaixo(
+            List<Produto> produtos) {
+
+        boxEstoqueBaixo.getChildren().clear();
+
+        List<Produto> produtosBaixos =
+            produtos.stream()
+                .filter(p -> p.getQtdeEstoque() <= 10)
+                .sorted(
+                    Comparator.comparingInt(
+                        Produto::getQtdeEstoque
+                    )
+                )
+                .limit(5)
+                .toList();
+
+        if (produtosBaixos.isEmpty()) {
+
+            Label vazio = new Label(
+                "Nenhum produto com estoque baixo."
+            );
+
+            vazio.getStyleClass().add(
+                "dashboard-empty"
+            );
+
+            boxEstoqueBaixo
+                .getChildren()
+                .add(vazio);
+
+            return;
+        }
+
+        for (Produto produto : produtosBaixos) {
+
+            VBox informacoes = new VBox(2);
+
+            Label nome = new Label(
+                produto.getNome()
+            );
+
+            nome.getStyleClass().add(
+                "dashboard-item-title"
+            );
+
+            Label codigo = new Label(
+                "Código: " + produto.getCodigo()
+            );
+
+            codigo.getStyleClass().add(
+                "dashboard-item-sub"
+            );
+
+            informacoes.getChildren().addAll(
+                nome,
+                codigo
+            );
+
+            Label estoque = new Label(
+                produto.getQtdeEstoque()
+                + " un."
+            );
+
+            estoque.getStyleClass().add(
+                "dashboard-item-title"
+            );
+
+            HBox linha = new HBox();
+
+            linha.setSpacing(10);
+
+            Region espaco = new Region();
+
+            HBox.setHgrow(
+                espaco,
+                javafx.scene.layout.Priority.ALWAYS
+            );
+
+            linha.getChildren().addAll(
+                informacoes,
+                espaco,
+                estoque
+            );
+
+            linha.getStyleClass().add(
+                "dashboard-item"
+            );
+
+            boxEstoqueBaixo
+                .getChildren()
+                .add(linha);
+        }
+    }
+    
     private void openSidebar() {
         TranslateTransition slide = new TranslateTransition(Duration.seconds(0.4), Slider);
         slide.setToX(0);
