@@ -150,6 +150,79 @@ public class VendaDAO {
     }
     
     /**
+     * Cancela uma venda e devolve ao estoque os produtos dos seus itens.
+     * A operação é transacional: ou o status muda e o estoque volta, ou nada acontece.
+     * @param idVenda
+     * @return mensagem de sucesso ou erro
+     */
+    public String cancelar(int idVenda) {
+        String s = "Venda cancelada com sucesso!";
+        BD bd = new BD();
+
+        try {
+            bd.getConnection();
+
+            bd.con.setAutoCommit(false);
+
+            // 1. Marca como cancelada somente se ainda não estiver.
+            //    A condição dentro do próprio UPDATE garante que uma venda
+            //    cancelada duas vezes não devolva o estoque em duplicidade.
+            String sqlStatus = "UPDATE venda SET status = 'Cancelada' " +
+                               "WHERE id_venda = ? AND status <> 'Cancelada'";
+
+            bd.st = bd.con.prepareStatement(sqlStatus);
+            bd.st.setInt(1, idVenda);
+
+            int n = bd.st.executeUpdate();
+
+            if (n == 0) {
+                bd.con.rollback();
+                return "Venda não encontrada ou já cancelada.";
+            }
+
+            // 2. Devolve ao estoque a quantidade de cada item da venda
+            String sqlEstoque = "UPDATE produto p " +
+                                "SET quantidade_estoque = p.quantidade_estoque + i.quantidade " +
+                                "FROM item_venda i " +
+                                "WHERE i.id_produto = p.id_produto AND i.id_venda = ?";
+
+            bd.st = bd.con.prepareStatement(sqlEstoque);
+            bd.st.setInt(1, idVenda);
+            bd.st.executeUpdate();
+
+            bd.con.commit();
+
+            System.out.println("Venda cancelada e estoque devolvido - ID: " + idVenda);
+
+        } catch (SQLException e) {
+            s = "Falha ao cancelar venda: " + e.getMessage();
+            e.printStackTrace();
+
+            try {
+                if (bd.con != null) {
+                    bd.con.rollback();
+                    System.out.println("Transação revertida devido a erro.");
+                }
+            } catch (SQLException ex) {
+                System.err.println("Erro ao fazer rollback: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                if (bd.con != null) {
+                    bd.con.setAutoCommit(true);
+                }
+            } catch (SQLException e) {
+                System.err.println("Erro ao restaurar auto-commit: " + e.getMessage());
+                e.printStackTrace();
+            }
+            bd.close();
+        }
+
+        return s;
+    }
+
+    /**
      * Deleta uma venda (CASCADE deleta os itens automaticamente)
      * @param idVenda
      * @return mensagem de sucesso ou erro

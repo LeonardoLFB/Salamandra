@@ -2,9 +2,16 @@ package controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import com.jfoenix.controls.JFXButton;
+
+import database.ClienteDAO;
+import database.ProdutoDAO;
+import database.VendaDAO;
+import model.Produto;
+import model.Venda;
 
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
@@ -33,6 +40,14 @@ public class MenuController implements Initializable {
     @FXML private JFXButton btUsuarios;
     @FXML private JFXButton btVendas;
 
+    // Indicadores do painel inicial
+    @FXML private Label lblQtdClientes;
+    @FXML private Label lblQtdProdutos;
+    @FXML private Label lblEstoqueBaixo;
+    @FXML private Label lblQtdVendas;
+    @FXML private Label lblFaturamento;
+    @FXML private Label lblPendentes;
+
 	
 // fx:id="Slider"     (sidebar)
 
@@ -56,6 +71,42 @@ public class MenuController implements Initializable {
 
         Menu.setOnMouseClicked(e -> openSidebar());
         MenuClose.setOnMouseClicked(e -> closeSidebar());
+
+        carregarIndicadores();
+    }
+
+    /**
+     * Preenche os cartões do painel inicial com os números do banco.
+     * Falhas de conexão não podem derrubar o menu: nesse caso os
+     * cartões apenas continuam mostrando "—".
+     */
+    private void carregarIndicadores() {
+        try {
+            List<Produto> produtos = new ProdutoDAO().getAll();
+            List<Venda> vendas = new VendaDAO().getAll();
+
+            int estoqueBaixo = 0;
+            for (Produto p : produtos) {
+                if (p.getQtdeEstoque() <= 10) estoqueBaixo++;
+            }
+
+            int pendentes = 0;
+            double faturamento = 0.0;
+            for (Venda v : vendas) {
+                if ("Pendente".equals(v.getStatus())) pendentes++;
+                if ("Concluída".equals(v.getStatus())) faturamento += v.getValorTotal();
+            }
+
+            lblQtdClientes.setText(String.valueOf(new ClienteDAO().getAll().size()));
+            lblQtdProdutos.setText(String.valueOf(produtos.size()));
+            lblEstoqueBaixo.setText(String.valueOf(estoqueBaixo));
+            lblQtdVendas.setText(String.valueOf(vendas.size()));
+            lblPendentes.setText(String.valueOf(pendentes));
+            lblFaturamento.setText(String.format("R$ %.2f", faturamento));
+
+        } catch (Exception e) {
+            System.err.println("Não foi possível carregar os indicadores: " + e.getMessage());
+        }
     }
 
     private void openSidebar() {

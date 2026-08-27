@@ -12,8 +12,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import java.net.URL?>
 
 <AnchorPane prefHeight="680.0" prefWidth="900.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ClienteController">
+
+    <stylesheets>
+        <URL value="@application.css" />
+    </stylesheets>
 
     <!-- CONTAINER PRINCIPAL -->
     <VBox prefHeight="680.0" prefWidth="900.0" spacing="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
@@ -72,8 +77,8 @@
 
                 <!-- Linha 6: Botões -->
                 <HBox alignment="CENTER_RIGHT" spacing="12" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="6">
-                    <Button fx:id="btnLimpar" onAction="#onLimparFormulario" style="-fx-background-color: #E5E7EB; -fx-text-fill: #374151; -fx-background-radius: 8; -fx-padding: 8 16;" text="Limpar" />
-                    <Button fx:id="btnCadastrar" onAction="#onCadastrarCliente" style="-fx-background-color: #B1812C; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 16;" text="Cadastrar Cliente" />
+                    <Button fx:id="btnLimpar" onAction="#onLimparFormulario" styleClass="btn, btn-secondary" text="Limpar" />
+                    <Button fx:id="btnCadastrar" onAction="#onCadastrarCliente" styleClass="btn, btn-primary" text="Cadastrar Cliente" />
                 </HBox>
             
                 <rowConstraints>
@@ -90,10 +95,11 @@
 
         <!-- BARRA DE BUSCA -->
         <HBox alignment="CENTER_LEFT" spacing="12">
-            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 8;" HBox.hgrow="ALWAYS">
-                <TextField fx:id="tfBusca" promptText="Buscar por nome ou CPF..." style="-fx-background-color: transparent; -fx-border-color: transparent;" HBox.hgrow="ALWAYS" />
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="search-bar" HBox.hgrow="ALWAYS">
+                <Label text="🔍" />
+                <TextField fx:id="tfBusca" promptText="Buscar por nome ou CPF..." HBox.hgrow="ALWAYS" />
             </HBox>
-            <Button fx:id="btnAtualizar" onAction="#onAtualizar" style="-fx-background-color: #B1812C; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 16;" text="🔄 Atualizar" />
+            <Button fx:id="btnAtualizar" onAction="#onAtualizar" styleClass="btn, btn-primary" text="🔄 Atualizar" />
         </HBox>
 
         <!-- TABELA DE CLIENTES -->

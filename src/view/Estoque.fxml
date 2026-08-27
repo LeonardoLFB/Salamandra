@@ -11,8 +11,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import java.net.URL?>
 
 <AnchorPane prefHeight="680.0" prefWidth="900.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.EstoqueController">
+
+    <stylesheets>
+        <URL value="@application.css" />
+    </stylesheets>
 
     <!-- Container principal -->
     <VBox prefHeight="680.0" prefWidth="900.0" spacing="18" AnchorPane.bottomAnchor="18" AnchorPane.leftAnchor="18" AnchorPane.rightAnchor="18" AnchorPane.topAnchor="18">
@@ -31,7 +36,7 @@
                 </HBox>
 
                 <ComboBox fx:id="cbFiltroStatus" prefWidth="160" promptText="Filtrar Status" />
-                <Button fx:id="btnAtualizar" style="-fx-background-color:#B1812C; -fx-text-fill:white; -fx-background-radius:8; -fx-padding:8 14;" text="🔄 Atualizar" />
+                <Button fx:id="btnAtualizar" styleClass="btn, btn-primary" text="🔄 Atualizar" />
             </HBox>
         </VBox>
 

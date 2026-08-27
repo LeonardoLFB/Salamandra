@@ -13,11 +13,15 @@ public class Usuario {
 
 	}
 
-	public Usuario(String nome, String email, String login, String senha, String tipo) {
+	/**
+	 * Mesma ordem de campos do construtor com id (nome, login, senha, email, tipo).
+	 * Manter as duas assinaturas consistentes evita trocar campos por engano.
+	 */
+	public Usuario(String nome, String login, String senha, String email, String tipo) {
 		this.nome = nome;
-		this.email = email;
 		this.login = login;
 		this.senha = senha;
+		this.email = email;
 		this.tipo = tipo;
 	}
 	

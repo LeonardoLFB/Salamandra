@@ -16,7 +16,7 @@ public class BD {
 	public final String DRIVER = "org.postgresql.Driver";
 	public final String URL = "jdbc:postgresql://localhost:5432/"+DATABASE;
 	public final String LOGIN = "postgres";
-	public final String SENHA = "1234";
+	public final String SENHA = "123";
 
 	/**
 	 * Realiza a conexão ao banco de dados

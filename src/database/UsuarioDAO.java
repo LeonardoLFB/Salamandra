@@ -19,9 +19,9 @@ public class UsuarioDAO extends Usuario {
 		try {
 			bd.st = bd.con.prepareStatement(sql);
 			bd.st.setString(1, u.getNome());
-			bd.st.setString(2, u.getEmail());
-			bd.st.setString(3, u.getLogin());
-			bd.st.setString(4, u.getSenha());
+			bd.st.setString(2, u.getLogin());
+			bd.st.setString(3, u.getSenha());
+			bd.st.setString(4, u.getEmail());
 			bd.st.setString(5, u.getTipo());
 
 			int n = bd.st.executeUpdate();

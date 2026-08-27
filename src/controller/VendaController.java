@@ -324,6 +324,10 @@ public class VendaController {
     private void carregarDadosIniciais() {
         todasVendas.setAll(vendaDAO.getAll());
         vendasFiltradas.setAll(todasVendas);
+
+        // Recarrega os produtos para refletir o estoque atualizado
+        // (a venda dá baixa e o cancelamento devolve as quantidades)
+        todosProdutos.setAll(produtoDAO.getAll());
     }
 
     // ==================== ADICIONAR ITEM À VENDA ====================
@@ -593,11 +597,11 @@ public class VendaController {
         Optional<ButtonType> resultado = confirmacao.showAndWait();
         
         if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-            venda.setStatus("Cancelada");
-            String msg = vendaDAO.atualizar(venda);
-            
+            // O DAO cancela e devolve os itens ao estoque na mesma transação
+            String msg = vendaDAO.cancelar(venda.getIdVenda());
+
             if (msg.contains("sucesso")) {
-                mostrarSucesso("Venda cancelada com sucesso!");
+                mostrarSucesso("Venda cancelada e itens devolvidos ao estoque!");
                 carregarDadosIniciais();
             } else {
                 mostrarErro("Erro ao cancelar venda", msg);

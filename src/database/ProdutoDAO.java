@@ -57,23 +57,30 @@ public class ProdutoDAO extends Produto {
 
 	/**
 	 * Altera no banco de dados o estado atual do produto
-	 * Antes de realizar a alteração o produto deve estar preenchido
+	 * Antes de realizar a alteração o produto deve estar preenchido (inclusive o id)
+	 * @param p - produto com id preenchido e demais campos atualizados
 	 * @return - uma mensagem contendo o resultado da operação
-	 * 
-	public String alterar() {
-		String s = "Produto alterado com sucesso!";
+	 */
+	public String atualizar(Produto p) {
+		String s = "Produto atualizado com sucesso!";
 		BD bd = new BD();
 		bd.getConnection();
-		String sql = "UPDATE produto SET nome=?,qtdeEstoque=?,preco=? WHERE codigo=?";
+		String sql = "UPDATE produto SET nome = ?, codigo = ?, lote = ?, descricao = ?, "
+				+ "preco_custo = ?, preco_venda = ?, quantidade_estoque = ? WHERE id_produto = ?";
 		try {
 			bd.st = bd.con.prepareStatement(sql);
-			bd.st.setInt(4,  getCodigo());
-			bd.st.setString(1,  getNome());
-			bd.st.setInt(2,  getQtdeEstoque());
-			bd.st.setDouble(3,  getPreco());
+			bd.st.setString(1, p.getNome());
+			bd.st.setInt(2, p.getCodigo());
+			bd.st.setString(3, p.getLote());
+			bd.st.setString(4, p.getDescricao());
+			bd.st.setDouble(5, p.getPrecoCusto());
+			bd.st.setDouble(6, p.getPrecoVenda());
+			bd.st.setInt(7, p.getQtdeEstoque());
+			bd.st.setInt(8, p.getId());
+
 			int linhasAfetadas = bd.st.executeUpdate();
 
-			if(linhasAfetadas == 0) {
+			if (linhasAfetadas == 0) {
 				s = "Produto não encontrado.";
 			}
 
@@ -86,10 +93,7 @@ public class ProdutoDAO extends Produto {
 		}
 		return s;
 	}
-	
-	 
-	
-	
+
 	/**
 	 * Altera no banco de dados o estado atual do produto
 	 * Antes de realizar a alteração o produto deve estar preenchido

@@ -6,12 +6,17 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
+<?import java.net.URL?>
 
 <AnchorPane prefWidth="900" prefHeight="600"
             xmlns="http://javafx.com/javafx/24.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="controller.ProdutosController"
             style="-fx-background-color: #F3F4F6;">
+
+    <stylesheets>
+        <URL value="@application.css" />
+    </stylesheets>
 
     <VBox spacing="20" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20">
 
@@ -73,14 +78,12 @@
             <Button fx:id="btnSalvar"
                     text="Salvar"
                     onAction="#cadastrarProduto"
-                    style="-fx-background-color: #10B981; -fx-text-fill: white;
-                           -fx-padding: 10 20; -fx-background-radius: 8;" />
+                    styleClass="btn, btn-success" />
 
             <Button fx:id="btnCancelar"
                     text="Cancelar"
                     onAction="#cancelar"
-                    style="-fx-background-color: #EF4444; -fx-text-fill: white;
-                           -fx-padding: 10 20; -fx-background-radius: 8;" />
+                    styleClass="btn, btn-danger" />
         </HBox>
 
     </VBox>
