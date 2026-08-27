@@ -296,3 +296,10 @@
 }
 .badge-ativo   { -fx-background-color: #DCFCE7; -fx-text-fill: #15803D; }
 .badge-inativo { -fx-background-color: #FEE2E2; -fx-text-fill: #B91C1C; }
+
+.painel-imagem-login {
+    -fx-background-image: url("../img/Salamandra_RecuperarSenha.png");
+    -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+}
