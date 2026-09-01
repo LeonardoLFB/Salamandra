@@ -35,6 +35,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import javafx.scene.layout.StackPane;
+
 public class MenuController implements Initializable {
 
  
@@ -58,6 +60,12 @@ public class MenuController implements Initializable {
 
     @FXML private VBox boxUltimasVendas;
     @FXML private VBox boxEstoqueBaixo;
+    
+    @FXML private StackPane conteudoPrincipal;
+    
+    @FXML private VBox dashboardPrincipal;
+    
+    private Parent dashboardInicial;
 	
 // fx:id="Slider"     (sidebar)
 
@@ -81,6 +89,8 @@ public class MenuController implements Initializable {
 
         Menu.setOnMouseClicked(e -> openSidebar());
         MenuClose.setOnMouseClicked(e -> closeSidebar());
+        
+        dashboardInicial = dashboardPrincipal;
 
         carregarIndicadores();
     }
@@ -362,91 +372,64 @@ public class MenuController implements Initializable {
         slide.play();
     }
         
-        public void OnBtProdutosClick (ActionEvent event) {
-			try {
-			           
-			    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Produtos.fxml"));
-			    Parent root = loader.load();
-			    Stage stage = new Stage();
-			    stage.setTitle("Nova Tela");
-			    stage.setScene(new Scene(root));
-			    stage.show();
+    public void OnBtProdutosClick(ActionEvent event) {
+
+        carregarTela("/view/Produtos.fxml");
+
+    }
+			
+        	public void OnBtEstoqueClick(ActionEvent event) {
+
+            carregarTela("/view/Estoque.fxml");
+
+        }
+        	public void OnBtFornecedoresClick(ActionEvent event) {
+
+        	    carregarTela("/view/Fornecedores.fxml");
+
+        	}
+			public void OnBtClientesClick(ActionEvent event) {
+
+			    carregarTela("/view/Clientes.fxml");
+
+			}
+			public void OnBtUsuariosClick(ActionEvent event) {
+
+			    carregarTela("/view/Usuarios.fxml");
+
+			}    
+			public void OnBtVendasClick(ActionEvent event) {
+
+			    carregarTela("/view/Vendas.fxml");
+
+			}
+			
+			private void carregarTela(String caminhoFXML) {
+
+			    try {
+
+			        FXMLLoader loader =
+			                new FXMLLoader(getClass().getResource(caminhoFXML));
+
+			        Parent tela = loader.load();
+
+			        conteudoPrincipal.getChildren().clear();
+			        conteudoPrincipal.getChildren().add(tela);
 
 			    } catch (IOException e) {
-			            e.printStackTrace();
-			    }
-			    }
-			
-			public void OnBtEstoqueClick (ActionEvent event) {
-				try {
-				           
-				    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Estoque.fxml"));
-				    Parent root = loader.load();
-				    Stage stage = new Stage();
-				    stage.setTitle("Nova Tela");
-				    stage.setScene(new Scene(root));
-				    stage.show();
 
-				    } catch (IOException e) {
-				            e.printStackTrace();
-				    }
+			        e.printStackTrace();
+
+			    }
 			}
-			public void OnBtFornecedoresClick (ActionEvent event) {
-				try {
-				           
-				    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Fornecedores.fxml"));
-				    Parent root = loader.load();
-				    Stage stage = new Stage();
-				    stage.setTitle("Nova Tela");
-				    stage.setScene(new Scene(root));
-				    stage.show();
-
-				    } catch (IOException e) {
-				            e.printStackTrace();
-				    }
-				    }
-			public void OnBtClientesClick (ActionEvent event) {
-				try {
-				           
-				    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Clientes.fxml"));
-				    Parent root = loader.load();
-				    Stage stage = new Stage();
-				    stage.setTitle("Nova Tela");
-				    stage.setScene(new Scene(root));
-				    stage.show();
-
-				    } catch (IOException e) {
-				            e.printStackTrace();
-				    }
-				    }
-			public void OnBtUsuariosClick (ActionEvent event) {
-				try {
-				           
-				    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Usuarios.fxml"));
-				    Parent root = loader.load();
-				    Stage stage = new Stage();
-				    stage.setTitle("Nova Tela");
-				    stage.setScene(new Scene(root));
-				    stage.show();
-
-				    } catch (IOException e) {
-				            e.printStackTrace();
-				    }
-				    }
-			public void OnBtVendasClick (ActionEvent event) {
-				try {
-				           
-				    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Vendas.fxml"));
-				    Parent root = loader.load();
-				    Stage stage = new Stage();
-				    stage.setTitle("Nova Tela");
-				    stage.setScene(new Scene(root));
-				    stage.show();
-
-				    } catch (IOException e) {
-				            e.printStackTrace();
-				    }
-				    }
 			
+			@FXML
+			private void voltarDashboard() {
+
+			    conteudoPrincipal.getChildren().clear();
+			    conteudoPrincipal.getChildren().add(dashboardInicial);
+
+			    carregarIndicadores();
+			}
     }
 

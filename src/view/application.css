@@ -757,3 +757,13 @@
     -fx-background-repeat: no-repeat;
 
 }
+
+.inicio-link {
+    -fx-cursor: hand;
+    -fx-padding: 4 8 4 8;
+    -fx-background-radius: 8;
+}
+
+.inicio-link:hover {
+    -fx-background-color: rgba(255,255,255,0.15);
+}
