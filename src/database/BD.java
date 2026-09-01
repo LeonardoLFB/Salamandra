@@ -6,17 +6,48 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 public class BD {
 
 	public Connection con = null; //realiza a conexão
 	public PreparedStatement st = null; //executa instruções em sql
 	public ResultSet rs = null;
 
-	public final String DATABASE = "salamandra_incensaria";
-	public final String DRIVER = "org.postgresql.Driver";
-	public final String URL = "jdbc:postgresql://localhost:5432/"+DATABASE;
-	public final String LOGIN = "postgres";
-	public final String SENHA = "123";
+	private String URL;
+	private String LOGIN;
+	private String SENHA;
+
+	public BD() {
+	    Properties properties = new Properties();
+
+	    try (InputStream input = getClass()
+	            .getClassLoader()
+	            .getResourceAsStream("config.properties")) {
+
+	        if (input == null) {
+	            System.out.println("Arquivo config.properties não encontrado.");
+	            return;
+	        }
+
+	        properties.load(input);
+
+	        String host = properties.getProperty("db.host");
+	        String port = properties.getProperty("db.port");
+	        String database = properties.getProperty("db.name");
+
+	        LOGIN = properties.getProperty("db.user");
+	        SENHA = properties.getProperty("db.password");
+
+	        URL = "jdbc:postgresql://" + host + ":" + port + "/" + database;
+
+	    } catch (IOException e) {
+	        System.out.println("Erro ao carregar config.properties");
+	        e.printStackTrace();
+	    }
+	}
 
 	/**
 	 * Realiza a conexão ao banco de dados
