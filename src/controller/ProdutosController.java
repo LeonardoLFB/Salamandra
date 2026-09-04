@@ -62,7 +62,6 @@ public class ProdutosController extends ProdutoDAO {
 			alert.setContentText(msg);
 			alert.showAndWait();
 			
-			cancelar();
 
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);

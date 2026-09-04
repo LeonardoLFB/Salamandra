@@ -23,15 +23,10 @@
         <HBox spacing="0" AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="10">
 
             <!-- LADO ESQUERDO: IMAGEM -->
-            <AnchorPane prefWidth="540" HBox.hgrow="ALWAYS">
-            <children>
-               <ImageView fitHeight="584.0" fitWidth="460.0" pickOnBounds="true" preserveRatio="true">
-                  <image>
-                     <Image url="@../img/Salamandra_RecuperarSenha.png" />
-                  </image>
-               </ImageView>
-            </children>
-            </AnchorPane>
+			<AnchorPane prefWidth="540"
+            			styleClass="painel-imagem-login"
+            			HBox.hgrow="ALWAYS">
+			</AnchorPane>
 
             <!-- LADO DIREITO: FORMULÁRIO -->
             <AnchorPane prefHeight="570.0" prefWidth="537.0" style="-fx-background-color: linear-gradient(to bottom right, #B37100 0%, #8B5A00 100%); -fx-background-radius: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.28), 22, 0, 0, 6);" HBox.hgrow="ALWAYS">
