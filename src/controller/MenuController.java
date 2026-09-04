@@ -37,6 +37,11 @@ import javafx.scene.layout.VBox;
 
 import javafx.scene.layout.StackPane;
 
+import java.util.Optional;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
 public class MenuController implements Initializable {
 
  
@@ -64,6 +69,10 @@ public class MenuController implements Initializable {
     @FXML private StackPane conteudoPrincipal;
     
     @FXML private VBox dashboardPrincipal;
+    
+    @FXML private JFXButton btSair;
+    
+
     
     private Parent dashboardInicial;
 	
@@ -430,6 +439,42 @@ public class MenuController implements Initializable {
 			    conteudoPrincipal.getChildren().add(dashboardInicial);
 
 			    carregarIndicadores();
+			}
+			
+			@FXML
+			private void OnBtSairClick(ActionEvent event) {
+
+			    Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+
+			    alerta.setTitle("Confirmação");
+			    alerta.setHeaderText("Deseja realmente sair do sistema?");
+			    alerta.setContentText("Você será redirecionado para a tela de login.");
+
+			    Optional<ButtonType> resultado = alerta.showAndWait();
+
+			    if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+
+			        try {
+
+			            FXMLLoader loader = new FXMLLoader(
+			                getClass().getResource("/view/TelaLogin.fxml")
+			            );
+
+			            Parent telaLogin = loader.load();
+
+			            Stage stage = (Stage) btSair.getScene().getWindow();
+
+			            Scene scene = new Scene(telaLogin);
+
+			            stage.setScene(scene);
+			            stage.show();
+
+			        } catch (IOException e) {
+
+			            e.printStackTrace();
+
+			        }
+			    }
 			}
     }
 
