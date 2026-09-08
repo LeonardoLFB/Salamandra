@@ -803,3 +803,80 @@
     -fx-background-color: #A61F1F;
     -fx-border-color: #A61F1F;
 }
+
+/* ============================================================
+   FORMULÁRIOS
+   ============================================================ */
+
+.page-background {
+    -fx-background-color: #F3F4F6;
+}
+
+.form-card {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-padding: 24;
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(0,0,0,0.06),
+        12,
+        0,
+        0,
+        3
+    );
+}
+
+.form-section-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -brand-dark;
+}
+
+.form-section-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -muted;
+}
+
+.field-label-strong {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -ink;
+}
+
+.form-card .text-field {
+    -fx-pref-height: 40px;
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #D1D5DB;
+    -fx-border-width: 1;
+    -fx-font-size: 13px;
+}
+
+.form-card .text-field:hover {
+    -fx-border-color: #9CA3AF;
+}
+
+.form-card .text-field:focused {
+    -fx-border-color: -brand;
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(177,129,44,0.18),
+        5,
+        0,
+        0,
+        0
+    );
+}
+
+.form-card .separator .line {
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1 0 0 0;
+}
+
+.form-actions {
+    -fx-padding: 4 0 0 0;
+}
