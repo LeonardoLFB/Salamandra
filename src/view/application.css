@@ -880,3 +880,61 @@
 .form-actions {
     -fx-padding: 4 0 0 0;
 }
+
+/* ============================================================
+   LISTAGENS / CONSULTAS
+   ============================================================ */
+
+.list-card {
+
+    -fx-background-color: white;
+
+    -fx-background-radius: 14;
+
+    -fx-border-radius: 14;
+
+    -fx-border-color: #E5E7EB;
+
+    -fx-border-width: 1;
+
+    -fx-padding: 18;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(0,0,0,0.05),
+        10,
+        0,
+        0,
+        2
+    );
+}
+
+/* ============================================================
+   AÇÕES DAS TABELAS
+   ============================================================ */
+
+.table-action-edit,
+.table-action-delete {
+    -fx-background-color: transparent;
+    -fx-background-radius: 7;
+    -fx-font-size: 14px;
+    -fx-padding: 5 8 5 8;
+    -fx-cursor: hand;
+}
+
+.table-action-edit:hover {
+    -fx-background-color: #FEF3C7;
+}
+
+.table-action-delete:hover {
+    -fx-background-color: #FEE2E2;
+}
+
+.btn-editing {
+    -fx-background-color: #2563EB;
+    -fx-text-fill: white;
+}
+
+.btn-editing:hover {
+    -fx-background-color: #1D4ED8;
+}
