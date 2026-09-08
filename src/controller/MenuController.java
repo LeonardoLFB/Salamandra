@@ -82,23 +82,27 @@ public class MenuController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // começa fora da tela
-        Slider.setTranslateX(-SIDEBAR_WIDTH);
 
-        // ponteiros de clique (opcional)
+        // Sidebar começa completamente fora do layout
+        Slider.setVisible(false);
+        Slider.setManaged(false);
+        Slider.setTranslateX(0);
+
+        // Cursores
         Menu.setCursor(Cursor.HAND);
         MenuClose.setCursor(Cursor.HAND);
-       
 
-        // estado inicial: mostra abrir, esconde fechar
+        // Estado inicial dos botões
         Menu.setVisible(true);
+        Menu.setManaged(true);
+
         MenuClose.setVisible(false);
+        MenuClose.setManaged(false);
 
-        
-
+        // Eventos
         Menu.setOnMouseClicked(e -> openSidebar());
         MenuClose.setOnMouseClicked(e -> closeSidebar());
-        
+
         dashboardInicial = dashboardPrincipal;
 
         carregarIndicadores();
@@ -362,22 +366,60 @@ public class MenuController implements Initializable {
     }
     
     private void openSidebar() {
-        TranslateTransition slide = new TranslateTransition(Duration.seconds(0.4), Slider);
+
+        // Coloca a sidebar novamente no layout
+        Slider.setManaged(true);
+        Slider.setVisible(true);
+
+        // Começa deslocada para a esquerda
+        Slider.setTranslateX(-SIDEBAR_WIDTH);
+
+        // Troca o botão MENU pelo X MENU
+        Menu.setVisible(false);
+        Menu.setManaged(false);
+
+        MenuClose.setVisible(true);
+        MenuClose.setManaged(true);
+
+        // Anima a entrada
+        TranslateTransition slide =
+            new TranslateTransition(
+                Duration.seconds(0.3),
+                Slider
+            );
+
         slide.setToX(0);
-        slide.setOnFinished((ActionEvent e) -> {
-            Menu.setVisible(false);
-            MenuClose.setVisible(true);
-        });
+
         slide.play();
     }
 
     private void closeSidebar() {
-        TranslateTransition slide = new TranslateTransition(Duration.seconds(0.4), Slider);
+
+        TranslateTransition slide =
+            new TranslateTransition(
+                Duration.seconds(0.3),
+                Slider
+            );
+
         slide.setToX(-SIDEBAR_WIDTH);
-        slide.setOnFinished((ActionEvent e) -> {
-            Menu.setVisible(true);
+
+        slide.setOnFinished(e -> {
+
+            // Remove completamente a sidebar do layout
+            Slider.setVisible(false);
+            Slider.setManaged(false);
+
+            // Reseta a posição para a próxima abertura
+            Slider.setTranslateX(0);
+
+            // Volta para o botão MENU
             MenuClose.setVisible(false);
+            MenuClose.setManaged(false);
+
+            Menu.setVisible(true);
+            Menu.setManaged(true);
         });
+
         slide.play();
     }
         
