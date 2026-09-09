@@ -42,6 +42,9 @@ import java.util.Optional;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
+import application.SessaoUsuario;
+import model.Usuario;
+
 public class MenuController implements Initializable {
 
  
@@ -71,6 +74,12 @@ public class MenuController implements Initializable {
     @FXML private VBox dashboardPrincipal;
     
     @FXML private JFXButton btSair;
+    
+    @FXML
+    private Label lblUsuarioLogado;
+
+    @FXML
+    private Label lblPerfilUsuario;
     
 
     
@@ -106,6 +115,7 @@ public class MenuController implements Initializable {
         dashboardInicial = dashboardPrincipal;
 
         carregarIndicadores();
+        carregarUsuarioLogado();
     }
 
     /**
@@ -498,6 +508,9 @@ public class MenuController implements Initializable {
 
 			        try {
 
+			            // Encerra a sessão do usuário atual
+			            SessaoUsuario.encerrarSessao();
+
 			            FXMLLoader loader = new FXMLLoader(
 			                getClass().getResource("/view/TelaLogin.fxml")
 			            );
@@ -512,11 +525,30 @@ public class MenuController implements Initializable {
 			            stage.show();
 
 			        } catch (IOException e) {
-
 			            e.printStackTrace();
-
 			        }
 			    }
+			}
+			private void carregarUsuarioLogado() {
+
+			    if (!SessaoUsuario.temUsuarioLogado()) {
+
+			        lblUsuarioLogado.setText("Usuário");
+			        lblPerfilUsuario.setText("");
+
+			        return;
+			    }
+
+			    Usuario usuario =
+			            SessaoUsuario.getUsuarioLogado();
+
+			    lblUsuarioLogado.setText(
+			            usuario.getNome()
+			    );
+
+			    lblPerfilUsuario.setText(
+			            usuario.getTipo()
+			    );
 			}
     }
 

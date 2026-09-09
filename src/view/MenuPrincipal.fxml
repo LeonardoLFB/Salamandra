@@ -149,21 +149,40 @@
 
                     </JFXButton>
 
-                    <Separator
-                        orientation="VERTICAL"
-                        prefHeight="28.0"
-                        opacity="0.35" />
+                 <Separator
+    orientation="VERTICAL"
+    prefHeight="28.0"
+    opacity="0.35" />
 
-                    <JFXButton
-                        fx:id="btSair"
-                        onAction="#OnBtSairClick"
-                        styleClass="logout-btn"
-                        text="Sair"
-                        alignment="CENTER"
-                        minWidth="70.0"
-                        prefWidth="70.0"
-                        minHeight="38.0"
-                        prefHeight="38.0" />
+<!-- USUÁRIO LOGADO -->
+
+<VBox
+    alignment="CENTER_RIGHT"
+    spacing="1"
+    minWidth="110">
+
+    <Label
+        fx:id="lblUsuarioLogado"
+        styleClass="header-user-name"
+        text="Usuário" />
+
+    <Label
+        fx:id="lblPerfilUsuario"
+        styleClass="header-user-role"
+        text="Perfil" />
+
+</VBox>
+
+<JFXButton
+    fx:id="btSair"
+    onAction="#OnBtSairClick"
+    styleClass="logout-btn"
+    text="Sair"
+    alignment="CENTER"
+    minWidth="70.0"
+    prefWidth="70.0"
+    minHeight="38.0"
+    prefHeight="38.0" />
 
                 </HBox>
 

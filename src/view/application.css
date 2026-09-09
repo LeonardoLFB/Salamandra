@@ -1350,3 +1350,192 @@
     -fx-font-size: 11px;
     -fx-text-fill: #9CA3AF;
 }
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+
+.login-panel {
+    -fx-background-color:
+        linear-gradient(
+            to bottom right,
+            #B37100 0%,
+            #8B5A00 100%
+        );
+
+    -fx-background-radius: 14;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0, 0, 0, 0.28),
+            22,
+            0,
+            0,
+            6
+        );
+}
+
+
+/* TÍTULO */
+
+.login-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.login-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(255, 255, 255, 0.72);
+}
+
+
+/* LABEL DOS CAMPOS */
+
+.login-field-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: rgba(255, 255, 255, 0.85);
+}
+
+
+/* CAMPOS */
+
+.login-field {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+
+    -fx-border-color: rgba(255, 255, 255, 0.30);
+    -fx-border-width: 1;
+
+    -fx-text-fill: white;
+
+    -fx-prompt-text-fill:
+        rgba(255, 255, 255, 0.50);
+
+    -fx-font-size: 13px;
+
+    -fx-padding: 0 48 0 14;
+}
+
+.login-field:focused {
+    -fx-border-color: rgba(255, 255, 255, 0.85);
+
+    -fx-background-color:
+        rgba(255, 255, 255, 0.17);
+}
+
+
+/* MOSTRAR SENHA */
+
+.login-eye-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-cursor: hand;
+    -fx-padding: 6 12 6 12;
+}
+
+.login-eye-button:hover {
+    -fx-background-color:
+        rgba(255, 255, 255, 0.10);
+
+    -fx-background-radius: 8;
+}
+
+
+/* CHECKBOX */
+
+.login-checkbox {
+    -fx-text-fill:
+        rgba(255, 255, 255, 0.85);
+
+    -fx-font-size: 11px;
+}
+
+
+/* MENSAGEM */
+
+.login-message {
+    -fx-background-color:
+        rgba(127, 29, 29, 0.32);
+
+    -fx-background-radius: 8;
+
+    -fx-padding: 8 10 8 10;
+
+    -fx-text-fill: #FEE2E2;
+
+    -fx-font-size: 11px;
+}
+
+
+/* BOTÃO ENTRAR */
+
+.login-primary-button {
+    -fx-background-color: white;
+
+    -fx-background-radius: 10;
+
+    -fx-text-fill: #8B5A00;
+
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+
+    -fx-cursor: hand;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0, 0, 0, 0.18),
+            8,
+            0,
+            0,
+            2
+        );
+}
+
+.login-primary-button:hover {
+    -fx-background-color: #F9FAFB;
+}
+
+
+/* CANCELAR */
+
+.login-secondary-button {
+    -fx-background-color: transparent;
+
+    -fx-background-radius: 10;
+
+    -fx-border-radius: 10;
+
+    -fx-border-color:
+        rgba(255, 255, 255, 0.60);
+
+    -fx-text-fill: white;
+
+    -fx-cursor: hand;
+}
+
+.login-secondary-button:hover {
+    -fx-background-color:
+        rgba(255, 255, 255, 0.10);
+}
+
+/* ============================================================
+   USUÁRIO LOGADO - HEADER
+   ============================================================ */
+
+.header-user-name {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.header-user-role {
+    -fx-font-size: 10px;
+    -fx-text-fill: rgba(255, 255, 255, 0.72);
+}
