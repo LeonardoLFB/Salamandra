@@ -81,6 +81,15 @@ public class MenuController implements Initializable {
     @FXML
     private Label lblPerfilUsuario;
     
+    @FXML
+    private JFXButton btAtalhoClientes;
+
+    @FXML
+    private JFXButton btAtalhoFornecedores;
+
+    @FXML
+    private JFXButton btAtalhoVendas;
+    
 
     
     private Parent dashboardInicial;
@@ -116,6 +125,7 @@ public class MenuController implements Initializable {
 
         carregarIndicadores();
         carregarUsuarioLogado();
+        aplicarPermissoesUsuario();
     }
 
     /**
@@ -549,6 +559,98 @@ public class MenuController implements Initializable {
 			    lblPerfilUsuario.setText(
 			            usuario.getTipo()
 			    );
+			}
+			
+			private void aplicarPermissoesUsuario() {
+
+			    if (!SessaoUsuario.temUsuarioLogado()) {
+			        return;
+			    }
+
+			    Usuario usuario = SessaoUsuario.getUsuarioLogado();
+
+			    String tipo = usuario.getTipo();
+
+			    if (tipo == null) {
+			        return;
+			    }
+
+			    switch (tipo.toLowerCase()) {
+
+			        case "administrador":
+			            liberarAcessoCompleto();
+			            configurarBotao(btAtalhoClientes, true);
+			            configurarBotao(btAtalhoFornecedores, true);
+			            configurarBotao(btAtalhoVendas, true);
+			            break;
+
+			        case "vendedor":
+			            configurarPermissoesVendedor();
+			            configurarBotao(btAtalhoClientes, true);
+			            configurarBotao(btAtalhoFornecedores, false);
+			            configurarBotao(btAtalhoVendas, true);
+			            break;
+
+			        case "estoquista":
+			            configurarPermissoesEstoquista();
+			            configurarBotao(btAtalhoClientes, false);
+			            configurarBotao(btAtalhoFornecedores, true);
+			            configurarBotao(btAtalhoVendas, false);
+			            break;
+
+			        default:
+			            bloquearAcessos();
+			            configurarBotao(btAtalhoClientes, false);
+			            configurarBotao(btAtalhoFornecedores, false);
+			            configurarBotao(btAtalhoVendas, false);
+			            break;
+			    }
+			}
+			
+			private void liberarAcessoCompleto() {
+
+			    configurarBotao(btProdutos, true);
+			    configurarBotao(btClientes, true);
+			    configurarBotao(btFornecedores, true);
+			    configurarBotao(btVendas, true);
+			    configurarBotao(btEstoque, true);
+			    configurarBotao(btUsuarios, true);
+			}
+			
+			private void configurarPermissoesVendedor() {
+
+			    configurarBotao(btProdutos, false);
+			    configurarBotao(btClientes, true);
+			    configurarBotao(btFornecedores, false);
+			    configurarBotao(btVendas, true);
+			    configurarBotao(btEstoque, true);
+			    configurarBotao(btUsuarios, false);
+			}
+			
+			private void configurarPermissoesEstoquista() {
+
+			    configurarBotao(btProdutos, true);
+			    configurarBotao(btClientes, false);
+			    configurarBotao(btFornecedores, true);
+			    configurarBotao(btVendas, false);
+			    configurarBotao(btEstoque, true);
+			    configurarBotao(btUsuarios, false);
+			}
+			
+			private void bloquearAcessos() {
+
+			    configurarBotao(btProdutos, false);
+			    configurarBotao(btClientes, false);
+			    configurarBotao(btFornecedores, false);
+			    configurarBotao(btVendas, false);
+			    configurarBotao(btEstoque, false);
+			    configurarBotao(btUsuarios, false);
+			}
+			
+			private void configurarBotao(JFXButton botao, boolean permitido) {
+
+			    botao.setVisible(permitido);
+			    botao.setManaged(permitido);
 			}
     }
 

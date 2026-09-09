@@ -90,6 +90,7 @@
                     <!-- ATALHOS -->
 
                     <JFXButton
+                    	fx:id="btAtalhoClientes"
                         onAction="#OnBtClientesClick"
                         styleClass="nav-btn"
                         text="Clientes">
@@ -110,6 +111,7 @@
                     </JFXButton>
 
                     <JFXButton
+                    	fx:id="btAtalhoFornecedores"	
                         onAction="#OnBtFornecedoresClick"
                         styleClass="nav-btn"
                         text="Fornecedores">
@@ -130,6 +132,7 @@
                     </JFXButton>
 
                     <JFXButton
+                    	fx:id="btAtalhoVendas"
                         onAction="#OnBtVendasClick"
                         styleClass="nav-btn"
                         text="Vendas">
