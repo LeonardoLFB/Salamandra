@@ -1039,3 +1039,97 @@
     -fx-background-color: #FEE2E2;
     -fx-text-fill: #991B1B;
 }
+
+/* ============================================================
+   VENDAS
+   ============================================================ */
+
+.sale-total-box {
+    -fx-background-color: #F9FAFB;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-padding: 10 16 10 16;
+    -fx-min-width: 220px;
+}
+
+.sale-total-label {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6B7280;
+}
+
+.sale-total-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #B1812C;
+}
+
+/* ============================================================
+   STATUS DAS VENDAS
+   ============================================================ */
+
+.sale-status-badge {
+    -fx-background-radius: 999;
+    -fx-padding: 4 9 4 9;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.sale-status-pending {
+    -fx-background-color: #FEF3C7;
+    -fx-text-fill: #92400E;
+}
+
+.sale-status-completed {
+    -fx-background-color: #DCFCE7;
+    -fx-text-fill: #166534;
+}
+
+.sale-status-cancelled {
+    -fx-background-color: #FEE2E2;
+    -fx-text-fill: #991B1B;
+}
+
+
+/* ============================================================
+   AÇÕES DAS VENDAS
+   ============================================================ */
+
+.sale-action-view,
+.sale-action-complete,
+.sale-action-cancel {
+    -fx-background-radius: 7;
+    -fx-padding: 5 9 5 9;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+}
+
+.sale-action-view {
+    -fx-background-color: #E0F2FE;
+    -fx-text-fill: #0369A1;
+}
+
+.sale-action-view:hover {
+    -fx-background-color: #BAE6FD;
+}
+
+.sale-action-complete {
+    -fx-background-color: #DCFCE7;
+    -fx-text-fill: #166534;
+}
+
+.sale-action-complete:hover {
+    -fx-background-color: #BBF7D0;
+}
+
+.sale-action-cancel {
+    -fx-background-color: #FEE2E2;
+    -fx-text-fill: #991B1B;
+}
+
+.sale-action-cancel:hover {
+    -fx-background-color: #FECACA;
+}
