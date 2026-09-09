@@ -1151,3 +1151,202 @@
     -fx-font-size: 12px;
     -fx-text-fill: #6B7280;
 }
+
+/* ============================================================
+   DASHBOARD - VERSÃO FINAL
+   ============================================================ */
+
+.dashboard-scroll {
+    -fx-background-color: #F3F4F6;
+    -fx-background: #F3F4F6;
+    -fx-border-color: transparent;
+}
+
+.dashboard-scroll > .viewport {
+    -fx-background-color: #F3F4F6;
+}
+
+.dashboard {
+    -fx-background-color: #F3F4F6;
+}
+
+
+/* ============================================================
+   INDICADORES PRINCIPAIS
+   ============================================================ */
+
+.dashboard-stat-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-padding: 17 18 17 18;
+    -fx-min-height: 96px;
+}
+
+.dashboard-stat-icon {
+    -fx-background-color: #F6EEDD;
+    -fx-background-radius: 10;
+    -fx-min-width: 52px;
+    -fx-pref-width: 52px;
+    -fx-min-height: 52px;
+    -fx-pref-height: 52px;
+}
+
+.dashboard-stat-label {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6B7280;
+}
+
+.dashboard-stat-value {
+    -fx-font-size: 23px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #B1812C;
+}
+
+.dashboard-stat-warning {
+    -fx-text-fill: #C2410C;
+}
+
+.dashboard-stat-success {
+    -fx-text-fill: #15803D;
+}
+
+.dashboard-stat-help {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9CA3AF;
+}
+
+
+/* ============================================================
+   RESUMO FINANCEIRO
+   ============================================================ */
+
+.dashboard-finance-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-padding: 18 20 18 20;
+    -fx-min-height: 105px;
+}
+
+.dashboard-finance-icon {
+    -fx-background-color: #DCFCE7;
+    -fx-background-radius: 10;
+    -fx-min-width: 56px;
+    -fx-pref-width: 56px;
+    -fx-min-height: 56px;
+    -fx-pref-height: 56px;
+}
+
+.dashboard-finance-symbol {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #15803D;
+}
+
+.dashboard-finance-label {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6B7280;
+}
+
+.dashboard-finance-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #15803D;
+}
+
+.dashboard-finance-help {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9CA3AF;
+}
+
+
+/* ============================================================
+   VENDAS PENDENTES
+   ============================================================ */
+
+.dashboard-pending-icon {
+    -fx-background-color: #FFEDD5;
+    -fx-background-radius: 10;
+    -fx-min-width: 56px;
+    -fx-pref-width: 56px;
+    -fx-min-height: 56px;
+    -fx-pref-height: 56px;
+}
+
+.dashboard-pending-symbol {
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #C2410C;
+}
+
+.dashboard-pending-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #C2410C;
+}
+
+
+/* ============================================================
+   PAINÉIS INFERIORES
+   ============================================================ */
+
+.dashboard-section {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-padding: 18 20 18 20;
+    -fx-min-height: 270px;
+}
+
+.dashboard-section-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1F2937;
+}
+
+.dashboard-section-subtitle {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9CA3AF;
+}
+
+.dashboard-item {
+    -fx-padding: 10 0 10 0;
+    -fx-border-color: transparent transparent #E5E7EB transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.dashboard-item-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #1F2937;
+}
+
+.dashboard-item-sub {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6B7280;
+}
+
+.dashboard-empty {
+    -fx-font-size: 12px;
+    -fx-text-fill: #9CA3AF;
+    -fx-padding: 12 0 12 0;
+}
+
+
+/* ============================================================
+   RODAPÉ
+   ============================================================ */
+
+.dashboard-footer {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9CA3AF;
+}
