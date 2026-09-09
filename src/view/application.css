@@ -979,3 +979,63 @@
     -fx-font-size: 12px;
     -fx-text-fill: #6B7280;
 }
+
+/* ============================================================
+   ESTOQUE
+   ============================================================ */
+
+.stock-footer {
+    -fx-background-color: #F9FAFB;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-padding: 10 14 10 14;
+}
+
+.stock-footer-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6B7280;
+}
+
+.stock-summary-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6B7280;
+}
+
+.stock-summary-value {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1F2937;
+}
+
+.stock-summary-currency {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6B7280;
+}
+
+/* ============================================================
+   STATUS DO ESTOQUE
+   ============================================================ */
+
+.stock-badge {
+    -fx-background-radius: 999;
+    -fx-padding: 4 9 4 9;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.stock-badge-ok {
+    -fx-background-color: #DCFCE7;
+    -fx-text-fill: #166534;
+}
+
+.stock-badge-low {
+    -fx-background-color: #FEF3C7;
+    -fx-text-fill: #92400E;
+}
+
+.stock-badge-empty {
+    -fx-background-color: #FEE2E2;
+    -fx-text-fill: #991B1B;
+}
