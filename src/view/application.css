@@ -1133,3 +1133,21 @@
 .sale-action-cancel:hover {
     -fx-background-color: #FECACA;
 }
+
+/* ============================================================
+   USUÁRIOS
+   ============================================================ */
+
+.user-list-footer {
+    -fx-background-color: #F9FAFB;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-padding: 10 14 10 14;
+}
+
+.user-footer-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6B7280;
+}
