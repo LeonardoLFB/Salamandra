@@ -1,20 +1,19 @@
 package controller;
 
 import java.io.IOException;
-
 import java.net.URL;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
-
 
 import com.jfoenix.controls.JFXButton;
 
+import application.PermissoesUsuario;
+import application.SessaoUsuario;
 import database.ClienteDAO;
 import database.ProdutoDAO;
 import database.VendaDAO;
-import model.Produto;
-import model.Venda;
-
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,64 +22,58 @@ import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-
-import java.util.Comparator;
-
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-
-import javafx.scene.layout.StackPane;
-
-import java.util.Optional;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-
-import application.SessaoUsuario;
+import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import model.Produto;
 import model.Usuario;
+import model.Venda;
 
 public class MenuController implements Initializable {
 
- 
-	@FXML private Label Menu;
-    @FXML private Label MenuClose;
-    @FXML private AnchorPane Slider;
-    @FXML private JFXButton btClientes;
-    @FXML private JFXButton btEstoque;
-    @FXML private JFXButton btFornecedores;
-    @FXML private JFXButton btProdutos;
-    @FXML private JFXButton btUsuarios;
-    @FXML private JFXButton btVendas;
-
-    // Indicadores do painel inicial
-    @FXML private Label lblQtdClientes;
-    @FXML private Label lblQtdProdutos;
-    @FXML private Label lblEstoqueBaixo;
-    @FXML private Label lblQtdVendas;
-    @FXML private Label lblFaturamento;
-    @FXML private Label lblPendentes;
-
-    @FXML private VBox boxUltimasVendas;
-    @FXML private VBox boxEstoqueBaixo;
-    
-    @FXML private StackPane conteudoPrincipal;
-    
-    @FXML private VBox dashboardPrincipal;
-    
-    @FXML private JFXButton btSair;
-    
-    @FXML
-    private Label lblUsuarioLogado;
+    // ============================================================
+    // MENU / SIDEBAR
+    // ============================================================
 
     @FXML
-    private Label lblPerfilUsuario;
-    
+    private Label Menu;
+
+    @FXML
+    private Label MenuClose;
+
+    @FXML
+    private AnchorPane Slider;
+
+    @FXML
+    private JFXButton btClientes;
+
+    @FXML
+    private JFXButton btEstoque;
+
+    @FXML
+    private JFXButton btFornecedores;
+
+    @FXML
+    private JFXButton btProdutos;
+
+    @FXML
+    private JFXButton btUsuarios;
+
+    @FXML
+    private JFXButton btVendas;
+
+    // ============================================================
+    // ATALHOS DO CABEÇALHO
+    // ============================================================
+
     @FXML
     private JFXButton btAtalhoClientes;
 
@@ -89,19 +82,66 @@ public class MenuController implements Initializable {
 
     @FXML
     private JFXButton btAtalhoVendas;
-    
 
-    
+    // ============================================================
+    // USUÁRIO LOGADO
+    // ============================================================
+
+    @FXML
+    private Label lblUsuarioLogado;
+
+    @FXML
+    private Label lblPerfilUsuario;
+
+    // ============================================================
+    // DASHBOARD
+    // ============================================================
+
+    @FXML
+    private Label lblQtdClientes;
+
+    @FXML
+    private Label lblQtdProdutos;
+
+    @FXML
+    private Label lblEstoqueBaixo;
+
+    @FXML
+    private Label lblQtdVendas;
+
+    @FXML
+    private Label lblFaturamento;
+
+    @FXML
+    private Label lblPendentes;
+
+    @FXML
+    private VBox boxUltimasVendas;
+
+    @FXML
+    private VBox boxEstoqueBaixo;
+
+    @FXML
+    private StackPane conteudoPrincipal;
+
+    @FXML
+    private VBox dashboardPrincipal;
+
+    @FXML
+    private JFXButton btSair;
+
     private Parent dashboardInicial;
-	
-// fx:id="Slider"     (sidebar)
 
-    private static final double SIDEBAR_WIDTH = 176; // ajuste se a largura for outra
+    private static final double SIDEBAR_WIDTH = 176;
+
+    // ============================================================
+    // INICIALIZAÇÃO
+    // ============================================================
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        // Sidebar começa completamente fora do layout
+        // Sidebar começa fora do layout
         Slider.setVisible(false);
         Slider.setManaged(false);
         Slider.setTranslateX(0);
@@ -110,7 +150,7 @@ public class MenuController implements Initializable {
         Menu.setCursor(Cursor.HAND);
         MenuClose.setCursor(Cursor.HAND);
 
-        // Estado inicial dos botões
+        // Estado inicial dos botões do menu
         Menu.setVisible(true);
         Menu.setManaged(true);
 
@@ -128,19 +168,21 @@ public class MenuController implements Initializable {
         aplicarPermissoesUsuario();
     }
 
-    /**
-     * Preenche os cartões do painel inicial com os números do banco.
-     * Falhas de conexão não podem derrubar o menu: nesse caso os
-     * cartões apenas continuam mostrando "—".
-     */
+    // ============================================================
+    // DASHBOARD
+    // ============================================================
+
     private void carregarIndicadores() {
+
         try {
+
             List<Produto> produtos = new ProdutoDAO().getAll();
             List<Venda> vendas = new VendaDAO().getAll();
 
             int estoqueBaixo = 0;
 
             for (Produto p : produtos) {
+
                 if (p.getQtdeEstoque() <= 10) {
                     estoqueBaixo++;
                 }
@@ -150,6 +192,7 @@ public class MenuController implements Initializable {
             double faturamento = 0.0;
 
             for (Venda v : vendas) {
+
                 if ("Pendente".equals(v.getStatus())) {
                     pendentes++;
                 }
@@ -160,7 +203,9 @@ public class MenuController implements Initializable {
             }
 
             lblQtdClientes.setText(
-                String.valueOf(new ClienteDAO().getAll().size())
+                String.valueOf(
+                    new ClienteDAO().getAll().size()
+                )
             );
 
             lblQtdProdutos.setText(
@@ -187,6 +232,7 @@ public class MenuController implements Initializable {
             carregarProdutosEstoqueBaixo(produtos);
 
         } catch (Exception e) {
+
             System.err.println(
                 "Não foi possível carregar os indicadores: "
                 + e.getMessage()
@@ -195,23 +241,30 @@ public class MenuController implements Initializable {
             e.printStackTrace();
         }
     }
-    
+
     private void carregarUltimasVendas(List<Venda> vendas) {
 
         boxUltimasVendas.getChildren().clear();
 
         if (vendas.isEmpty()) {
 
-            Label vazio = new Label("Nenhuma venda encontrada.");
-            vazio.getStyleClass().add("dashboard-empty");
+            Label vazio =
+                new Label("Nenhuma venda encontrada.");
 
-            boxUltimasVendas.getChildren().add(vazio);
+            vazio.getStyleClass().add(
+                "dashboard-empty"
+            );
+
+            boxUltimasVendas
+                .getChildren()
+                .add(vazio);
 
             return;
         }
 
         vendas.sort(
-            Comparator.comparing(Venda::getData,
+            Comparator.comparing(
+                Venda::getData,
                 Comparator.nullsLast(
                     Comparator.naturalOrder()
                 )
@@ -272,7 +325,7 @@ public class MenuController implements Initializable {
 
             HBox.setHgrow(
                 espaco,
-                javafx.scene.layout.Priority.ALWAYS
+                Priority.ALWAYS
             );
 
             linha.getChildren().addAll(
@@ -290,15 +343,19 @@ public class MenuController implements Initializable {
                 .add(linha);
         }
     }
-    
+
     private void carregarProdutosEstoqueBaixo(
             List<Produto> produtos) {
 
-        boxEstoqueBaixo.getChildren().clear();
+        boxEstoqueBaixo
+            .getChildren()
+            .clear();
 
         List<Produto> produtosBaixos =
             produtos.stream()
-                .filter(p -> p.getQtdeEstoque() <= 10)
+                .filter(
+                    p -> p.getQtdeEstoque() <= 10
+                )
                 .sorted(
                     Comparator.comparingInt(
                         Produto::getQtdeEstoque
@@ -328,9 +385,8 @@ public class MenuController implements Initializable {
 
             VBox informacoes = new VBox(2);
 
-            Label nome = new Label(
-                produto.getNome()
-            );
+            Label nome =
+                new Label(produto.getNome());
 
             nome.getStyleClass().add(
                 "dashboard-item-title"
@@ -366,7 +422,7 @@ public class MenuController implements Initializable {
 
             HBox.setHgrow(
                 espaco,
-                javafx.scene.layout.Priority.ALWAYS
+                Priority.ALWAYS
             );
 
             linha.getChildren().addAll(
@@ -384,24 +440,26 @@ public class MenuController implements Initializable {
                 .add(linha);
         }
     }
-    
+
+    // ============================================================
+    // SIDEBAR
+    // ============================================================
+
     private void openSidebar() {
 
-        // Coloca a sidebar novamente no layout
         Slider.setManaged(true);
         Slider.setVisible(true);
 
-        // Começa deslocada para a esquerda
-        Slider.setTranslateX(-SIDEBAR_WIDTH);
+        Slider.setTranslateX(
+            -SIDEBAR_WIDTH
+        );
 
-        // Troca o botão MENU pelo X MENU
         Menu.setVisible(false);
         Menu.setManaged(false);
 
         MenuClose.setVisible(true);
         MenuClose.setManaged(true);
 
-        // Anima a entrada
         TranslateTransition slide =
             new TranslateTransition(
                 Duration.seconds(0.3),
@@ -409,7 +467,6 @@ public class MenuController implements Initializable {
             );
 
         slide.setToX(0);
-
         slide.play();
     }
 
@@ -421,18 +478,17 @@ public class MenuController implements Initializable {
                 Slider
             );
 
-        slide.setToX(-SIDEBAR_WIDTH);
+        slide.setToX(
+            -SIDEBAR_WIDTH
+        );
 
         slide.setOnFinished(e -> {
 
-            // Remove completamente a sidebar do layout
             Slider.setVisible(false);
             Slider.setManaged(false);
 
-            // Reseta a posição para a próxima abertura
             Slider.setTranslateX(0);
 
-            // Volta para o botão MENU
             MenuClose.setVisible(false);
             MenuClose.setManaged(false);
 
@@ -442,215 +498,306 @@ public class MenuController implements Initializable {
 
         slide.play();
     }
-        
+
+    // ============================================================
+    // NAVEGAÇÃO + PROTEÇÃO DE ACESSO
+    // ============================================================
+
+    @FXML
     public void OnBtProdutosClick(ActionEvent event) {
 
-        carregarTela("/view/Produtos.fxml");
+        if (!PermissoesUsuario.podeAcessarProdutos()) {
 
-    }
-			
-        	public void OnBtEstoqueClick(ActionEvent event) {
-
-            carregarTela("/view/Estoque.fxml");
-
+            mostrarAcessoNegado();
+            return;
         }
-        	public void OnBtFornecedoresClick(ActionEvent event) {
 
-        	    carregarTela("/view/Fornecedores.fxml");
-
-        	}
-			public void OnBtClientesClick(ActionEvent event) {
-
-			    carregarTela("/view/Clientes.fxml");
-
-			}
-			public void OnBtUsuariosClick(ActionEvent event) {
-
-			    carregarTela("/view/Usuarios.fxml");
-
-			}    
-			public void OnBtVendasClick(ActionEvent event) {
-
-			    carregarTela("/view/Vendas.fxml");
-
-			}
-			
-			private void carregarTela(String caminhoFXML) {
-
-			    try {
-
-			        FXMLLoader loader =
-			                new FXMLLoader(getClass().getResource(caminhoFXML));
-
-			        Parent tela = loader.load();
-
-			        conteudoPrincipal.getChildren().clear();
-			        conteudoPrincipal.getChildren().add(tela);
-
-			    } catch (IOException e) {
-
-			        e.printStackTrace();
-
-			    }
-			}
-			
-			@FXML
-			private void voltarDashboard() {
-
-			    conteudoPrincipal.getChildren().clear();
-			    conteudoPrincipal.getChildren().add(dashboardInicial);
-
-			    carregarIndicadores();
-			}
-			
-			@FXML
-			private void OnBtSairClick(ActionEvent event) {
-
-			    Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
-
-			    alerta.setTitle("Confirmação");
-			    alerta.setHeaderText("Deseja realmente sair do sistema?");
-			    alerta.setContentText("Você será redirecionado para a tela de login.");
-
-			    Optional<ButtonType> resultado = alerta.showAndWait();
-
-			    if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-
-			        try {
-
-			            // Encerra a sessão do usuário atual
-			            SessaoUsuario.encerrarSessao();
-
-			            FXMLLoader loader = new FXMLLoader(
-			                getClass().getResource("/view/TelaLogin.fxml")
-			            );
-
-			            Parent telaLogin = loader.load();
-
-			            Stage stage = (Stage) btSair.getScene().getWindow();
-
-			            Scene scene = new Scene(telaLogin);
-
-			            stage.setScene(scene);
-			            stage.show();
-
-			        } catch (IOException e) {
-			            e.printStackTrace();
-			        }
-			    }
-			}
-			private void carregarUsuarioLogado() {
-
-			    if (!SessaoUsuario.temUsuarioLogado()) {
-
-			        lblUsuarioLogado.setText("Usuário");
-			        lblPerfilUsuario.setText("");
-
-			        return;
-			    }
-
-			    Usuario usuario =
-			            SessaoUsuario.getUsuarioLogado();
-
-			    lblUsuarioLogado.setText(
-			            usuario.getNome()
-			    );
-
-			    lblPerfilUsuario.setText(
-			            usuario.getTipo()
-			    );
-			}
-			
-			private void aplicarPermissoesUsuario() {
-
-			    if (!SessaoUsuario.temUsuarioLogado()) {
-			        return;
-			    }
-
-			    Usuario usuario = SessaoUsuario.getUsuarioLogado();
-
-			    String tipo = usuario.getTipo();
-
-			    if (tipo == null) {
-			        return;
-			    }
-
-			    switch (tipo.toLowerCase()) {
-
-			        case "administrador":
-			            liberarAcessoCompleto();
-			            configurarBotao(btAtalhoClientes, true);
-			            configurarBotao(btAtalhoFornecedores, true);
-			            configurarBotao(btAtalhoVendas, true);
-			            break;
-
-			        case "vendedor":
-			            configurarPermissoesVendedor();
-			            configurarBotao(btAtalhoClientes, true);
-			            configurarBotao(btAtalhoFornecedores, false);
-			            configurarBotao(btAtalhoVendas, true);
-			            break;
-
-			        case "estoquista":
-			            configurarPermissoesEstoquista();
-			            configurarBotao(btAtalhoClientes, false);
-			            configurarBotao(btAtalhoFornecedores, true);
-			            configurarBotao(btAtalhoVendas, false);
-			            break;
-
-			        default:
-			            bloquearAcessos();
-			            configurarBotao(btAtalhoClientes, false);
-			            configurarBotao(btAtalhoFornecedores, false);
-			            configurarBotao(btAtalhoVendas, false);
-			            break;
-			    }
-			}
-			
-			private void liberarAcessoCompleto() {
-
-			    configurarBotao(btProdutos, true);
-			    configurarBotao(btClientes, true);
-			    configurarBotao(btFornecedores, true);
-			    configurarBotao(btVendas, true);
-			    configurarBotao(btEstoque, true);
-			    configurarBotao(btUsuarios, true);
-			}
-			
-			private void configurarPermissoesVendedor() {
-
-			    configurarBotao(btProdutos, false);
-			    configurarBotao(btClientes, true);
-			    configurarBotao(btFornecedores, false);
-			    configurarBotao(btVendas, true);
-			    configurarBotao(btEstoque, true);
-			    configurarBotao(btUsuarios, false);
-			}
-			
-			private void configurarPermissoesEstoquista() {
-
-			    configurarBotao(btProdutos, true);
-			    configurarBotao(btClientes, false);
-			    configurarBotao(btFornecedores, true);
-			    configurarBotao(btVendas, false);
-			    configurarBotao(btEstoque, true);
-			    configurarBotao(btUsuarios, false);
-			}
-			
-			private void bloquearAcessos() {
-
-			    configurarBotao(btProdutos, false);
-			    configurarBotao(btClientes, false);
-			    configurarBotao(btFornecedores, false);
-			    configurarBotao(btVendas, false);
-			    configurarBotao(btEstoque, false);
-			    configurarBotao(btUsuarios, false);
-			}
-			
-			private void configurarBotao(JFXButton botao, boolean permitido) {
-
-			    botao.setVisible(permitido);
-			    botao.setManaged(permitido);
-			}
+        carregarTela("/view/Produtos.fxml");
     }
 
+    @FXML
+    public void OnBtEstoqueClick(ActionEvent event) {
+
+        if (!PermissoesUsuario.podeAcessarEstoque()) {
+
+            mostrarAcessoNegado();
+            return;
+        }
+
+        carregarTela("/view/Estoque.fxml");
+    }
+
+    @FXML
+    public void OnBtFornecedoresClick(ActionEvent event) {
+
+        if (!PermissoesUsuario.podeAcessarFornecedores()) {
+
+            mostrarAcessoNegado();
+            return;
+        }
+
+        carregarTela("/view/Fornecedores.fxml");
+    }
+
+    @FXML
+    public void OnBtClientesClick(ActionEvent event) {
+
+        if (!PermissoesUsuario.podeAcessarClientes()) {
+
+            mostrarAcessoNegado();
+            return;
+        }
+
+        carregarTela("/view/Clientes.fxml");
+    }
+
+    @FXML
+    public void OnBtUsuariosClick(ActionEvent event) {
+
+        if (!PermissoesUsuario.podeAcessarUsuarios()) {
+
+            mostrarAcessoNegado();
+            return;
+        }
+
+        carregarTela("/view/Usuarios.fxml");
+    }
+
+    @FXML
+    public void OnBtVendasClick(ActionEvent event) {
+
+        if (!PermissoesUsuario.podeAcessarVendas()) {
+
+            mostrarAcessoNegado();
+            return;
+        }
+
+        carregarTela("/view/Vendas.fxml");
+    }
+
+    private void mostrarAcessoNegado() {
+
+        Alert alerta =
+            new Alert(Alert.AlertType.WARNING);
+
+        alerta.setTitle(
+            "Acesso restrito"
+        );
+
+        alerta.setHeaderText(
+            "Você não possui permissão para acessar esta área."
+        );
+
+        alerta.setContentText(
+            "Esta funcionalidade não está disponível "
+            + "para o seu perfil de usuário."
+        );
+
+        alerta.showAndWait();
+    }
+
+    private void carregarTela(
+            String caminhoFXML) {
+
+        try {
+
+            FXMLLoader loader =
+                new FXMLLoader(
+                    getClass().getResource(
+                        caminhoFXML
+                    )
+                );
+
+            Parent tela = loader.load();
+
+            conteudoPrincipal
+                .getChildren()
+                .clear();
+
+            conteudoPrincipal
+                .getChildren()
+                .add(tela);
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+    }
+
+    // ============================================================
+    // VOLTAR PARA O DASHBOARD
+    // ============================================================
+
+    @FXML
+    private void voltarDashboard() {
+
+        conteudoPrincipal
+            .getChildren()
+            .clear();
+
+        conteudoPrincipal
+            .getChildren()
+            .add(dashboardInicial);
+
+        carregarIndicadores();
+    }
+
+    // ============================================================
+    // USUÁRIO LOGADO
+    // ============================================================
+
+    private void carregarUsuarioLogado() {
+
+        if (!SessaoUsuario.temUsuarioLogado()) {
+
+            lblUsuarioLogado.setText(
+                "Usuário"
+            );
+
+            lblPerfilUsuario.setText("");
+
+            return;
+        }
+
+        Usuario usuario =
+            SessaoUsuario.getUsuarioLogado();
+
+        lblUsuarioLogado.setText(
+            usuario.getNome()
+        );
+
+        lblPerfilUsuario.setText(
+            usuario.getTipo()
+        );
+    }
+
+    // ============================================================
+    // PERMISSÕES VISUAIS
+    // ============================================================
+
+    private void aplicarPermissoesUsuario() {
+
+        // Sidebar
+
+        configurarBotao(
+            btProdutos,
+            PermissoesUsuario.podeAcessarProdutos()
+        );
+
+        configurarBotao(
+            btClientes,
+            PermissoesUsuario.podeAcessarClientes()
+        );
+
+        configurarBotao(
+            btFornecedores,
+            PermissoesUsuario.podeAcessarFornecedores()
+        );
+
+        configurarBotao(
+            btVendas,
+            PermissoesUsuario.podeAcessarVendas()
+        );
+
+        configurarBotao(
+            btEstoque,
+            PermissoesUsuario.podeAcessarEstoque()
+        );
+
+        configurarBotao(
+            btUsuarios,
+            PermissoesUsuario.podeAcessarUsuarios()
+        );
+
+        // Atalhos do cabeçalho
+
+        configurarBotao(
+            btAtalhoClientes,
+            PermissoesUsuario.podeAcessarClientes()
+        );
+
+        configurarBotao(
+            btAtalhoFornecedores,
+            PermissoesUsuario.podeAcessarFornecedores()
+        );
+
+        configurarBotao(
+            btAtalhoVendas,
+            PermissoesUsuario.podeAcessarVendas()
+        );
+    }
+
+    private void configurarBotao(
+            JFXButton botao,
+            boolean permitido) {
+
+        botao.setVisible(permitido);
+        botao.setManaged(permitido);
+    }
+
+    // ============================================================
+    // LOGOUT
+    // ============================================================
+
+    @FXML
+    private void OnBtSairClick(
+            ActionEvent event) {
+
+        Alert alerta =
+            new Alert(
+                Alert.AlertType.CONFIRMATION
+            );
+
+        alerta.setTitle(
+            "Confirmação"
+        );
+
+        alerta.setHeaderText(
+            "Deseja realmente sair do sistema?"
+        );
+
+        alerta.setContentText(
+            "Você será redirecionado para a tela de login."
+        );
+
+        Optional<ButtonType> resultado =
+            alerta.showAndWait();
+
+        if (resultado.isPresent()
+                && resultado.get()
+                == ButtonType.OK) {
+
+            try {
+
+                FXMLLoader loader =
+                    new FXMLLoader(
+                        getClass().getResource(
+                            "/view/TelaLogin.fxml"
+                        )
+                    );
+
+                Parent telaLogin =
+                    loader.load();
+
+                // Encerra a sessão depois que
+                // a tela de login carregou corretamente
+                SessaoUsuario.encerrarSessao();
+
+                Stage stage =
+                    (Stage) btSair
+                        .getScene()
+                        .getWindow();
+
+                Scene scene =
+                    new Scene(telaLogin);
+
+                stage.setScene(scene);
+                stage.show();
+
+            } catch (IOException e) {
+
+                e.printStackTrace();
+            }
+        }
+    }
+}
