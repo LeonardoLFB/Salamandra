@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+
 <AnchorPane
     prefHeight="600"
     prefWidth="900"
@@ -177,11 +178,13 @@
                             <!-- MENSAGEM -->
 
                             <Label
-                                fx:id="lblMensagem"
-                                visible="false"
-                                managed="false"
-                                wrapText="true"
-                                styleClass="login-message" />
+    fx:id="lblMensagem"
+    visible="false"
+    managed="false"
+    wrapText="true"
+    maxWidth="420"
+    prefWidth="420"
+    styleClass="login-message" />
 
                             <!-- BOTÕES -->
 

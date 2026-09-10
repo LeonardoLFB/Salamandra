@@ -1465,11 +1465,11 @@
 
     -fx-background-radius: 8;
 
-    -fx-padding: 8 10 8 10;
+    -fx-padding: 8 12 9 10;
 
     -fx-text-fill: #FEE2E2;
 
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
 }
 
 
@@ -1627,9 +1627,6 @@
     -fx-text-fill: #B91C1C;
 }
 
-/* ---------- Badge "Crítico" para a coluna Situação (faltava) ---------- */
-
-.stock-badge-critical {
     -fx-background-color: #FFEDD5;
     -fx-text-fill: #C2410C;
 }

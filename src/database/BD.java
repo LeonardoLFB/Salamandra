@@ -53,16 +53,17 @@ public class BD {
 	 * Realiza a conexão ao banco de dados
 	 * @return - true em caso de sucesso, ou false caos contrário
 	 */
-	public boolean getConnection(){
-		try {
-			con = DriverManager.getConnection(URL,LOGIN,SENHA);
-			System.out.println("Conectou BD");
-			return true;
-		}
-		catch(SQLException erro) {
-			System.out.println("Falha na conexão " + erro);
-			return false;
-		}
+	public boolean getConnection() throws SQLException {
+
+	    con = DriverManager.getConnection(
+	            URL,
+	            LOGIN,
+	            SENHA
+	    );
+
+	    System.out.println("Conectou BD");
+
+	    return true;
 	}
 
 	public void close() {
@@ -86,9 +87,27 @@ public class BD {
 	}
 	
 	public static void main(String[] args) {
-		BD bd = new BD();
-		bd.getConnection();
-		//realizo a ação
+
+	    BD bd = new BD();
+
+	    try {
+
+	        bd.getConnection();
+
+	        System.out.println(
+	                "Teste de conexão realizado com sucesso."
+	        );
+
+	    } catch (SQLException e) {
+
+	        System.out.println(
+	                "Não foi possível conectar ao banco de dados."
+	        );
+
+	    } finally {
+
+	        bd.close();
+	    }
 	}
 
 }

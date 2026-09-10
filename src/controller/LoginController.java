@@ -369,11 +369,11 @@ public class LoginController {
 
             if (usuario == null) {
 
+                limparSenha();
+
                 mostrarMensagem(
                         "Usuário ou senha incorretos. Verifique os dados e tente novamente."
                 );
-
-                limparSenha();
 
                 focarSenha();
 
@@ -422,16 +422,11 @@ public class LoginController {
                     "Não foi possível entrar no sistema. Verifique a conexão com o banco de dados."
             );
 
-
             System.err.println(
-                    "Erro durante autenticação: "
-                    + e.getMessage()
+                    "Falha ao conectar com o banco de dados."
             );
 
-            e.printStackTrace();
-
-
-        } finally {
+        } finally { {
 
             btLogar.setDisable(
                     false
@@ -440,7 +435,7 @@ public class LoginController {
             btLogar.setText(
                     "Entrar"
             );
-        }
+        }}
     }
 
 

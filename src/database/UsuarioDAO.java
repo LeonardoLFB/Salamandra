@@ -669,13 +669,10 @@ public class UsuarioDAO {
 
         } catch (SQLException e) {
 
-            System.err.println(
-                    "Erro ao autenticar usuário: "
-                    + e.getMessage()
+            throw new RuntimeException(
+                    "Falha na conexão com o banco de dados.",
+                    e
             );
-
-            e.printStackTrace();
-
 
         } catch (Exception e) {
 
