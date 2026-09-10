@@ -70,6 +70,9 @@ public class MenuController implements Initializable {
     @FXML
     private JFXButton btVendas;
 
+    @FXML
+    private JFXButton btRelatorios;
+
     // ============================================================
     // ATALHOS DO CABEÇALHO
     // ============================================================
@@ -141,23 +144,19 @@ public class MenuController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        // Sidebar começa fora do layout
         Slider.setVisible(false);
         Slider.setManaged(false);
         Slider.setTranslateX(0);
 
-        // Cursores
         Menu.setCursor(Cursor.HAND);
         MenuClose.setCursor(Cursor.HAND);
 
-        // Estado inicial dos botões do menu
         Menu.setVisible(true);
         Menu.setManaged(true);
 
         MenuClose.setVisible(false);
         MenuClose.setManaged(false);
 
-        // Eventos
         Menu.setOnMouseClicked(e -> openSidebar());
         MenuClose.setOnMouseClicked(e -> closeSidebar());
 
@@ -575,6 +574,12 @@ public class MenuController implements Initializable {
         carregarTela("/view/Vendas.fxml");
     }
 
+    @FXML
+    public void OnBtRelatoriosClick(ActionEvent event) {
+
+        carregarTela("/view/Relatorios.fxml");
+    }
+
     private void mostrarAcessoNegado() {
 
         Alert alerta =
@@ -677,8 +682,6 @@ public class MenuController implements Initializable {
 
     private void aplicarPermissoesUsuario() {
 
-        // Sidebar
-
         configurarBotao(
             btProdutos,
             PermissoesUsuario.podeAcessarProdutos()
@@ -708,8 +711,6 @@ public class MenuController implements Initializable {
             btUsuarios,
             PermissoesUsuario.podeAcessarUsuarios()
         );
-
-        // Atalhos do cabeçalho
 
         configurarBotao(
             btAtalhoClientes,
@@ -779,8 +780,6 @@ public class MenuController implements Initializable {
                 Parent telaLogin =
                     loader.load();
 
-                // Encerra a sessão depois que
-                // a tela de login carregou corretamente
                 SessaoUsuario.encerrarSessao();
 
                 Stage stage =

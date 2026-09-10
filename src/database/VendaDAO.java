@@ -4,9 +4,14 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
 
 import model.ItemVenda;
 import model.Venda;
+
+import model.ProdutoMaisVendido;
+
+import model.ClienteMaisComprou;
 
 public class VendaDAO {
 
@@ -1192,7 +1197,287 @@ public class VendaDAO {
         return lista;
     }
 
+    
+    public List<Venda> buscarPorPeriodo(
+            LocalDateTime dataInicial,
+            LocalDateTime dataFinal) {
 
+        List<Venda> lista = new ArrayList<>();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT " +
+                    "v.id_venda, " +
+                    "v.id_cliente, " +
+                    "c.nome AS nome_cliente, " +
+                    "v.data, " +
+                    "v.valor_total, " +
+                    "v.status, " +
+                    "v.observacao " +
+                    "FROM venda v " +
+                    "LEFT JOIN cliente c " +
+                    "ON v.id_cliente = c.id_cliente " +
+                    "WHERE v.data BETWEEN ? AND ? " +
+                    "ORDER BY v.data DESC";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.st.setTimestamp(
+                    1,
+                    Timestamp.valueOf(dataInicial)
+            );
+
+            bd.st.setTimestamp(
+                    2,
+                    Timestamp.valueOf(dataFinal)
+            );
+
+            bd.rs = bd.st.executeQuery();
+
+            while (bd.rs.next()) {
+
+                int idVenda =
+                        bd.rs.getInt("id_venda");
+
+                int idCliente =
+                        bd.rs.getInt("id_cliente");
+
+                String nomeCliente =
+                        bd.rs.getString("nome_cliente");
+
+                Timestamp timestamp =
+                        bd.rs.getTimestamp("data");
+
+                double valorTotal =
+                        bd.rs.getDouble("valor_total");
+
+                String status =
+                        bd.rs.getString("status");
+
+                String observacao =
+                        bd.rs.getString("observacao");
+
+                Venda venda =
+                        new Venda(
+                                idVenda,
+                                idCliente,
+                                nomeCliente,
+                                timestamp != null
+                                        ? timestamp.toLocalDateTime()
+                                        : null,
+                                valorTotal,
+                                status,
+                                observacao
+                        );
+
+                lista.add(venda);
+            }
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao buscar vendas por período: "
+                    + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return lista;
+    }
+    
+    public List<ProdutoMaisVendido> buscarProdutosMaisVendidos(
+            LocalDateTime dataInicial,
+            LocalDateTime dataFinal) {
+
+        List<ProdutoMaisVendido> lista =
+                new ArrayList<>();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT " +
+                    "p.id_produto, " +
+                    "p.nome AS nome_produto, " +
+                    "SUM(iv.quantidade) AS quantidade_vendida, " +
+                    "SUM(iv.subtotal) AS valor_total " +
+                    "FROM item_venda iv " +
+                    "INNER JOIN produto p " +
+                    "ON iv.id_produto = p.id_produto " +
+                    "INNER JOIN venda v " +
+                    "ON iv.id_venda = v.id_venda " +
+                    "WHERE v.data BETWEEN ? AND ? " +
+                    "AND LOWER(v.status) <> 'cancelada' " +
+                    "GROUP BY p.id_produto, p.nome " +
+                    "ORDER BY quantidade_vendida DESC";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.st.setTimestamp(
+                    1,
+                    Timestamp.valueOf(dataInicial)
+            );
+
+            bd.st.setTimestamp(
+                    2,
+                    Timestamp.valueOf(dataFinal)
+            );
+
+            bd.rs = bd.st.executeQuery();
+
+            while (bd.rs.next()) {
+
+                int idProduto =
+                        bd.rs.getInt(
+                                "id_produto"
+                        );
+
+                String nomeProduto =
+                        bd.rs.getString(
+                                "nome_produto"
+                        );
+
+                int quantidadeVendida =
+                        bd.rs.getInt(
+                                "quantidade_vendida"
+                        );
+
+                double valorTotal =
+                        bd.rs.getDouble(
+                                "valor_total"
+                        );
+
+                ProdutoMaisVendido produto =
+                        new ProdutoMaisVendido(
+                                idProduto,
+                                nomeProduto,
+                                quantidadeVendida,
+                                valorTotal
+                        );
+
+                lista.add(produto);
+            }
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao buscar produtos mais vendidos: "
+                    + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return lista;
+    }
+
+    public List<ClienteMaisComprou> buscarClientesQueMaisCompraram(
+            LocalDateTime dataInicial,
+            LocalDateTime dataFinal) {
+
+        List<ClienteMaisComprou> lista =
+                new ArrayList<>();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT " +
+                    "c.id_cliente, " +
+                    "c.nome AS nome_cliente, " +
+                    "COUNT(v.id_venda) AS quantidade_compras, " +
+                    "SUM(v.valor_total) AS valor_total " +
+                    "FROM venda v " +
+                    "INNER JOIN cliente c " +
+                    "ON v.id_cliente = c.id_cliente " +
+                    "WHERE v.data BETWEEN ? AND ? " +
+                    "AND LOWER(v.status) = LOWER('Concluída') " +
+                    "GROUP BY c.id_cliente, c.nome " +
+                    "ORDER BY valor_total DESC";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.st.setTimestamp(
+                    1,
+                    Timestamp.valueOf(dataInicial)
+            );
+
+            bd.st.setTimestamp(
+                    2,
+                    Timestamp.valueOf(dataFinal)
+            );
+
+            bd.rs = bd.st.executeQuery();
+
+            while (bd.rs.next()) {
+
+                int idCliente =
+                        bd.rs.getInt(
+                                "id_cliente"
+                        );
+
+                String nomeCliente =
+                        bd.rs.getString(
+                                "nome_cliente"
+                        );
+
+                int quantidadeCompras =
+                        bd.rs.getInt(
+                                "quantidade_compras"
+                        );
+
+                double valorTotal =
+                        bd.rs.getDouble(
+                                "valor_total"
+                        );
+
+                ClienteMaisComprou cliente =
+                        new ClienteMaisComprou(
+                                idCliente,
+                                nomeCliente,
+                                quantidadeCompras,
+                                valorTotal
+                        );
+
+                lista.add(cliente);
+            }
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao buscar clientes que mais compraram: "
+                    + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return lista;
+    }
     // ============================================================
     // AUXILIAR
     // ============================================================

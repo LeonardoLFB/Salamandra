@@ -90,7 +90,7 @@
                     <!-- ATALHOS -->
 
                     <JFXButton
-                    	fx:id="btAtalhoClientes"
+                        fx:id="btAtalhoClientes"
                         onAction="#OnBtClientesClick"
                         styleClass="nav-btn"
                         text="Clientes">
@@ -111,7 +111,7 @@
                     </JFXButton>
 
                     <JFXButton
-                    	fx:id="btAtalhoFornecedores"	
+                        fx:id="btAtalhoFornecedores"
                         onAction="#OnBtFornecedoresClick"
                         styleClass="nav-btn"
                         text="Fornecedores">
@@ -132,7 +132,7 @@
                     </JFXButton>
 
                     <JFXButton
-                    	fx:id="btAtalhoVendas"
+                        fx:id="btAtalhoVendas"
                         onAction="#OnBtVendasClick"
                         styleClass="nav-btn"
                         text="Vendas">
@@ -152,40 +152,40 @@
 
                     </JFXButton>
 
-                 <Separator
-    orientation="VERTICAL"
-    prefHeight="28.0"
-    opacity="0.35" />
+                    <Separator
+                        orientation="VERTICAL"
+                        prefHeight="28.0"
+                        opacity="0.35" />
 
-<!-- USUÁRIO LOGADO -->
+                    <!-- USUÁRIO LOGADO -->
 
-<VBox
-    alignment="CENTER_RIGHT"
-    spacing="1"
-    minWidth="110">
+                    <VBox
+                        alignment="CENTER_RIGHT"
+                        spacing="1"
+                        minWidth="110">
 
-    <Label
-        fx:id="lblUsuarioLogado"
-        styleClass="header-user-name"
-        text="Usuário" />
+                        <Label
+                            fx:id="lblUsuarioLogado"
+                            styleClass="header-user-name"
+                            text="Usuário" />
 
-    <Label
-        fx:id="lblPerfilUsuario"
-        styleClass="header-user-role"
-        text="Perfil" />
+                        <Label
+                            fx:id="lblPerfilUsuario"
+                            styleClass="header-user-role"
+                            text="Perfil" />
 
-</VBox>
+                    </VBox>
 
-<JFXButton
-    fx:id="btSair"
-    onAction="#OnBtSairClick"
-    styleClass="logout-btn"
-    text="Sair"
-    alignment="CENTER"
-    minWidth="70.0"
-    prefWidth="70.0"
-    minHeight="38.0"
-    prefHeight="38.0" />
+                    <JFXButton
+                        fx:id="btSair"
+                        onAction="#OnBtSairClick"
+                        styleClass="logout-btn"
+                        text="Sair"
+                        alignment="CENTER"
+                        minWidth="70.0"
+                        prefWidth="70.0"
+                        minHeight="38.0"
+                        prefHeight="38.0" />
 
                 </HBox>
 
@@ -335,6 +335,28 @@
 
                             </JFXButton>
 
+                            <JFXButton
+                                fx:id="btRelatorios"
+                                maxWidth="Infinity"
+                                onAction="#OnBtRelatoriosClick"
+                                styleClass="nav-item"
+                                text="Relatórios">
+
+                                <graphic>
+                                    <ImageView
+                                        fitHeight="20"
+                                        fitWidth="20"
+                                        preserveRatio="true">
+
+                                        <image>
+                                            <Image url="@../img/venda.png" />
+                                        </image>
+
+                                    </ImageView>
+                                </graphic>
+
+                            </JFXButton>
+
                             <Label
                                 styleClass="sidebar-title"
                                 text="SISTEMA">
@@ -403,10 +425,6 @@
                                         left="34" />
                                 </padding>
 
-                                <!-- ==========================================
-                                     BOAS-VINDAS
-                                     ========================================== -->
-
                                 <HBox
                                     alignment="CENTER_LEFT"
                                     spacing="18">
@@ -437,10 +455,6 @@
 
                                 </HBox>
 
-                                <!-- ==========================================
-                                     INDICADORES PRINCIPAIS
-                                     ========================================== -->
-
                                 <GridPane
                                     hgap="16"
                                     vgap="16">
@@ -464,8 +478,6 @@
                                             hgrow="ALWAYS" />
 
                                     </columnConstraints>
-
-                                    <!-- CLIENTES -->
 
                                     <HBox
                                         alignment="CENTER_LEFT"
@@ -509,8 +521,6 @@
 
                                     </HBox>
 
-                                    <!-- PRODUTOS -->
-
                                     <HBox
                                         alignment="CENTER_LEFT"
                                         spacing="14"
@@ -553,8 +563,6 @@
 
                                     </HBox>
 
-                                    <!-- ESTOQUE BAIXO -->
-
                                     <HBox
                                         alignment="CENTER_LEFT"
                                         spacing="14"
@@ -596,8 +604,6 @@
                                         </VBox>
 
                                     </HBox>
-
-                                    <!-- VENDAS -->
 
                                     <HBox
                                         alignment="CENTER_LEFT"
@@ -643,10 +649,6 @@
 
                                 </GridPane>
 
-                                <!-- ==========================================
-                                     RESUMO FINANCEIRO
-                                     ========================================== -->
-
                                 <GridPane
                                     hgap="16"
                                     vgap="16">
@@ -662,8 +664,6 @@
                                             hgrow="ALWAYS" />
 
                                     </columnConstraints>
-
-                                    <!-- FATURAMENTO -->
 
                                     <HBox
                                         alignment="CENTER_LEFT"
@@ -699,8 +699,6 @@
                                         </VBox>
 
                                     </HBox>
-
-                                    <!-- PENDENTES -->
 
                                     <HBox
                                         alignment="CENTER_LEFT"
@@ -739,10 +737,6 @@
 
                                 </GridPane>
 
-                                <!-- ==========================================
-                                     PAINÉIS INFERIORES
-                                     ========================================== -->
-
                                 <GridPane
                                     hgap="18"
                                     vgap="18">
@@ -758,8 +752,6 @@
                                             hgrow="ALWAYS" />
 
                                     </columnConstraints>
-
-                                    <!-- ÚLTIMAS VENDAS -->
 
                                     <VBox
                                         spacing="14"
@@ -793,8 +785,6 @@
                                         </VBox>
 
                                     </VBox>
-
-                                    <!-- ESTOQUE BAIXO -->
 
                                     <VBox
                                         spacing="14"
@@ -834,10 +824,6 @@
                                 <Region
                                     minHeight="5"
                                     VBox.vgrow="ALWAYS" />
-
-                                <!-- ==========================================
-                                     RODAPÉ
-                                     ========================================== -->
 
                                 <HBox alignment="CENTER">
 
