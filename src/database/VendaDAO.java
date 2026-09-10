@@ -2,16 +2,16 @@ package database;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDateTime;
 
-import model.ItemVenda;
-import model.Venda;
-
-import model.ProdutoMaisVendido;
-
+import application.SessaoUsuario;
 import model.ClienteMaisComprou;
+import model.ItemVenda;
+import model.ProdutoMaisVendido;
+import model.Usuario;
+import model.Venda;
 
 public class VendaDAO {
 
@@ -26,6 +26,17 @@ public class VendaDAO {
 
         try {
 
+            // ============================================================
+            // USUÁRIO LOGADO
+            // ============================================================
+
+            Usuario usuarioLogado =
+                    SessaoUsuario.getUsuarioLogado();
+
+            if (usuarioLogado == null) {
+                return "Nenhum usuário está logado no sistema.";
+            }
+
             bd.getConnection();
             bd.con.setAutoCommit(false);
 
@@ -35,8 +46,8 @@ public class VendaDAO {
 
             String sqlVenda =
                     "INSERT INTO venda " +
-                    "(id_cliente, data, valor_total, status, observacao) " +
-                    "VALUES (?, ?, ?, ?, ?) " +
+                    "(id_cliente, id_usuario, data, valor_total, status, observacao) " +
+                    "VALUES (?, ?, ?, ?, ?, ?) " +
                     "RETURNING id_venda";
 
             bd.st = bd.con.prepareStatement(sqlVenda);
@@ -46,25 +57,30 @@ public class VendaDAO {
                     venda.getIdCliente()
             );
 
-            bd.st.setTimestamp(
+            bd.st.setInt(
                     2,
+                    usuarioLogado.getId()
+            );
+
+            bd.st.setTimestamp(
+                    3,
                     Timestamp.valueOf(
                             venda.getData()
                     )
             );
 
             bd.st.setDouble(
-                    3,
+                    4,
                     venda.getValorTotal()
             );
 
             bd.st.setString(
-                    4,
+                    5,
                     venda.getStatus()
             );
 
             bd.st.setString(
-                    5,
+                    6,
                     venda.getObservacao()
             );
 
@@ -83,13 +99,20 @@ public class VendaDAO {
                         idVendaGerado
                 );
 
+                venda.setIdUsuario(
+                        usuarioLogado.getId()
+                );
+
+                venda.setNomeUsuario(
+                        usuarioLogado.getNome()
+                );
+
             } else {
 
                 throw new SQLException(
                         "Não foi possível obter o ID da venda."
                 );
             }
-
 
             // ============================================================
             // 2. INSERIR ITENS
@@ -136,19 +159,8 @@ public class VendaDAO {
 
             bd.st.executeBatch();
 
-
             // ============================================================
             // 3. BAIXAR ESTOQUE
-            // ============================================================
-            //
-            // A condição:
-            //
-            // quantidade_estoque >= ?
-            //
-            // impede que o estoque fique negativo.
-            //
-            // Isso também protege o sistema quando dois computadores
-            // tentam vender o mesmo produto ao mesmo tempo.
             // ============================================================
 
             String sqlEstoque =
@@ -190,7 +202,6 @@ public class VendaDAO {
                 }
             }
 
-
             // ============================================================
             // 4. CONFIRMAR TRANSAÇÃO
             // ============================================================
@@ -200,8 +211,9 @@ public class VendaDAO {
             System.out.println(
                     "Venda inserida com sucesso - ID: "
                     + idVendaGerado
+                    + " - Usuário: "
+                    + usuarioLogado.getNome()
             );
-
 
         } catch (SQLException e) {
 
@@ -210,11 +222,6 @@ public class VendaDAO {
                     + e.getMessage();
 
             e.printStackTrace();
-
-
-            // ============================================================
-            // ROLLBACK
-            // ============================================================
 
             try {
 
@@ -237,21 +244,17 @@ public class VendaDAO {
                 rollbackException.printStackTrace();
             }
 
-
         } finally {
 
             restaurarAutoCommit(bd);
-
             bd.close();
         }
 
         return mensagem;
     }
 
-
     /**
      * Atualiza os dados principais de uma venda.
-     * Atualmente utilizado principalmente para alterar o status.
      */
     public String atualizar(Venda venda) {
 
@@ -309,7 +312,6 @@ public class VendaDAO {
                 );
             }
 
-
         } catch (SQLException e) {
 
             mensagem =
@@ -317,7 +319,6 @@ public class VendaDAO {
                     + e.getMessage();
 
             e.printStackTrace();
-
 
         } finally {
 
@@ -327,11 +328,8 @@ public class VendaDAO {
         return mensagem;
     }
 
-
     /**
      * Cancela uma venda pendente e devolve os produtos ao estoque.
-     *
-     * Toda a operação acontece dentro de uma única transação.
      */
     public String cancelar(int idVenda) {
 
@@ -343,18 +341,10 @@ public class VendaDAO {
         try {
 
             bd.getConnection();
-
             bd.con.setAutoCommit(false);
-
 
             // ============================================================
             // 1. ALTERAR STATUS
-            // ============================================================
-            //
-            // Só permite cancelar vendas pendentes.
-            //
-            // Isso também impede que uma venda cancelada seja
-            // cancelada novamente e devolva estoque em duplicidade.
             // ============================================================
 
             String sqlStatus =
@@ -382,7 +372,6 @@ public class VendaDAO {
                 return "A venda não foi encontrada ou não está pendente.";
             }
 
-
             // ============================================================
             // 2. DEVOLVER PRODUTOS AO ESTOQUE
             // ============================================================
@@ -406,7 +395,6 @@ public class VendaDAO {
 
             bd.st.executeUpdate();
 
-
             // ============================================================
             // 3. COMMIT
             // ============================================================
@@ -418,7 +406,6 @@ public class VendaDAO {
                     + idVenda
             );
 
-
         } catch (SQLException e) {
 
             mensagem =
@@ -426,7 +413,6 @@ public class VendaDAO {
                     + e.getMessage();
 
             e.printStackTrace();
-
 
             try {
 
@@ -449,26 +435,17 @@ public class VendaDAO {
                 rollbackException.printStackTrace();
             }
 
-
         } finally {
 
             restaurarAutoCommit(bd);
-
             bd.close();
         }
 
         return mensagem;
     }
 
-
     /**
      * Exclui uma venda.
-     *
-     * Caso a venda ainda tenha provocado baixa no estoque,
-     * os produtos são devolvidos antes da exclusão.
-     *
-     * Se a venda já estiver cancelada, o estoque não é alterado,
-     * pois o cancelar() já realizou a devolução.
      */
     public String deletar(int idVenda) {
 
@@ -480,9 +457,7 @@ public class VendaDAO {
         try {
 
             bd.getConnection();
-
             bd.con.setAutoCommit(false);
-
 
             // ============================================================
             // 1. CONSULTAR STATUS
@@ -504,7 +479,6 @@ public class VendaDAO {
 
             bd.rs = bd.st.executeQuery();
 
-
             if (!bd.rs.next()) {
 
                 bd.con.rollback();
@@ -512,12 +486,10 @@ public class VendaDAO {
                 return "Venda não encontrada.";
             }
 
-
             String status =
                     bd.rs.getString(
                             "status"
                     );
-
 
             // ============================================================
             // 2. DEVOLVER ESTOQUE SE NECESSÁRIO
@@ -545,13 +517,8 @@ public class VendaDAO {
                 bd.st.executeUpdate();
             }
 
-
             // ============================================================
             // 3. DELETAR VENDA
-            // ============================================================
-            //
-            // Os itens podem ser apagados automaticamente caso exista
-            // ON DELETE CASCADE na FK de item_venda.
             // ============================================================
 
             String sqlDelete =
@@ -570,14 +537,12 @@ public class VendaDAO {
             int linhasAfetadas =
                     bd.st.executeUpdate();
 
-
             if (linhasAfetadas == 0) {
 
                 throw new SQLException(
                         "Não foi possível excluir a venda."
                 );
             }
-
 
             bd.con.commit();
 
@@ -586,7 +551,6 @@ public class VendaDAO {
                     + idVenda
             );
 
-
         } catch (SQLException e) {
 
             mensagem =
@@ -594,7 +558,6 @@ public class VendaDAO {
                     + e.getMessage();
 
             e.printStackTrace();
-
 
             try {
 
@@ -617,17 +580,14 @@ public class VendaDAO {
                 rollbackException.printStackTrace();
             }
 
-
         } finally {
 
             restaurarAutoCommit(bd);
-
             bd.close();
         }
 
         return mensagem;
     }
-
 
     /**
      * Retorna todas as vendas com o nome do cliente.
@@ -647,7 +607,9 @@ public class VendaDAO {
                     "SELECT " +
                     "v.id_venda, " +
                     "v.id_cliente, " +
+                    "v.id_usuario, " +
                     "c.nome AS nome_cliente, " +
+                    "u.nome AS nome_usuario, " +
                     "v.data, " +
                     "v.valor_total, " +
                     "v.status, " +
@@ -655,6 +617,8 @@ public class VendaDAO {
                     "FROM venda v " +
                     "LEFT JOIN cliente c " +
                     "ON v.id_cliente = c.id_cliente " +
+                    "LEFT JOIN usuario u " +
+                    "ON v.id_usuario = u.id_usuario " +
                     "ORDER BY v.data DESC";
 
             bd.st = bd.con.prepareStatement(
@@ -662,7 +626,6 @@ public class VendaDAO {
             );
 
             bd.rs = bd.st.executeQuery();
-
 
             while (bd.rs.next()) {
 
@@ -676,9 +639,19 @@ public class VendaDAO {
                                 "id_cliente"
                         );
 
+                int idUsuario =
+                        bd.rs.getInt(
+                                "id_usuario"
+                        );
+
                 String nomeCliente =
                         bd.rs.getString(
                                 "nome_cliente"
+                        );
+
+                String nomeUsuario =
+                        bd.rs.getString(
+                                "nome_usuario"
                         );
 
                 Timestamp timestamp =
@@ -701,7 +674,6 @@ public class VendaDAO {
                                 "observacao"
                         );
 
-
                 Venda venda =
                         new Venda(
                                 idVenda,
@@ -715,11 +687,18 @@ public class VendaDAO {
                                 observacao
                         );
 
+                venda.setIdUsuario(
+                        idUsuario
+                );
+
+                venda.setNomeUsuario(
+                        nomeUsuario
+                );
+
                 lista.add(
                         venda
                 );
             }
-
 
         } catch (SQLException e) {
 
@@ -730,12 +709,10 @@ public class VendaDAO {
 
             e.printStackTrace();
 
-
         } finally {
 
             bd.close();
         }
-
 
         System.out.println(
                 "VendaDAO.getAll() retornou "
@@ -745,7 +722,6 @@ public class VendaDAO {
 
         return lista;
     }
-
 
     /**
      * Busca uma venda pelo ID.
@@ -785,7 +761,6 @@ public class VendaDAO {
 
             bd.rs = bd.st.executeQuery();
 
-
             if (bd.rs.next()) {
 
                 int idCliente =
@@ -818,7 +793,6 @@ public class VendaDAO {
                                 "observacao"
                         );
 
-
                 venda =
                         new Venda(
                                 idVenda,
@@ -833,7 +807,6 @@ public class VendaDAO {
                         );
             }
 
-
         } catch (SQLException e) {
 
             System.err.println(
@@ -843,16 +816,13 @@ public class VendaDAO {
 
             e.printStackTrace();
 
-
         } finally {
 
             bd.close();
         }
 
-
         return venda;
     }
-
 
     /**
      * Busca os itens de uma venda.
@@ -893,7 +863,6 @@ public class VendaDAO {
 
             bd.rs = bd.st.executeQuery();
 
-
             while (bd.rs.next()) {
 
                 int idProduto =
@@ -921,7 +890,6 @@ public class VendaDAO {
                                 "subtotal"
                         );
 
-
                 ItemVenda item =
                         new ItemVenda(
                                 idVenda,
@@ -937,7 +905,6 @@ public class VendaDAO {
                 );
             }
 
-
         } catch (SQLException e) {
 
             System.err.println(
@@ -947,16 +914,13 @@ public class VendaDAO {
 
             e.printStackTrace();
 
-
         } finally {
 
             bd.close();
         }
 
-
         return lista;
     }
-
 
     /**
      * Busca vendas pelo nome do cliente.
@@ -1001,7 +965,6 @@ public class VendaDAO {
 
             bd.rs = bd.st.executeQuery();
 
-
             while (bd.rs.next()) {
 
                 int idVenda =
@@ -1039,7 +1002,6 @@ public class VendaDAO {
                                 "observacao"
                         );
 
-
                 Venda venda =
                         new Venda(
                                 idVenda,
@@ -1058,7 +1020,6 @@ public class VendaDAO {
                 );
             }
 
-
         } catch (SQLException e) {
 
             System.err.println(
@@ -1068,16 +1029,13 @@ public class VendaDAO {
 
             e.printStackTrace();
 
-
         } finally {
 
             bd.close();
         }
 
-
         return lista;
     }
-
 
     /**
      * Busca vendas pelo status.
@@ -1120,7 +1078,6 @@ public class VendaDAO {
 
             bd.rs = bd.st.executeQuery();
 
-
             while (bd.rs.next()) {
 
                 int idVenda =
@@ -1158,7 +1115,6 @@ public class VendaDAO {
                                 "observacao"
                         );
 
-
                 Venda venda =
                         new Venda(
                                 idVenda,
@@ -1177,7 +1133,6 @@ public class VendaDAO {
                 );
             }
 
-
         } catch (SQLException e) {
 
             System.err.println(
@@ -1187,22 +1142,20 @@ public class VendaDAO {
 
             e.printStackTrace();
 
-
         } finally {
 
             bd.close();
         }
 
-
         return lista;
     }
 
-    
     public List<Venda> buscarPorPeriodo(
             LocalDateTime dataInicial,
             LocalDateTime dataFinal) {
 
-        List<Venda> lista = new ArrayList<>();
+        List<Venda> lista =
+                new ArrayList<>();
 
         BD bd = new BD();
 
@@ -1225,16 +1178,22 @@ public class VendaDAO {
                     "WHERE v.data BETWEEN ? AND ? " +
                     "ORDER BY v.data DESC";
 
-            bd.st = bd.con.prepareStatement(sql);
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
 
             bd.st.setTimestamp(
                     1,
-                    Timestamp.valueOf(dataInicial)
+                    Timestamp.valueOf(
+                            dataInicial
+                    )
             );
 
             bd.st.setTimestamp(
                     2,
-                    Timestamp.valueOf(dataFinal)
+                    Timestamp.valueOf(
+                            dataFinal
+                    )
             );
 
             bd.rs = bd.st.executeQuery();
@@ -1242,25 +1201,39 @@ public class VendaDAO {
             while (bd.rs.next()) {
 
                 int idVenda =
-                        bd.rs.getInt("id_venda");
+                        bd.rs.getInt(
+                                "id_venda"
+                        );
 
                 int idCliente =
-                        bd.rs.getInt("id_cliente");
+                        bd.rs.getInt(
+                                "id_cliente"
+                        );
 
                 String nomeCliente =
-                        bd.rs.getString("nome_cliente");
+                        bd.rs.getString(
+                                "nome_cliente"
+                        );
 
                 Timestamp timestamp =
-                        bd.rs.getTimestamp("data");
+                        bd.rs.getTimestamp(
+                                "data"
+                        );
 
                 double valorTotal =
-                        bd.rs.getDouble("valor_total");
+                        bd.rs.getDouble(
+                                "valor_total"
+                        );
 
                 String status =
-                        bd.rs.getString("status");
+                        bd.rs.getString(
+                                "status"
+                        );
 
                 String observacao =
-                        bd.rs.getString("observacao");
+                        bd.rs.getString(
+                                "observacao"
+                        );
 
                 Venda venda =
                         new Venda(
@@ -1275,7 +1248,9 @@ public class VendaDAO {
                                 observacao
                         );
 
-                lista.add(venda);
+                lista.add(
+                        venda
+                );
             }
 
         } catch (SQLException e) {
@@ -1294,7 +1269,7 @@ public class VendaDAO {
 
         return lista;
     }
-    
+
     public List<ProdutoMaisVendido> buscarProdutosMaisVendidos(
             LocalDateTime dataInicial,
             LocalDateTime dataFinal) {
@@ -1324,16 +1299,22 @@ public class VendaDAO {
                     "GROUP BY p.id_produto, p.nome " +
                     "ORDER BY quantidade_vendida DESC";
 
-            bd.st = bd.con.prepareStatement(sql);
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
 
             bd.st.setTimestamp(
                     1,
-                    Timestamp.valueOf(dataInicial)
+                    Timestamp.valueOf(
+                            dataInicial
+                    )
             );
 
             bd.st.setTimestamp(
                     2,
-                    Timestamp.valueOf(dataFinal)
+                    Timestamp.valueOf(
+                            dataFinal
+                    )
             );
 
             bd.rs = bd.st.executeQuery();
@@ -1368,7 +1349,9 @@ public class VendaDAO {
                                 valorTotal
                         );
 
-                lista.add(produto);
+                lista.add(
+                        produto
+                );
             }
 
         } catch (SQLException e) {
@@ -1415,16 +1398,22 @@ public class VendaDAO {
                     "GROUP BY c.id_cliente, c.nome " +
                     "ORDER BY valor_total DESC";
 
-            bd.st = bd.con.prepareStatement(sql);
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
 
             bd.st.setTimestamp(
                     1,
-                    Timestamp.valueOf(dataInicial)
+                    Timestamp.valueOf(
+                            dataInicial
+                    )
             );
 
             bd.st.setTimestamp(
                     2,
-                    Timestamp.valueOf(dataFinal)
+                    Timestamp.valueOf(
+                            dataFinal
+                    )
             );
 
             bd.rs = bd.st.executeQuery();
@@ -1459,7 +1448,9 @@ public class VendaDAO {
                                 valorTotal
                         );
 
-                lista.add(cliente);
+                lista.add(
+                        cliente
+                );
             }
 
         } catch (SQLException e) {
@@ -1478,6 +1469,7 @@ public class VendaDAO {
 
         return lista;
     }
+
     // ============================================================
     // AUXILIAR
     // ============================================================
@@ -1503,4 +1495,55 @@ public class VendaDAO {
             e.printStackTrace();
         }
     }
+    
+    public int contarVendasPorUsuario(int idUsuario) {
+
+        int quantidade = 0;
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT COUNT(*) AS quantidade " +
+                    "FROM venda " +
+                    "WHERE id_usuario = ? " +
+                    "AND status = 'Concluída'";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.st.setInt(
+                    1,
+                    idUsuario
+            );
+
+            bd.rs = bd.st.executeQuery();
+
+            if (bd.rs.next()) {
+
+                quantidade =
+                        bd.rs.getInt(
+                                "quantidade"
+                        );
+            }
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao contar vendas do usuário: "
+                    + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return quantidade;
+    }
+    
 }

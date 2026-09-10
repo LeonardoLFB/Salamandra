@@ -15,7 +15,6 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane
@@ -267,8 +266,7 @@
 
                     <VBox spacing="10.0">
 
-                        <HBox
-                            alignment="CENTER_LEFT">
+                        <HBox alignment="CENTER_LEFT">
 
                             <VBox spacing="3.0">
 
@@ -326,8 +324,7 @@
                          TOTAL
                          ================================================= -->
 
-                    <HBox
-                        alignment="CENTER_RIGHT">
+                    <HBox alignment="CENTER_RIGHT">
 
                         <VBox
                             alignment="CENTER_RIGHT"
@@ -433,32 +430,37 @@
 
                             <TableColumn
                                 fx:id="colId"
-                                prefWidth="80.0"
+                                prefWidth="70.0"
                                 text="ID"/>
 
                             <TableColumn
                                 fx:id="colCliente"
-                                prefWidth="240.0"
+                                prefWidth="190.0"
                                 text="CLIENTE"/>
 
                             <TableColumn
-                                fx:id="colData"
+                                fx:id="colResponsavel"
                                 prefWidth="170.0"
+                                text="RESPONSÁVEL"/>
+
+                            <TableColumn
+                                fx:id="colData"
+                                prefWidth="155.0"
                                 text="DATA"/>
 
                             <TableColumn
                                 fx:id="colValor"
-                                prefWidth="150.0"
+                                prefWidth="140.0"
                                 text="VALOR TOTAL"/>
 
                             <TableColumn
                                 fx:id="colStatus"
-                                prefWidth="130.0"
+                                prefWidth="125.0"
                                 text="STATUS"/>
 
                             <TableColumn
                                 fx:id="colAcoes"
-                                prefWidth="260.0"
+                                prefWidth="240.0"
                                 text="AÇÕES"/>
 
                         </columns>

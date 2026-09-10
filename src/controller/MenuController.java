@@ -117,6 +117,9 @@ public class MenuController implements Initializable {
 
     @FXML
     private Label lblPendentes;
+    
+    @FXML
+    private Label lblMinhasVendas;
 
     @FXML
     private VBox boxUltimasVendas;
@@ -162,8 +165,8 @@ public class MenuController implements Initializable {
 
         dashboardInicial = dashboardPrincipal;
 
-        carregarIndicadores();
         carregarUsuarioLogado();
+        carregarIndicadores();
         aplicarPermissoesUsuario();
     }
 
@@ -239,6 +242,26 @@ public class MenuController implements Initializable {
 
             e.printStackTrace();
         }
+        
+        if (SessaoUsuario.temUsuarioLogado()) {
+
+            Usuario usuario =
+                    SessaoUsuario.getUsuarioLogado();
+
+            int vendasUsuario =
+                    new VendaDAO()
+                            .contarVendasPorUsuario(
+                                    usuario.getId()
+                            );
+
+            lblMinhasVendas.setText(
+                    String.valueOf(vendasUsuario)
+            );
+
+        } else {
+
+            lblMinhasVendas.setText("0");
+        }
     }
 
     private void carregarUltimasVendas(List<Venda> vendas) {
@@ -293,10 +316,18 @@ public class MenuController implements Initializable {
                 "dashboard-item-title"
             );
 
+            String responsavel = venda.getNomeUsuario();
+
+            if (responsavel == null || responsavel.isBlank()) {
+                responsavel = "Não informado";
+            }
+
             Label detalhes = new Label(
                 venda.getDataFormatada()
                 + " • "
                 + venda.getStatus()
+                + " • "
+                + responsavel
             );
 
             detalhes.getStyleClass().add(
@@ -668,12 +699,12 @@ public class MenuController implements Initializable {
             SessaoUsuario.getUsuarioLogado();
 
         lblUsuarioLogado.setText(
-            usuario.getNome()
-        );
+        	    "Olá, " + usuario.getNome()
+        	);
 
-        lblPerfilUsuario.setText(
-            usuario.getTipo()
-        );
+        	lblPerfilUsuario.setText(
+        	    usuario.getTipo()
+        	);
     }
 
     // ============================================================

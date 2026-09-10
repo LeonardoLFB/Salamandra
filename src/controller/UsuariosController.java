@@ -28,6 +28,8 @@ import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import model.Usuario;
 
+import application.SessaoUsuario;
+
 public class UsuariosController {
 
     // ============================================================
@@ -670,6 +672,22 @@ public class UsuariosController {
     private void excluirUsuario(
             Usuario usuario) {
 
+        Usuario usuarioLogado =
+                SessaoUsuario.getUsuarioLogado();
+
+        if (usuarioLogado != null
+                && usuarioLogado.getId()
+                == usuario.getId()) {
+
+            mostrarAviso(
+                    "Ação não permitida",
+                    "Você não pode excluir o usuário que está atualmente conectado ao sistema."
+            );
+
+            return;
+        }
+
+
         Alert confirmacao =
                 new Alert(
                         Alert.AlertType.CONFIRMATION
@@ -811,6 +829,16 @@ public class UsuariosController {
                 .select(
                         usuario.getTipo()
                 );
+        
+        Usuario usuarioLogado =
+                SessaoUsuario.getUsuarioLogado();
+
+        if (usuarioLogado != null
+                && usuarioLogado.getId()
+                == usuario.getId()) {
+
+            campoTipo.setDisable(true);
+        }
 
 
         GridPane grid =

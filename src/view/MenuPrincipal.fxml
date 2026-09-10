@@ -1,21 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+
 <?import java.net.URL?>
+
 <?import javafx.geometry.Insets?>
+
 <?import javafx.scene.control.Label?>
+
 <?import javafx.scene.control.Separator?>
+
 <?import javafx.scene.control.ScrollPane?>
+
 <?import javafx.scene.image.Image?>
+
 <?import javafx.scene.image.ImageView?>
+
 <?import javafx.scene.layout.AnchorPane?>
+
 <?import javafx.scene.layout.BorderPane?>
+
 <?import javafx.scene.layout.ColumnConstraints?>
+
 <?import javafx.scene.layout.GridPane?>
+
 <?import javafx.scene.layout.HBox?>
+
 <?import javafx.scene.layout.Priority?>
+
 <?import javafx.scene.layout.Region?>
+
 <?import javafx.scene.layout.StackPane?>
+
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane
@@ -425,6 +441,10 @@
                                         left="34" />
                                 </padding>
 
+                                <!-- ==================================================
+                                     BOAS-VINDAS
+                                     ================================================== -->
+
                                 <HBox
                                     alignment="CENTER_LEFT"
                                     spacing="18">
@@ -455,6 +475,10 @@
 
                                 </HBox>
 
+                                <!-- ==================================================
+                                     INDICADORES PRINCIPAIS
+                                     ================================================== -->
+
                                 <GridPane
                                     hgap="16"
                                     vgap="16">
@@ -478,6 +502,8 @@
                                             hgrow="ALWAYS" />
 
                                     </columnConstraints>
+
+                                    <!-- CLIENTES -->
 
                                     <HBox
                                         alignment="CENTER_LEFT"
@@ -521,6 +547,8 @@
 
                                     </HBox>
 
+                                    <!-- PRODUTOS -->
+
                                     <HBox
                                         alignment="CENTER_LEFT"
                                         spacing="14"
@@ -563,6 +591,8 @@
 
                                     </HBox>
 
+                                    <!-- ESTOQUE BAIXO -->
+
                                     <HBox
                                         alignment="CENTER_LEFT"
                                         spacing="14"
@@ -604,6 +634,8 @@
                                         </VBox>
 
                                     </HBox>
+
+                                    <!-- VENDAS -->
 
                                     <HBox
                                         alignment="CENTER_LEFT"
@@ -649,6 +681,10 @@
 
                                 </GridPane>
 
+                                <!-- ==================================================
+                                     INDICADORES FINANCEIROS
+                                     ================================================== -->
+
                                 <GridPane
                                     hgap="16"
                                     vgap="16">
@@ -656,14 +692,20 @@
                                     <columnConstraints>
 
                                         <ColumnConstraints
-                                            percentWidth="65"
+                                            percentWidth="50"
                                             hgrow="ALWAYS" />
 
                                         <ColumnConstraints
-                                            percentWidth="35"
+                                            percentWidth="25"
+                                            hgrow="ALWAYS" />
+
+                                        <ColumnConstraints
+                                            percentWidth="25"
                                             hgrow="ALWAYS" />
 
                                     </columnConstraints>
+
+                                    <!-- FATURAMENTO -->
 
                                     <HBox
                                         alignment="CENTER_LEFT"
@@ -700,6 +742,8 @@
 
                                     </HBox>
 
+                                    <!-- VENDAS PENDENTES -->
+
                                     <HBox
                                         alignment="CENTER_LEFT"
                                         spacing="16"
@@ -735,7 +779,55 @@
 
                                     </HBox>
 
+                                    <!-- MINHAS VENDAS -->
+
+                                    <HBox
+                                        alignment="CENTER_LEFT"
+                                        spacing="16"
+                                        styleClass="dashboard-finance-card"
+                                        GridPane.columnIndex="2">
+
+                                        <VBox
+                                            alignment="CENTER"
+                                            styleClass="dashboard-stat-icon">
+
+                                            <ImageView
+                                                fitHeight="26"
+                                                fitWidth="26"
+                                                preserveRatio="true">
+
+                                                <image>
+                                                    <Image url="@../img/venda.png" />
+                                                </image>
+
+                                            </ImageView>
+
+                                        </VBox>
+
+                                        <VBox spacing="3">
+
+                                            <Label
+                                                styleClass="dashboard-finance-label"
+                                                text="MINHAS VENDAS" />
+
+                                            <Label
+                                                fx:id="lblMinhasVendas"
+                                                styleClass="dashboard-stat-value"
+                                                text="0" />
+
+                                            <Label
+                                                styleClass="dashboard-finance-help"
+                                                text="vendas concluídas" />
+
+                                        </VBox>
+
+                                    </HBox>
+
                                 </GridPane>
+
+                                <!-- ==================================================
+                                     ÚLTIMAS VENDAS / ESTOQUE BAIXO
+                                     ================================================== -->
 
                                 <GridPane
                                     hgap="18"
@@ -752,6 +844,8 @@
                                             hgrow="ALWAYS" />
 
                                     </columnConstraints>
+
+                                    <!-- ÚLTIMAS VENDAS -->
 
                                     <VBox
                                         spacing="14"
@@ -785,6 +879,8 @@
                                         </VBox>
 
                                     </VBox>
+
+                                    <!-- ESTOQUE BAIXO -->
 
                                     <VBox
                                         spacing="14"
