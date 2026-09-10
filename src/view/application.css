@@ -1539,3 +1539,105 @@
     -fx-font-size: 10px;
     -fx-text-fill: rgba(255, 255, 255, 0.72);
 }
+
+/* ============================================================
+   RELATÓRIOS
+   Cole este bloco no final do application.css.
+   Reaproveita as variáveis -brand / -brand-dark / -brand-soft /
+   -muted já definidas em .root.
+   ============================================================ */
+
+/* ---------- Barra de filtro (data inicial / data final / buscar) ---------- */
+
+.reports-filter-bar {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-padding: 16 20 16 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
+}
+
+/* ---------- TabPane com identidade dourada ---------- */
+
+.reports-tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.reports-tab-pane .tab-header-area {
+    -fx-padding: 0 0 6 0;
+}
+
+.reports-tab-pane .tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8 8 0 0;
+    -fx-padding: 10 18 10 18;
+    -fx-cursor: hand;
+}
+
+.reports-tab-pane .tab .tab-label {
+    -fx-text-fill: -muted;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.reports-tab-pane .tab:hover {
+    -fx-background-color: -brand-soft;
+}
+
+.reports-tab-pane .tab:selected {
+    -fx-background-color: -brand-soft;
+    -fx-border-color: -brand transparent transparent transparent;
+    -fx-border-width: 3 0 0 0;
+}
+
+.reports-tab-pane .tab:selected .tab-label {
+    -fx-text-fill: -brand-dark;
+}
+
+.reports-tab-pane .tab-content-area {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 0 12 12 12;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-border-radius: 0 12 12 12;
+}
+
+/* ---------- Card "sem estoque" (vermelho, ainda não existia) ---------- */
+
+.report-danger-icon {
+    -fx-background-color: #FEE2E2;
+    -fx-background-radius: 10;
+    -fx-min-width: 56px;
+    -fx-pref-width: 56px;
+    -fx-min-height: 56px;
+    -fx-pref-height: 56px;
+}
+
+.report-danger-symbol {
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #B91C1C;
+}
+
+.report-danger-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #B91C1C;
+}
+
+/* ---------- Badge "Crítico" para a coluna Situação (faltava) ---------- */
+
+.stock-badge-critical {
+    -fx-background-color: #FFEDD5;
+    -fx-text-fill: #C2410C;
+}
+
+/* ---------- Texto de tabela vazia ---------- */
+
+.table-placeholder {
+    -fx-font-size: 13px;
+    -fx-text-fill: #9CA3AF;
+    -fx-font-style: italic;
+}

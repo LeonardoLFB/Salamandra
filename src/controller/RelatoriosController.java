@@ -13,9 +13,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -83,6 +85,9 @@ public class RelatoriosController implements Initializable {
     // ============================================================
 
     @FXML
+    private Label lblProdutosRanking;
+
+    @FXML
     private TableView<ProdutoMaisVendido> tabelaProdutosMaisVendidos;
 
     @FXML
@@ -125,6 +130,9 @@ public class RelatoriosController implements Initializable {
  // ============================================================
  // RELATÓRIO DE CLIENTES QUE MAIS COMPRARAM
  // ============================================================
+
+	 @FXML
+	 private Label lblClientesRanking;
 
 	 @FXML
 	 private TableView<ClienteMaisComprou> tabelaClientesMaisCompraram;
@@ -217,6 +225,55 @@ public class RelatoriosController implements Initializable {
                         "status"
                 )
         );
+
+        // Renderiza o status como um "badge" colorido,
+        // reaproveitando as classes já existentes no CSS
+        // (.sale-status-badge / .sale-status-completed / etc.)
+        colStatus.setCellFactory(coluna -> new TableCell<Venda, String>() {
+
+            private final Label badge = new Label();
+
+            {
+                badge.getStyleClass().add("sale-status-badge");
+            }
+
+            @Override
+            protected void updateItem(String status, boolean empty) {
+
+                super.updateItem(status, empty);
+
+                if (empty || status == null) {
+                    setGraphic(null);
+                    setText(null);
+                    return;
+                }
+
+                badge.setText(status);
+
+                badge.getStyleClass().removeAll(
+                        "sale-status-completed",
+                        "sale-status-pending",
+                        "sale-status-cancelled"
+                );
+
+                if ("Concluída".equalsIgnoreCase(status)) {
+
+                    badge.getStyleClass().add("sale-status-completed");
+
+                } else if ("Cancelada".equalsIgnoreCase(status)) {
+
+                    badge.getStyleClass().add("sale-status-cancelled");
+
+                } else {
+
+                    badge.getStyleClass().add("sale-status-pending");
+                }
+
+                setAlignment(Pos.CENTER_LEFT);
+                setGraphic(badge);
+                setText(null);
+            }
+        });
     }
 
     // ============================================================
@@ -364,6 +421,10 @@ public class RelatoriosController implements Initializable {
 
         tabelaProdutosMaisVendidos.setItems(
                 dados
+        );
+
+        lblProdutosRanking.setText(
+                String.valueOf(produtos.size())
         );
     }
 
@@ -543,6 +604,61 @@ private void configurarTabelaEstoqueBaixo() {
               );
           }
   );
+
+  // Renderiza a situação como um "badge" colorido,
+  // reaproveitando as classes já existentes no CSS
+  // (.stock-badge / .stock-badge-empty / .stock-badge-critical / .stock-badge-low)
+  colEstoqueSituacao.setCellFactory(coluna -> new TableCell<Produto, String>() {
+
+      private final Label badge = new Label();
+
+      {
+          badge.getStyleClass().add("stock-badge");
+      }
+
+      @Override
+      protected void updateItem(String situacao, boolean empty) {
+
+          super.updateItem(situacao, empty);
+
+          if (empty || situacao == null) {
+              setGraphic(null);
+              setText(null);
+              return;
+          }
+
+          badge.setText(situacao);
+
+          badge.getStyleClass().removeAll(
+                  "stock-badge-ok",
+                  "stock-badge-low",
+                  "stock-badge-critical",
+                  "stock-badge-empty"
+          );
+
+          switch (situacao) {
+
+              case "Sem estoque":
+                  badge.getStyleClass().add("stock-badge-empty");
+                  break;
+
+              case "Crítico":
+                  badge.getStyleClass().add("stock-badge-critical");
+                  break;
+
+              case "Baixo":
+                  badge.getStyleClass().add("stock-badge-low");
+                  break;
+
+              default:
+                  badge.getStyleClass().add("stock-badge-ok");
+          }
+
+          setAlignment(Pos.CENTER_LEFT);
+          setGraphic(badge);
+          setText(null);
+      }
+  });
 }
 
 //============================================================
@@ -659,6 +775,10 @@ private void buscarClientesMaisCompraram(
 
  tabelaClientesMaisCompraram.setItems(
          dados
+ );
+
+ lblClientesRanking.setText(
+         String.valueOf(clientes.size())
  );
 }
 

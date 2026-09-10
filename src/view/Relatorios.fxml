@@ -10,6 +10,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane
@@ -18,6 +19,7 @@
     fx:controller="controller.RelatoriosController"
     prefWidth="1000.0"
     prefHeight="650.0"
+    styleClass="page-background"
     stylesheets="@application.css">
 
     <children>
@@ -33,15 +35,34 @@
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
 
-            <Label
-                text="Relatórios"
-                styleClass="titulo-pagina"/>
+            <!-- ==================================================
+                 CABEÇALHO
+                 ================================================== -->
 
-            <HBox spacing="15.0">
+            <VBox spacing="2.0">
+
+                <Label
+                    text="Relatórios"
+                    styleClass="page-title"/>
+
+                <Label
+                    text="Acompanhe vendas, faturamento, estoque e o desempenho dos seus clientes."
+                    styleClass="page-subtitle"/>
+
+            </VBox>
+
+            <!-- ==================================================
+                 FILTRO DE PERÍODO
+                 ================================================== -->
+
+            <HBox
+                spacing="20.0"
+                alignment="CENTER_LEFT"
+                styleClass="reports-filter-bar">
 
                 <VBox spacing="5.0">
 
-                    <Label text="Data inicial"/>
+                    <Label text="Data inicial" styleClass="field-label"/>
 
                     <DatePicker
                         fx:id="dpDataInicial"
@@ -51,7 +72,7 @@
 
                 <VBox spacing="5.0">
 
-                    <Label text="Data final"/>
+                    <Label text="Data final" styleClass="field-label"/>
 
                     <DatePicker
                         fx:id="dpDataFinal"
@@ -66,13 +87,14 @@
                         text="Buscar"
                         onAction="#buscarRelatorios"
                         prefWidth="120.0"
-                        styleClass="botao-principal"/>
+                        styleClass="btn, btn-primary"/>
 
                 </VBox>
 
             </HBox>
 
             <TabPane
+                styleClass="reports-tab-pane"
                 tabClosingPolicy="UNAVAILABLE"
                 VBox.vgrow="ALWAYS">
 
@@ -88,71 +110,83 @@
 
                             <padding>
                                 <Insets
-                                    top="20"
-                                    right="15"
-                                    bottom="15"
-                                    left="15"/>
+                                    top="22"
+                                    right="20"
+                                    bottom="20"
+                                    left="20"/>
                             </padding>
 
                             <Label
                                 text="Vendas por período"
-                                styleClass="subtitulo-pagina"/>
+                                styleClass="section-title"/>
 
                             <HBox spacing="20.0">
 
-                                <VBox
-                                    spacing="5.0"
-                                    prefWidth="220.0"
-                                    styleClass="card-dashboard">
+                                <HBox
+                                    styleClass="dashboard-stat-card"
+                                    spacing="14"
+                                    alignment="CENTER_LEFT"
+                                    HBox.hgrow="ALWAYS">
 
-                                    <padding>
-                                        <Insets
-                                            top="15"
-                                            right="15"
-                                            bottom="15"
-                                            left="15"/>
-                                    </padding>
+                                    <StackPane styleClass="dashboard-stat-icon">
+                                        <Label text="🧾" styleClass="stat-icon"/>
+                                    </StackPane>
 
-                                    <Label
-                                        text="Quantidade de vendas"
-                                        styleClass="card-titulo"/>
+                                    <VBox spacing="4">
 
-                                    <Label
-                                        fx:id="lblQuantidadeVendas"
-                                        text="0"
-                                        styleClass="card-valor"/>
+                                        <Label
+                                            text="Quantidade de vendas"
+                                            styleClass="dashboard-stat-label"/>
 
-                                </VBox>
+                                        <Label
+                                            fx:id="lblQuantidadeVendas"
+                                            text="0"
+                                            styleClass="dashboard-stat-value"/>
 
-                                <VBox
-                                    spacing="5.0"
-                                    prefWidth="220.0"
-                                    styleClass="card-dashboard">
+                                    </VBox>
 
-                                    <padding>
-                                        <Insets
-                                            top="15"
-                                            right="15"
-                                            bottom="15"
-                                            left="15"/>
-                                    </padding>
+                                </HBox>
 
-                                    <Label
-                                        text="Faturamento"
-                                        styleClass="card-titulo"/>
+                                <HBox
+                                    styleClass="dashboard-finance-card"
+                                    spacing="14"
+                                    alignment="CENTER_LEFT"
+                                    HBox.hgrow="ALWAYS">
 
-                                    <Label
-                                        fx:id="lblFaturamento"
-                                        text="R$ 0,00"
-                                        styleClass="card-valor"/>
+                                    <StackPane styleClass="dashboard-finance-icon">
+                                        <Label text="💰" styleClass="stat-icon"/>
+                                    </StackPane>
 
-                                </VBox>
+                                    <VBox spacing="4">
+
+                                        <Label
+                                            text="Faturamento"
+                                            styleClass="dashboard-finance-label"/>
+
+                                        <Label
+                                            fx:id="lblFaturamento"
+                                            text="R$ 0,00"
+                                            styleClass="dashboard-finance-value"/>
+
+                                    </VBox>
+
+                                </HBox>
 
                             </HBox>
 
                             <TableView
                                 fx:id="tabelaVendas"
-                                VBox.vgrow="ALWAYS">
+                                prefHeight="380.0">
+
+                                <placeholder>
+                                    <Label
+                                        text="Nenhuma venda encontrada para o período selecionado."
+                                        styleClass="table-placeholder"/>
+                                </placeholder>
+
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                </columnResizePolicy>
 
                                 <columns>
 
@@ -199,22 +233,62 @@
 
                             <padding>
                                 <Insets
-                                    top="20"
-                                    right="15"
-                                    bottom="15"
-                                    left="15"/>
+                                    top="22"
+                                    right="20"
+                                    bottom="20"
+                                    left="20"/>
                             </padding>
 
-                            <Label
-                                text="Produtos mais vendidos"
-                                styleClass="subtitulo-pagina"/>
+                            <VBox spacing="2.0">
 
-                            <Label
-                                text="Ranking dos produtos vendidos no período selecionado."/>
+                                <Label
+                                    text="Produtos mais vendidos"
+                                    styleClass="section-title"/>
+
+                                <Label
+                                    text="Ranking dos produtos vendidos no período selecionado."
+                                    styleClass="page-subtitle"/>
+
+                            </VBox>
+
+                            <HBox
+                                styleClass="dashboard-stat-card"
+                                spacing="14"
+                                alignment="CENTER_LEFT"
+                                maxWidth="280.0">
+
+                                <StackPane styleClass="dashboard-stat-icon">
+                                    <Label text="📊" styleClass="stat-icon"/>
+                                </StackPane>
+
+                                <VBox spacing="4">
+
+                                    <Label
+                                        text="Produtos no ranking"
+                                        styleClass="dashboard-stat-label"/>
+
+                                    <Label
+                                        fx:id="lblProdutosRanking"
+                                        text="0"
+                                        styleClass="dashboard-stat-value"/>
+
+                                </VBox>
+
+                            </HBox>
 
                             <TableView
                                 fx:id="tabelaProdutosMaisVendidos"
-                                VBox.vgrow="ALWAYS">
+                                prefHeight="380.0">
+
+                                <placeholder>
+                                    <Label
+                                        text="Nenhum produto vendido no período selecionado."
+                                        styleClass="table-placeholder"/>
+                                </placeholder>
+
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                </columnResizePolicy>
 
                                 <columns>
 
@@ -256,92 +330,100 @@
 
                             <padding>
                                 <Insets
-                                    top="20"
-                                    right="15"
-                                    bottom="15"
-                                    left="15"/>
+                                    top="22"
+                                    right="20"
+                                    bottom="20"
+                                    left="20"/>
                             </padding>
 
-                            <Label
-                                text="Faturamento por período"
-                                styleClass="subtitulo-pagina"/>
+                            <VBox spacing="2.0">
 
-                            <Label
-                                text="Resumo financeiro das vendas concluídas no período selecionado."/>
+                                <Label
+                                    text="Faturamento por período"
+                                    styleClass="section-title"/>
+
+                                <Label
+                                    text="Resumo financeiro das vendas concluídas no período selecionado."
+                                    styleClass="page-subtitle"/>
+
+                            </VBox>
 
                             <HBox spacing="20.0">
 
-                                <VBox
-                                    spacing="8.0"
-                                    prefWidth="260.0"
-                                    styleClass="card-dashboard">
+                                <HBox
+                                    styleClass="dashboard-finance-card"
+                                    spacing="14"
+                                    alignment="CENTER_LEFT"
+                                    HBox.hgrow="ALWAYS">
 
-                                    <padding>
-                                        <Insets
-                                            top="20"
-                                            right="20"
-                                            bottom="20"
-                                            left="20"/>
-                                    </padding>
+                                    <StackPane styleClass="dashboard-finance-icon">
+                                        <Label text="💰" styleClass="stat-icon"/>
+                                    </StackPane>
 
-                                    <Label
-                                        text="Faturamento total"
-                                        styleClass="card-titulo"/>
+                                    <VBox spacing="4">
 
-                                    <Label
-                                        fx:id="lblFaturamentoPeriodo"
-                                        text="R$ 0,00"
-                                        styleClass="card-valor"/>
+                                        <Label
+                                            text="Faturamento total"
+                                            styleClass="dashboard-finance-label"/>
 
-                                </VBox>
+                                        <Label
+                                            fx:id="lblFaturamentoPeriodo"
+                                            text="R$ 0,00"
+                                            styleClass="dashboard-finance-value"/>
 
-                                <VBox
-                                    spacing="8.0"
-                                    prefWidth="260.0"
-                                    styleClass="card-dashboard">
+                                    </VBox>
 
-                                    <padding>
-                                        <Insets
-                                            top="20"
-                                            right="20"
-                                            bottom="20"
-                                            left="20"/>
-                                    </padding>
+                                </HBox>
 
-                                    <Label
-                                        text="Vendas concluídas"
-                                        styleClass="card-titulo"/>
+                                <HBox
+                                    styleClass="dashboard-stat-card"
+                                    spacing="14"
+                                    alignment="CENTER_LEFT"
+                                    HBox.hgrow="ALWAYS">
 
-                                    <Label
-                                        fx:id="lblVendasConcluidas"
-                                        text="0"
-                                        styleClass="card-valor"/>
+                                    <StackPane styleClass="dashboard-stat-icon">
+                                        <Label text="✅" styleClass="stat-icon"/>
+                                    </StackPane>
 
-                                </VBox>
+                                    <VBox spacing="4">
 
-                                <VBox
-                                    spacing="8.0"
-                                    prefWidth="260.0"
-                                    styleClass="card-dashboard">
+                                        <Label
+                                            text="Vendas concluídas"
+                                            styleClass="dashboard-stat-label"/>
 
-                                    <padding>
-                                        <Insets
-                                            top="20"
-                                            right="20"
-                                            bottom="20"
-                                            left="20"/>
-                                    </padding>
+                                        <Label
+                                            fx:id="lblVendasConcluidas"
+                                            text="0"
+                                            styleClass="dashboard-stat-value"/>
 
-                                    <Label
-                                        text="Ticket médio"
-                                        styleClass="card-titulo"/>
+                                    </VBox>
 
-                                    <Label
-                                        fx:id="lblTicketMedio"
-                                        text="R$ 0,00"
-                                        styleClass="card-valor"/>
+                                </HBox>
 
-                                </VBox>
+                                <HBox
+                                    styleClass="dashboard-stat-card"
+                                    spacing="14"
+                                    alignment="CENTER_LEFT"
+                                    HBox.hgrow="ALWAYS">
+
+                                    <StackPane styleClass="dashboard-stat-icon">
+                                        <Label text="📈" styleClass="stat-icon"/>
+                                    </StackPane>
+
+                                    <VBox spacing="4">
+
+                                        <Label
+                                            text="Ticket médio"
+                                            styleClass="dashboard-stat-label"/>
+
+                                        <Label
+                                            fx:id="lblTicketMedio"
+                                            text="R$ 0,00"
+                                            styleClass="dashboard-stat-value"/>
+
+                                    </VBox>
+
+                                </HBox>
 
                             </HBox>
 
@@ -359,74 +441,91 @@
 
                             <padding>
                                 <Insets
-                                    top="20"
-                                    right="15"
-                                    bottom="15"
-                                    left="15"/>
+                                    top="22"
+                                    right="20"
+                                    bottom="20"
+                                    left="20"/>
                             </padding>
 
-                            <Label
-                                text="Estoque baixo"
-                                styleClass="subtitulo-pagina"/>
+                            <VBox spacing="2.0">
 
-                            <Label
-                                text="Produtos com 10 unidades ou menos em estoque."/>
+                                <Label
+                                    text="Estoque baixo"
+                                    styleClass="section-title"/>
+
+                                <Label
+                                    text="Produtos com 10 unidades ou menos em estoque."
+                                    styleClass="page-subtitle"/>
+
+                            </VBox>
 
                             <HBox spacing="20.0">
 
-                                <VBox
-                                    spacing="8.0"
-                                    prefWidth="240.0"
-                                    styleClass="card-dashboard">
+                                <HBox
+                                    styleClass="dashboard-stat-card"
+                                    spacing="14"
+                                    alignment="CENTER_LEFT"
+                                    HBox.hgrow="ALWAYS">
 
-                                    <padding>
-                                        <Insets
-                                            top="15"
-                                            right="15"
-                                            bottom="15"
-                                            left="15"/>
-                                    </padding>
+                                    <StackPane styleClass="dashboard-pending-icon">
+                                        <Label text="⚠️" styleClass="stat-icon"/>
+                                    </StackPane>
 
-                                    <Label
-                                        text="Produtos com estoque baixo"
-                                        styleClass="card-titulo"/>
+                                    <VBox spacing="4">
 
-                                    <Label
-                                        fx:id="lblProdutosEstoqueBaixo"
-                                        text="0"
-                                        styleClass="card-valor"/>
+                                        <Label
+                                            text="Produtos com estoque baixo"
+                                            styleClass="dashboard-stat-label"/>
 
-                                </VBox>
+                                        <Label
+                                            fx:id="lblProdutosEstoqueBaixo"
+                                            text="0"
+                                            styleClass="dashboard-pending-value"/>
 
-                                <VBox
-                                    spacing="8.0"
-                                    prefWidth="240.0"
-                                    styleClass="card-dashboard">
+                                    </VBox>
 
-                                    <padding>
-                                        <Insets
-                                            top="15"
-                                            right="15"
-                                            bottom="15"
-                                            left="15"/>
-                                    </padding>
+                                </HBox>
 
-                                    <Label
-                                        text="Produtos sem estoque"
-                                        styleClass="card-titulo"/>
+                                <HBox
+                                    styleClass="dashboard-stat-card"
+                                    spacing="14"
+                                    alignment="CENTER_LEFT"
+                                    HBox.hgrow="ALWAYS">
 
-                                    <Label
-                                        fx:id="lblProdutosSemEstoque"
-                                        text="0"
-                                        styleClass="card-valor"/>
+                                    <StackPane styleClass="report-danger-icon">
+                                        <Label text="🚫" styleClass="report-danger-symbol"/>
+                                    </StackPane>
 
-                                </VBox>
+                                    <VBox spacing="4">
+
+                                        <Label
+                                            text="Produtos sem estoque"
+                                            styleClass="dashboard-stat-label"/>
+
+                                        <Label
+                                            fx:id="lblProdutosSemEstoque"
+                                            text="0"
+                                            styleClass="report-danger-value"/>
+
+                                    </VBox>
+
+                                </HBox>
 
                             </HBox>
 
                             <TableView
                                 fx:id="tabelaEstoqueBaixo"
-                                VBox.vgrow="ALWAYS">
+                                prefHeight="360.0">
+
+                                <placeholder>
+                                    <Label
+                                        text="Nenhum produto com estoque baixo. 🎉"
+                                        styleClass="table-placeholder"/>
+                                </placeholder>
+
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                </columnResizePolicy>
 
                                 <columns>
 
@@ -468,22 +567,62 @@
 
                             <padding>
                                 <Insets
-                                    top="20"
-                                    right="15"
-                                    bottom="15"
-                                    left="15"/>
+                                    top="22"
+                                    right="20"
+                                    bottom="20"
+                                    left="20"/>
                             </padding>
 
-                            <Label
-                                text="Clientes que mais compraram"
-                                styleClass="subtitulo-pagina"/>
+                            <VBox spacing="2.0">
 
-                            <Label
-                                text="Ranking dos clientes com maior valor em compras concluídas no período selecionado."/>
+                                <Label
+                                    text="Clientes que mais compraram"
+                                    styleClass="section-title"/>
+
+                                <Label
+                                    text="Ranking dos clientes com maior valor em compras concluídas no período selecionado."
+                                    styleClass="page-subtitle"/>
+
+                            </VBox>
+
+                            <HBox
+                                styleClass="dashboard-stat-card"
+                                spacing="14"
+                                alignment="CENTER_LEFT"
+                                maxWidth="280.0">
+
+                                <StackPane styleClass="dashboard-stat-icon">
+                                    <Label text="👥" styleClass="stat-icon"/>
+                                </StackPane>
+
+                                <VBox spacing="4">
+
+                                    <Label
+                                        text="Clientes no ranking"
+                                        styleClass="dashboard-stat-label"/>
+
+                                    <Label
+                                        fx:id="lblClientesRanking"
+                                        text="0"
+                                        styleClass="dashboard-stat-value"/>
+
+                                </VBox>
+
+                            </HBox>
 
                             <TableView
                                 fx:id="tabelaClientesMaisCompraram"
-                                VBox.vgrow="ALWAYS">
+                                prefHeight="380.0">
+
+                                <placeholder>
+                                    <Label
+                                        text="Nenhuma compra concluída no período selecionado."
+                                        styleClass="table-placeholder"/>
+                                </placeholder>
+
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                </columnResizePolicy>
 
                                 <columns>
 
