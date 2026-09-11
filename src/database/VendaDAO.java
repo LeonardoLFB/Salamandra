@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import application.SessaoUsuario;
+
+import model.Auditoria;
 import model.ClienteMaisComprou;
 import model.ItemVenda;
 import model.ProdutoMaisVendido;
@@ -15,20 +17,16 @@ import model.Venda;
 
 public class VendaDAO {
 
-    /**
-     * Insere uma nova venda junto com seus itens.
-     * Também realiza a baixa do estoque na mesma transação.
-     */
+    // ============================================================
+    // INSERIR VENDA
+    // ============================================================
+
     public String inserir(Venda venda, List<ItemVenda> itens) {
 
         String mensagem = "Venda inserida com sucesso!";
         BD bd = new BD();
 
         try {
-
-            // ============================================================
-            // USUÁRIO LOGADO
-            // ============================================================
 
             Usuario usuarioLogado =
                     SessaoUsuario.getUsuarioLogado();
@@ -197,7 +195,7 @@ public class VendaDAO {
 
                     throw new SQLException(
                             "Estoque insuficiente para o produto: "
-                            + item.getNomeProduto()
+                                    + item.getNomeProduto()
                     );
                 }
             }
@@ -208,18 +206,33 @@ public class VendaDAO {
 
             bd.con.commit();
 
+            // ============================================================
+            // 5. AUDITORIA - CADASTRO
+            // ============================================================
+
+            Auditoria auditoria =
+                    new Auditoria(
+                            usuarioLogado.getId(),
+                            "CADASTRO_VENDA",
+                            "Cadastrou a venda #" + idVendaGerado
+                    );
+
+            new AuditoriaDAO().registrar(
+                    auditoria
+            );
+
             System.out.println(
                     "Venda inserida com sucesso - ID: "
-                    + idVendaGerado
-                    + " - Usuário: "
-                    + usuarioLogado.getNome()
+                            + idVendaGerado
+                            + " - Usuário: "
+                            + usuarioLogado.getNome()
             );
 
         } catch (SQLException e) {
 
             mensagem =
                     "Falha ao inserir venda: "
-                    + e.getMessage();
+                            + e.getMessage();
 
             e.printStackTrace();
 
@@ -238,7 +251,7 @@ public class VendaDAO {
 
                 System.err.println(
                         "Erro ao realizar rollback: "
-                        + rollbackException.getMessage()
+                                + rollbackException.getMessage()
                 );
 
                 rollbackException.printStackTrace();
@@ -253,9 +266,11 @@ public class VendaDAO {
         return mensagem;
     }
 
-    /**
-     * Atualiza os dados principais de uma venda.
-     */
+
+    // ============================================================
+    // ATUALIZAR / CONCLUIR VENDA
+    // ============================================================
+
     public String atualizar(Venda venda) {
 
         String mensagem =
@@ -308,15 +323,42 @@ public class VendaDAO {
 
                 System.out.println(
                         "Venda atualizada - ID: "
-                        + venda.getIdVenda()
+                                + venda.getIdVenda()
                 );
+
+                // ========================================================
+                // AUDITORIA - CONCLUSÃO
+                // ========================================================
+
+                if ("Concluída".equals(
+                        venda.getStatus()
+                )) {
+
+                    Usuario usuarioLogado =
+                            SessaoUsuario.getUsuarioLogado();
+
+                    if (usuarioLogado != null) {
+
+                        Auditoria auditoria =
+                                new Auditoria(
+                                        usuarioLogado.getId(),
+                                        "CONCLUSAO_VENDA",
+                                        "Concluiu a venda #"
+                                                + venda.getIdVenda()
+                                );
+
+                        new AuditoriaDAO().registrar(
+                                auditoria
+                        );
+                    }
+                }
             }
 
         } catch (SQLException e) {
 
             mensagem =
                     "Falha ao atualizar venda: "
-                    + e.getMessage();
+                            + e.getMessage();
 
             e.printStackTrace();
 
@@ -328,9 +370,11 @@ public class VendaDAO {
         return mensagem;
     }
 
-    /**
-     * Cancela uma venda pendente e devolve os produtos ao estoque.
-     */
+
+    // ============================================================
+    // CANCELAR VENDA
+    // ============================================================
+
     public String cancelar(int idVenda) {
 
         String mensagem =
@@ -396,21 +440,42 @@ public class VendaDAO {
             bd.st.executeUpdate();
 
             // ============================================================
-            // 3. COMMIT
+            // 3. CONFIRMAR CANCELAMENTO
             // ============================================================
 
             bd.con.commit();
 
+            // ============================================================
+            // 4. AUDITORIA - CANCELAMENTO
+            // ============================================================
+
+            Usuario usuarioLogado =
+                    SessaoUsuario.getUsuarioLogado();
+
+            if (usuarioLogado != null) {
+
+                Auditoria auditoria =
+                        new Auditoria(
+                                usuarioLogado.getId(),
+                                "CANCELAMENTO_VENDA",
+                                "Cancelou a venda #" + idVenda
+                        );
+
+                new AuditoriaDAO().registrar(
+                        auditoria
+                );
+            }
+
             System.out.println(
                     "Venda cancelada e estoque devolvido - ID: "
-                    + idVenda
+                            + idVenda
             );
 
         } catch (SQLException e) {
 
             mensagem =
                     "Falha ao cancelar venda: "
-                    + e.getMessage();
+                            + e.getMessage();
 
             e.printStackTrace();
 
@@ -429,7 +494,7 @@ public class VendaDAO {
 
                 System.err.println(
                         "Erro ao realizar rollback: "
-                        + rollbackException.getMessage()
+                                + rollbackException.getMessage()
                 );
 
                 rollbackException.printStackTrace();
@@ -444,9 +509,11 @@ public class VendaDAO {
         return mensagem;
     }
 
-    /**
-     * Exclui uma venda.
-     */
+
+    // ============================================================
+    // EXCLUIR VENDA
+    // ============================================================
+
     public String deletar(int idVenda) {
 
         String mensagem =
@@ -518,7 +585,7 @@ public class VendaDAO {
             }
 
             // ============================================================
-            // 3. DELETAR VENDA
+            // 3. EXCLUIR VENDA
             // ============================================================
 
             String sqlDelete =
@@ -544,18 +611,43 @@ public class VendaDAO {
                 );
             }
 
+            // ============================================================
+            // 4. CONFIRMAR EXCLUSÃO
+            // ============================================================
+
             bd.con.commit();
+
+            // ============================================================
+            // 5. AUDITORIA - EXCLUSÃO
+            // ============================================================
+
+            Usuario usuarioLogado =
+                    SessaoUsuario.getUsuarioLogado();
+
+            if (usuarioLogado != null) {
+
+                Auditoria auditoria =
+                        new Auditoria(
+                                usuarioLogado.getId(),
+                                "EXCLUSAO_VENDA",
+                                "Excluiu a venda #" + idVenda
+                        );
+
+                new AuditoriaDAO().registrar(
+                        auditoria
+                );
+            }
 
             System.out.println(
                     "Venda deletada - ID: "
-                    + idVenda
+                            + idVenda
             );
 
         } catch (SQLException e) {
 
             mensagem =
                     "Falha ao deletar venda: "
-                    + e.getMessage();
+                            + e.getMessage();
 
             e.printStackTrace();
 
@@ -574,7 +666,7 @@ public class VendaDAO {
 
                 System.err.println(
                         "Erro ao realizar rollback: "
-                        + rollbackException.getMessage()
+                                + rollbackException.getMessage()
                 );
 
                 rollbackException.printStackTrace();
@@ -589,9 +681,11 @@ public class VendaDAO {
         return mensagem;
     }
 
-    /**
-     * Retorna todas as vendas com o nome do cliente.
-     */
+
+    // ============================================================
+    // LISTAR TODAS AS VENDAS
+    // ============================================================
+
     public List<Venda> getAll() {
 
         List<Venda> lista =
@@ -704,7 +798,7 @@ public class VendaDAO {
 
             System.err.println(
                     "Erro em VendaDAO.getAll(): "
-                    + e.getMessage()
+                            + e.getMessage()
             );
 
             e.printStackTrace();
@@ -716,20 +810,21 @@ public class VendaDAO {
 
         System.out.println(
                 "VendaDAO.getAll() retornou "
-                + lista.size()
-                + " registros."
+                        + lista.size()
+                        + " registros."
         );
 
         return lista;
     }
 
-    /**
-     * Busca uma venda pelo ID.
-     */
+
+    // ============================================================
+    // BUSCAR VENDA POR ID
+    // ============================================================
+
     public Venda buscarPorId(int idVenda) {
 
         Venda venda = null;
-
         BD bd = new BD();
 
         try {
@@ -811,7 +906,7 @@ public class VendaDAO {
 
             System.err.println(
                     "Erro ao buscar venda por ID: "
-                    + e.getMessage()
+                            + e.getMessage()
             );
 
             e.printStackTrace();
@@ -824,9 +919,11 @@ public class VendaDAO {
         return venda;
     }
 
-    /**
-     * Busca os itens de uma venda.
-     */
+
+    // ============================================================
+    // BUSCAR ITENS DA VENDA
+    // ============================================================
+
     public List<ItemVenda> buscarItensPorVenda(
             int idVenda) {
 
@@ -909,7 +1006,7 @@ public class VendaDAO {
 
             System.err.println(
                     "Erro ao buscar itens da venda: "
-                    + e.getMessage()
+                            + e.getMessage()
             );
 
             e.printStackTrace();
@@ -922,9 +1019,11 @@ public class VendaDAO {
         return lista;
     }
 
-    /**
-     * Busca vendas pelo nome do cliente.
-     */
+
+    // ============================================================
+    // BUSCAR POR CLIENTE
+    // ============================================================
+
     public List<Venda> buscarPorCliente(
             String nomeCliente) {
 
@@ -959,8 +1058,8 @@ public class VendaDAO {
             bd.st.setString(
                     1,
                     "%"
-                    + nomeCliente
-                    + "%"
+                            + nomeCliente
+                            + "%"
             );
 
             bd.rs = bd.st.executeQuery();
@@ -1024,7 +1123,7 @@ public class VendaDAO {
 
             System.err.println(
                     "Erro ao buscar vendas por cliente: "
-                    + e.getMessage()
+                            + e.getMessage()
             );
 
             e.printStackTrace();
@@ -1037,9 +1136,11 @@ public class VendaDAO {
         return lista;
     }
 
-    /**
-     * Busca vendas pelo status.
-     */
+
+    // ============================================================
+    // BUSCAR POR STATUS
+    // ============================================================
+
     public List<Venda> buscarPorStatus(
             String status) {
 
@@ -1137,7 +1238,7 @@ public class VendaDAO {
 
             System.err.println(
                     "Erro ao buscar vendas por status: "
-                    + e.getMessage()
+                            + e.getMessage()
             );
 
             e.printStackTrace();
@@ -1149,6 +1250,11 @@ public class VendaDAO {
 
         return lista;
     }
+
+
+    // ============================================================
+    // BUSCAR POR PERÍODO
+    // ============================================================
 
     public List<Venda> buscarPorPeriodo(
             LocalDateTime dataInicial,
@@ -1257,7 +1363,7 @@ public class VendaDAO {
 
             System.err.println(
                     "Erro ao buscar vendas por período: "
-                    + e.getMessage()
+                            + e.getMessage()
             );
 
             e.printStackTrace();
@@ -1269,6 +1375,11 @@ public class VendaDAO {
 
         return lista;
     }
+
+
+    // ============================================================
+    // PRODUTOS MAIS VENDIDOS
+    // ============================================================
 
     public List<ProdutoMaisVendido> buscarProdutosMaisVendidos(
             LocalDateTime dataInicial,
@@ -1321,32 +1432,20 @@ public class VendaDAO {
 
             while (bd.rs.next()) {
 
-                int idProduto =
-                        bd.rs.getInt(
-                                "id_produto"
-                        );
-
-                String nomeProduto =
-                        bd.rs.getString(
-                                "nome_produto"
-                        );
-
-                int quantidadeVendida =
-                        bd.rs.getInt(
-                                "quantidade_vendida"
-                        );
-
-                double valorTotal =
-                        bd.rs.getDouble(
-                                "valor_total"
-                        );
-
                 ProdutoMaisVendido produto =
                         new ProdutoMaisVendido(
-                                idProduto,
-                                nomeProduto,
-                                quantidadeVendida,
-                                valorTotal
+                                bd.rs.getInt(
+                                        "id_produto"
+                                ),
+                                bd.rs.getString(
+                                        "nome_produto"
+                                ),
+                                bd.rs.getInt(
+                                        "quantidade_vendida"
+                                ),
+                                bd.rs.getDouble(
+                                        "valor_total"
+                                )
                         );
 
                 lista.add(
@@ -1358,7 +1457,7 @@ public class VendaDAO {
 
             System.err.println(
                     "Erro ao buscar produtos mais vendidos: "
-                    + e.getMessage()
+                            + e.getMessage()
             );
 
             e.printStackTrace();
@@ -1370,6 +1469,11 @@ public class VendaDAO {
 
         return lista;
     }
+
+
+    // ============================================================
+    // CLIENTES QUE MAIS COMPRARAM
+    // ============================================================
 
     public List<ClienteMaisComprou> buscarClientesQueMaisCompraram(
             LocalDateTime dataInicial,
@@ -1420,32 +1524,20 @@ public class VendaDAO {
 
             while (bd.rs.next()) {
 
-                int idCliente =
-                        bd.rs.getInt(
-                                "id_cliente"
-                        );
-
-                String nomeCliente =
-                        bd.rs.getString(
-                                "nome_cliente"
-                        );
-
-                int quantidadeCompras =
-                        bd.rs.getInt(
-                                "quantidade_compras"
-                        );
-
-                double valorTotal =
-                        bd.rs.getDouble(
-                                "valor_total"
-                        );
-
                 ClienteMaisComprou cliente =
                         new ClienteMaisComprou(
-                                idCliente,
-                                nomeCliente,
-                                quantidadeCompras,
-                                valorTotal
+                                bd.rs.getInt(
+                                        "id_cliente"
+                                ),
+                                bd.rs.getString(
+                                        "nome_cliente"
+                                ),
+                                bd.rs.getInt(
+                                        "quantidade_compras"
+                                ),
+                                bd.rs.getDouble(
+                                        "valor_total"
+                                )
                         );
 
                 lista.add(
@@ -1457,7 +1549,7 @@ public class VendaDAO {
 
             System.err.println(
                     "Erro ao buscar clientes que mais compraram: "
-                    + e.getMessage()
+                            + e.getMessage()
             );
 
             e.printStackTrace();
@@ -1470,36 +1562,15 @@ public class VendaDAO {
         return lista;
     }
 
+
     // ============================================================
-    // AUXILIAR
+    // CONTAR VENDAS POR USUÁRIO
     // ============================================================
 
-    private void restaurarAutoCommit(BD bd) {
-
-        try {
-
-            if (bd.con != null) {
-
-                bd.con.setAutoCommit(
-                        true
-                );
-            }
-
-        } catch (SQLException e) {
-
-            System.err.println(
-                    "Erro ao restaurar auto-commit: "
-                    + e.getMessage()
-            );
-
-            e.printStackTrace();
-        }
-    }
-    
-    public int contarVendasPorUsuario(int idUsuario) {
+    public int contarVendasPorUsuario(
+            int idUsuario) {
 
         int quantidade = 0;
-
         BD bd = new BD();
 
         try {
@@ -1512,7 +1583,9 @@ public class VendaDAO {
                     "WHERE id_usuario = ? " +
                     "AND status = 'Concluída'";
 
-            bd.st = bd.con.prepareStatement(sql);
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
 
             bd.st.setInt(
                     1,
@@ -1533,7 +1606,7 @@ public class VendaDAO {
 
             System.err.println(
                     "Erro ao contar vendas do usuário: "
-                    + e.getMessage()
+                            + e.getMessage()
             );
 
             e.printStackTrace();
@@ -1545,5 +1618,32 @@ public class VendaDAO {
 
         return quantidade;
     }
-    
+
+
+    // ============================================================
+    // AUXILIAR
+    // ============================================================
+
+    private void restaurarAutoCommit(
+            BD bd) {
+
+        try {
+
+            if (bd.con != null) {
+
+                bd.con.setAutoCommit(
+                        true
+                );
+            }
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao restaurar auto-commit: "
+                            + e.getMessage()
+            );
+
+            e.printStackTrace();
+        }
+    }
 }

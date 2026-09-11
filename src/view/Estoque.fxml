@@ -193,7 +193,7 @@
 
                             <TableColumn
                                 fx:id="colAcoes"
-                                prefWidth="90.0"
+                                prefWidth="130.0"
                                 text="AÇÕES"/>
 
                         </columns>

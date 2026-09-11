@@ -506,6 +506,8 @@
     -fx-alignment: CENTER_LEFT;
     -fx-padding: 10 14 10 16;
     -fx-cursor: hand;
+    -fx-border-color: transparent transparent transparent transparent;
+    -fx-border-width: 0 0 0 3;
 
 }
 
@@ -516,6 +518,23 @@
 }
 
 .nav-item:pressed {
+
+    -fx-background-color: rgba(255,255,255,0.26);
+
+}
+
+/* item de menu correspondente a tela atualmente aberta */
+
+.nav-item-active {
+
+    -fx-background-color: rgba(255,255,255,0.20);
+    -fx-border-color: transparent transparent transparent #FFFFFF;
+    -fx-border-width: 0 0 0 3;
+    -fx-font-weight: bold;
+
+}
+
+.nav-item-active:hover {
 
     -fx-background-color: rgba(255,255,255,0.26);
 
@@ -634,43 +653,6 @@
    PAINEIS SECUNDARIOS DO DASHBOARD
 
    ============================================================ */
-
-.dashboard-section {
-
-    -fx-background-color: white;
-
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
-
-    -fx-border-color: -line;
-    -fx-border-width: 1;
-
-    -fx-padding: 18;
-
-    -fx-effect: dropshadow(
-        gaussian,
-        rgba(0,0,0,0.05),
-        10,
-        0,
-        0,
-        2
-    );
-
-}
-
-.dashboard-section:hover {
-
-    -fx-border-color: derive(-brand, 35%);
-
-}
-
-.dashboard-section-title {
-
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -ink;
-
-}
 
 .dashboard-item {
 
@@ -1170,6 +1152,51 @@
     -fx-background-color: #F3F4F6;
 }
 
+/* ---------- Cabecalho de boas-vindas: atualizar / última atualização ---------- */
+
+.dashboard-updated-at {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9CA3AF;
+}
+
+.btn-refresh {
+    -fx-background-color: -brand-soft;
+    -fx-text-fill: -brand-dark;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12 6 12;
+    -fx-cursor: hand;
+}
+
+.btn-refresh:hover {
+    -fx-background-color: derive(-brand-soft, -8%);
+}
+
+.btn-refresh:pressed {
+    -fx-background-color: derive(-brand-soft, -16%);
+}
+
+/* ---------- Banner de erro do dashboard ---------- */
+
+.dashboard-error-banner {
+    -fx-background-color: #FEF2F2;
+    -fx-border-color: #FECACA;
+    -fx-border-width: 1;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-padding: 10 14 10 14;
+}
+
+.dashboard-error-icon {
+    -fx-font-size: 15px;
+    -fx-text-fill: #B91C1C;
+}
+
+.dashboard-error-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #991B1B;
+}
 
 /* ============================================================
    INDICADORES PRINCIPAIS
@@ -1185,6 +1212,12 @@
     -fx-min-height: 96px;
 }
 
+.dashboard-stat-card:hover {
+    -fx-border-color: -brand;
+    -fx-translate-y: -2;
+    -fx-effect: dropshadow(gaussian, rgba(177,129,44,0.20), 12, 0, 0, 4);
+}
+
 .dashboard-stat-icon {
     -fx-background-color: #F6EEDD;
     -fx-background-radius: 10;
@@ -1192,6 +1225,24 @@
     -fx-pref-width: 52px;
     -fx-min-height: 52px;
     -fx-pref-height: 52px;
+}
+
+/* variacoes de cor do icone, para diferenciar os cartoes rapidamente */
+
+.dashboard-stat-icon-brand {
+    -fx-background-color: #F6EEDD;
+}
+
+.dashboard-stat-icon-info {
+    -fx-background-color: #DBEAFE;
+}
+
+.dashboard-stat-icon-warning {
+    -fx-background-color: #FFEDD5;
+}
+
+.dashboard-stat-icon-success {
+    -fx-background-color: #DCFCE7;
 }
 
 .dashboard-stat-label {
@@ -1204,6 +1255,10 @@
     -fx-font-size: 23px;
     -fx-font-weight: bold;
     -fx-text-fill: #B1812C;
+}
+
+.dashboard-stat-info {
+    -fx-text-fill: #1D4ED8;
 }
 
 .dashboard-stat-warning {
@@ -1232,6 +1287,12 @@
     -fx-border-width: 1;
     -fx-padding: 18 20 18 20;
     -fx-min-height: 105px;
+}
+
+.dashboard-finance-card:hover {
+    -fx-border-color: derive(#15803D, 30%);
+    -fx-translate-y: -2;
+    -fx-effect: dropshadow(gaussian, rgba(21,128,61,0.16), 12, 0, 0, 4);
 }
 
 .dashboard-finance-icon {
@@ -1627,6 +1688,13 @@
     -fx-text-fill: #B91C1C;
 }
 
+/* ---------- Card de aviso (laranja) ---------- */
+
+.report-warning-icon {
+    -fx-background-color: #FFEDD5;
+}
+
+.report-warning-value {
     -fx-background-color: #FFEDD5;
     -fx-text-fill: #C2410C;
 }

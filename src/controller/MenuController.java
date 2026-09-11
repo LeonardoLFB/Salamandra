@@ -2,6 +2,8 @@ package controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +16,8 @@ import application.SessaoUsuario;
 import database.ClienteDAO;
 import database.ProdutoDAO;
 import database.VendaDAO;
+import javafx.animation.FadeTransition;
+import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,6 +30,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -101,6 +106,9 @@ public class MenuController implements Initializable {
     // ============================================================
 
     @FXML
+    private Label lblBoasVindasTitulo;
+
+    @FXML
     private Label lblQtdClientes;
 
     @FXML
@@ -117,9 +125,30 @@ public class MenuController implements Initializable {
 
     @FXML
     private Label lblPendentes;
-    
+
     @FXML
     private Label lblMinhasVendas;
+
+    @FXML
+    private Label lblUltimaAtualizacao;
+
+    @FXML
+    private JFXButton btAtualizarDashboard;
+
+    @FXML
+    private HBox boxErroDashboard;
+
+    @FXML
+    private Label lblErroDashboard;
+
+    @FXML
+    private GridPane gridIndicadores;
+
+    @FXML
+    private GridPane gridFinanceiro;
+
+    @FXML
+    private GridPane gridPaineis;
 
     @FXML
     private VBox boxUltimasVendas;
@@ -138,7 +167,12 @@ public class MenuController implements Initializable {
 
     private Parent dashboardInicial;
 
+    private JFXButton botaoMenuAtivo;
+
     private static final double SIDEBAR_WIDTH = 176;
+
+    private static final DateTimeFormatter FORMATO_HORA =
+        DateTimeFormatter.ofPattern("HH:mm");
 
     // ============================================================
     // INICIALIZAÇÃO
@@ -168,6 +202,8 @@ public class MenuController implements Initializable {
         carregarUsuarioLogado();
         carregarIndicadores();
         aplicarPermissoesUsuario();
+
+        animarEntradaDashboard();
     }
 
     // ============================================================
@@ -175,6 +211,8 @@ public class MenuController implements Initializable {
     // ============================================================
 
     private void carregarIndicadores() {
+
+        esconderErroDashboard();
 
         try {
 
@@ -233,6 +271,8 @@ public class MenuController implements Initializable {
             carregarUltimasVendas(vendas);
             carregarProdutosEstoqueBaixo(produtos);
 
+            atualizarHorarioAtualizacao();
+
         } catch (Exception e) {
 
             System.err.println(
@@ -241,8 +281,13 @@ public class MenuController implements Initializable {
             );
 
             e.printStackTrace();
+
+            mostrarErroDashboard(
+                "Não foi possível carregar os indicadores agora. "
+                + "Tente novamente em instantes."
+            );
         }
-        
+
         if (SessaoUsuario.temUsuarioLogado()) {
 
             Usuario usuario =
@@ -262,6 +307,97 @@ public class MenuController implements Initializable {
 
             lblMinhasVendas.setText("0");
         }
+    }
+
+    /**
+     * Recarrega os indicadores do dashboard manualmente,
+     * acionado pelo botão "Atualizar" ao lado das boas-vindas.
+     */
+    @FXML
+    private void OnBtAtualizarDashboardClick(ActionEvent event) {
+
+        RotateTransition giro =
+            new RotateTransition(
+                Duration.millis(500),
+                btAtualizarDashboard
+            );
+
+        giro.setByAngle(360);
+        giro.play();
+
+        carregarIndicadores();
+    }
+
+    private void atualizarHorarioAtualizacao() {
+
+        if (lblUltimaAtualizacao == null) {
+            return;
+        }
+
+        lblUltimaAtualizacao.setText(
+            "Atualizado às " + LocalTime.now().format(FORMATO_HORA)
+        );
+    }
+
+    private void mostrarErroDashboard(String mensagem) {
+
+        if (boxErroDashboard == null) {
+            return;
+        }
+
+        lblErroDashboard.setText(mensagem);
+
+        boxErroDashboard.setVisible(true);
+        boxErroDashboard.setManaged(true);
+    }
+
+    private void esconderErroDashboard() {
+
+        if (boxErroDashboard == null) {
+            return;
+        }
+
+        boxErroDashboard.setVisible(false);
+        boxErroDashboard.setManaged(false);
+    }
+
+    /**
+     * Pequena animação de entrada (fade + leve deslocamento) aplicada
+     * aos blocos do dashboard quando a tela é aberta, para dar uma
+     * sensação de painel "vivo" em vez de conteúdo estático.
+     */
+    private void animarEntradaDashboard() {
+
+        animarBloco(gridIndicadores, 0);
+        animarBloco(gridFinanceiro, 80);
+        animarBloco(gridPaineis, 160);
+    }
+
+    private void animarBloco(Region bloco, double atrasoMs) {
+
+        if (bloco == null) {
+            return;
+        }
+
+        bloco.setOpacity(0);
+        bloco.setTranslateY(12);
+
+        FadeTransition fade =
+            new FadeTransition(Duration.millis(320), bloco);
+
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.setDelay(Duration.millis(atrasoMs));
+
+        TranslateTransition desliza =
+            new TranslateTransition(Duration.millis(320), bloco);
+
+        desliza.setFromY(12);
+        desliza.setToY(0);
+        desliza.setDelay(Duration.millis(atrasoMs));
+
+        fade.play();
+        desliza.play();
     }
 
     private void carregarUltimasVendas(List<Venda> vendas) {
@@ -542,6 +678,7 @@ public class MenuController implements Initializable {
             return;
         }
 
+        marcarItemAtivo(btProdutos);
         carregarTela("/view/Produtos.fxml");
     }
 
@@ -554,6 +691,7 @@ public class MenuController implements Initializable {
             return;
         }
 
+        marcarItemAtivo(btEstoque);
         carregarTela("/view/Estoque.fxml");
     }
 
@@ -566,6 +704,7 @@ public class MenuController implements Initializable {
             return;
         }
 
+        marcarItemAtivo(btFornecedores);
         carregarTela("/view/Fornecedores.fxml");
     }
 
@@ -578,6 +717,7 @@ public class MenuController implements Initializable {
             return;
         }
 
+        marcarItemAtivo(btClientes);
         carregarTela("/view/Clientes.fxml");
     }
 
@@ -590,6 +730,7 @@ public class MenuController implements Initializable {
             return;
         }
 
+        marcarItemAtivo(btUsuarios);
         carregarTela("/view/Usuarios.fxml");
     }
 
@@ -602,12 +743,14 @@ public class MenuController implements Initializable {
             return;
         }
 
+        marcarItemAtivo(btVendas);
         carregarTela("/view/Vendas.fxml");
     }
 
     @FXML
     public void OnBtRelatoriosClick(ActionEvent event) {
 
+        marcarItemAtivo(btRelatorios);
         carregarTela("/view/Relatorios.fxml");
     }
 
@@ -660,6 +803,30 @@ public class MenuController implements Initializable {
         }
     }
 
+    /**
+     * Aplica o destaque visual (classe "nav-item-active") apenas
+     * no item do menu lateral correspondente à tela aberta, e
+     * remove do item que estava marcado anteriormente.
+     */
+    private void marcarItemAtivo(JFXButton botaoClicado) {
+
+        if (botaoMenuAtivo != null) {
+
+            botaoMenuAtivo
+                .getStyleClass()
+                .remove("nav-item-active");
+        }
+
+        if (botaoClicado != null) {
+
+            botaoClicado
+                .getStyleClass()
+                .add("nav-item-active");
+        }
+
+        botaoMenuAtivo = botaoClicado;
+    }
+
     // ============================================================
     // VOLTAR PARA O DASHBOARD
     // ============================================================
@@ -675,7 +842,10 @@ public class MenuController implements Initializable {
             .getChildren()
             .add(dashboardInicial);
 
+        marcarItemAtivo(null);
+
         carregarIndicadores();
+        animarEntradaDashboard();
     }
 
     // ============================================================
@@ -692,6 +862,13 @@ public class MenuController implements Initializable {
 
             lblPerfilUsuario.setText("");
 
+            if (lblBoasVindasTitulo != null) {
+
+                lblBoasVindasTitulo.setText(
+                    "Bem-vindo à Salamandra"
+                );
+            }
+
             return;
         }
 
@@ -705,6 +882,16 @@ public class MenuController implements Initializable {
         	lblPerfilUsuario.setText(
         	    usuario.getTipo()
         	);
+
+        if (lblBoasVindasTitulo != null) {
+
+            String primeiroNome =
+                usuario.getNome().split(" ")[0];
+
+            lblBoasVindasTitulo.setText(
+                "Bem-vindo, " + primeiroNome + "!"
+            );
+        }
     }
 
     // ============================================================

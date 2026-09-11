@@ -808,161 +808,198 @@ public class VendaController {
         );
 
 
-        // ========================================================
-        // AÇÕES
-        // ========================================================
+     // ========================================================
+     // AÇÕES
+     // ========================================================
 
-        colAcoes.setCellFactory(
-                col ->
-                        new TableCell<Venda, Void>() {
+     colAcoes.setCellFactory(
+             col ->
+                     new TableCell<Venda, Void>() {
 
-                            private final Button btnDetalhes =
-                                    new Button("Ver");
+                         private final Button btnDetalhes =
+                                 new Button("Ver");
 
-                            private final Button btnConcluir =
-                                    new Button("Concluir");
+                         private final Button btnConcluir =
+                                 new Button("Concluir");
 
-                            private final Button btnCancelar =
-                                    new Button("Cancelar");
+                         private final Button btnCancelar =
+                                 new Button("Cancelar");
 
-                            private final HBox boxCompleto =
-                                    new HBox(
-                                            6,
-                                            btnDetalhes,
-                                            btnConcluir,
-                                            btnCancelar
-                                    );
+                         private final Button btnExcluir =
+                                 new Button("Excluir");
 
-                            private final HBox boxDetalhes =
-                                    new HBox(
-                                            6,
-                                            btnDetalhes
-                                    );
+                         private final HBox boxCompleto =
+                                 new HBox(
+                                         6,
+                                         btnDetalhes,
+                                         btnConcluir,
+                                         btnCancelar,
+                                         btnExcluir
+                                 );
 
-                            {
-                                btnDetalhes
-                                        .getStyleClass()
-                                        .add(
-                                                "sale-action-view"
-                                        );
+                         private final HBox boxFinalizada =
+                                 new HBox(
+                                         6,
+                                         btnDetalhes,
+                                         btnExcluir
+                                 );
 
-                                btnConcluir
-                                        .getStyleClass()
-                                        .add(
-                                                "sale-action-complete"
-                                        );
+                         {
+                             btnDetalhes
+                                     .getStyleClass()
+                                     .add(
+                                             "sale-action-view"
+                                     );
 
-                                btnCancelar
-                                        .getStyleClass()
-                                        .add(
-                                                "sale-action-cancel"
-                                        );
+                             btnConcluir
+                                     .getStyleClass()
+                                     .add(
+                                             "sale-action-complete"
+                                     );
 
-                                btnDetalhes.setTooltip(
-                                        new Tooltip(
-                                                "Ver detalhes da venda"
-                                        )
-                                );
+                             btnCancelar
+                                     .getStyleClass()
+                                     .add(
+                                             "sale-action-cancel"
+                                     );
 
-                                btnConcluir.setTooltip(
-                                        new Tooltip(
-                                                "Concluir venda"
-                                        )
-                                );
+                             btnExcluir
+                                     .getStyleClass()
+                                     .add(
+                                             "table-action-delete"
+                                     );
 
-                                btnCancelar.setTooltip(
-                                        new Tooltip(
-                                                "Cancelar venda"
-                                        )
-                                );
 
-                                btnDetalhes.setOnAction(e -> {
+                             btnDetalhes.setTooltip(
+                                     new Tooltip(
+                                             "Ver detalhes da venda"
+                                     )
+                             );
 
-                                    Venda venda =
-                                            getTableView()
-                                                    .getItems()
-                                                    .get(
-                                                            getIndex()
-                                                    );
+                             btnConcluir.setTooltip(
+                                     new Tooltip(
+                                             "Concluir venda"
+                                     )
+                             );
 
-                                    mostrarDetalhesVenda(
-                                            venda
-                                    );
-                                });
+                             btnCancelar.setTooltip(
+                                     new Tooltip(
+                                             "Cancelar venda"
+                                     )
+                             );
 
-                                btnConcluir.setOnAction(e -> {
+                             btnExcluir.setTooltip(
+                                     new Tooltip(
+                                             "Excluir venda"
+                                     )
+                             );
 
-                                    Venda venda =
-                                            getTableView()
-                                                    .getItems()
-                                                    .get(
-                                                            getIndex()
-                                                    );
 
-                                    concluirVenda(
-                                            venda
-                                    );
-                                });
+                             btnDetalhes.setOnAction(e -> {
 
-                                btnCancelar.setOnAction(e -> {
+                                 Venda venda =
+                                         getTableView()
+                                                 .getItems()
+                                                 .get(
+                                                         getIndex()
+                                                 );
 
-                                    Venda venda =
-                                            getTableView()
-                                                    .getItems()
-                                                    .get(
-                                                            getIndex()
-                                                    );
+                                 mostrarDetalhesVenda(
+                                         venda
+                                 );
+                             });
 
-                                    cancelarVenda(
-                                            venda
-                                    );
-                                });
-                            }
 
-                            @Override
-                            protected void updateItem(
-                                    Void item,
-                                    boolean empty) {
+                             btnConcluir.setOnAction(e -> {
 
-                                super.updateItem(
-                                        item,
-                                        empty
-                                );
+                                 Venda venda =
+                                         getTableView()
+                                                 .getItems()
+                                                 .get(
+                                                         getIndex()
+                                                 );
 
-                                if (empty) {
+                                 concluirVenda(
+                                         venda
+                                 );
+                             });
 
-                                    setGraphic(null);
 
-                                    return;
-                                }
+                             btnCancelar.setOnAction(e -> {
 
-                                Venda venda =
-                                        getTableView()
-                                                .getItems()
-                                                .get(
-                                                        getIndex()
-                                                );
+                                 Venda venda =
+                                         getTableView()
+                                                 .getItems()
+                                                 .get(
+                                                         getIndex()
+                                                 );
 
-                                if ("Concluída".equals(
-                                        venda.getStatus()
-                                )
-                                        || "Cancelada".equals(
-                                        venda.getStatus()
-                                )) {
+                                 cancelarVenda(
+                                         venda
+                                 );
+                             });
 
-                                    setGraphic(
-                                            boxDetalhes
-                                    );
 
-                                } else {
+                             btnExcluir.setOnAction(e -> {
 
-                                    setGraphic(
-                                            boxCompleto
-                                    );
-                                }
-                            }
-                        }
-        );
+                                 Venda venda =
+                                         getTableView()
+                                                 .getItems()
+                                                 .get(
+                                                         getIndex()
+                                                 );
+
+                                 excluirVenda(
+                                         venda
+                                 );
+                             });
+                         }
+
+
+                         @Override
+                         protected void updateItem(
+                                 Void item,
+                                 boolean empty) {
+
+                             super.updateItem(
+                                     item,
+                                     empty
+                             );
+
+                             if (empty) {
+
+                                 setGraphic(null);
+                                 return;
+                             }
+
+                             Venda venda =
+                                     getTableView()
+                                             .getItems()
+                                             .get(
+                                                     getIndex()
+                                             );
+
+
+                             if ("Concluída".equals(
+                                     venda.getStatus()
+                             )
+                                     || "Cancelada".equals(
+                                             venda.getStatus()
+                                     )) {
+
+                                 setGraphic(
+                                         boxFinalizada
+                                 );
+
+                             } else {
+
+                                 setGraphic(
+                                         boxCompleto
+                                 );
+                             }
+                         }
+                     }
+     );
 
         tableVendas.setItems(
                 vendasFiltradas
@@ -1947,6 +1984,88 @@ public class VendaController {
         }
     }
 
+ // ============================================================
+ // EXCLUIR VENDA
+ // ============================================================
+
+ private void excluirVenda(
+         Venda venda) {
+
+     Alert confirmacao =
+             new Alert(
+                     Alert.AlertType.CONFIRMATION
+             );
+
+     confirmacao.setTitle(
+             "Excluir venda"
+     );
+
+     confirmacao.setHeaderText(
+             "Deseja realmente excluir esta venda?"
+     );
+
+     confirmacao.setContentText(
+             "Venda #"
+             + venda.getIdVenda()
+             + "\nCliente: "
+             + venda.getNomeCliente()
+             + "\n\n"
+             + "Esta ação não poderá ser desfeita."
+     );
+
+
+     Optional<ButtonType> resultado =
+             confirmacao.showAndWait();
+
+
+     if (resultado.isEmpty()
+             || resultado.get()
+             != ButtonType.OK) {
+
+         return;
+     }
+
+
+     try {
+
+         String mensagem =
+                 vendaDAO.deletar(
+                         venda.getIdVenda()
+                 );
+
+
+         if (mensagem.contains(
+                 "sucesso"
+         )) {
+
+             mostrarSucesso(
+                     "Venda #"
+                     + venda.getIdVenda()
+                     + " excluída com sucesso!"
+             );
+
+             carregarDadosIniciais();
+
+             aplicarFiltroVendas();
+
+         } else {
+
+             mostrarErro(
+                     "Erro ao excluir venda",
+                     mensagem
+             );
+         }
+
+     } catch (Exception e) {
+
+         mostrarErro(
+                 "Erro ao excluir venda",
+                 "Não foi possível excluir a venda."
+         );
+
+         e.printStackTrace();
+     }
+ }
 
     // ============================================================
     // ALERTAS

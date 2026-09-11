@@ -463,6 +463,7 @@
                                     <VBox spacing="4">
 
                                         <Label
+                                            fx:id="lblBoasVindasTitulo"
                                             styleClass="welcome-title"
                                             text="Bem-vindo à Salamandra" />
 
@@ -473,6 +474,48 @@
 
                                     </VBox>
 
+                                    <Region HBox.hgrow="ALWAYS" />
+
+                                    <VBox
+                                        alignment="CENTER_RIGHT"
+                                        spacing="2">
+
+                                        <Label
+                                            fx:id="lblUltimaAtualizacao"
+                                            styleClass="dashboard-updated-at"
+                                            text="Atualizado agora" />
+
+                                        <JFXButton
+                                            fx:id="btAtualizarDashboard"
+                                            onAction="#OnBtAtualizarDashboardClick"
+                                            styleClass="btn-refresh"
+                                            text="⟳  Atualizar" />
+
+                                    </VBox>
+
+                                </HBox>
+
+                                <!-- ==================================================
+                                     BANNER DE ERRO (oculto por padrão)
+                                     ================================================== -->
+
+                                <HBox
+                                    fx:id="boxErroDashboard"
+                                    alignment="CENTER_LEFT"
+                                    spacing="10"
+                                    styleClass="dashboard-error-banner"
+                                    visible="false"
+                                    managed="false">
+
+                                    <Label
+                                        styleClass="dashboard-error-icon"
+                                        text="⚠" />
+
+                                    <Label
+                                        fx:id="lblErroDashboard"
+                                        styleClass="dashboard-error-text"
+                                        text="Não foi possível carregar os indicadores." />
+
                                 </HBox>
 
                                 <!-- ==================================================
@@ -480,6 +523,7 @@
                                      ================================================== -->
 
                                 <GridPane
+                                    fx:id="gridIndicadores"
                                     hgap="16"
                                     vgap="16">
 
@@ -513,7 +557,7 @@
 
                                         <VBox
                                             alignment="CENTER"
-                                            styleClass="dashboard-stat-icon">
+                                            styleClass="dashboard-stat-icon, dashboard-stat-icon-brand">
 
                                             <ImageView
                                                 fitHeight="26"
@@ -557,7 +601,7 @@
 
                                         <VBox
                                             alignment="CENTER"
-                                            styleClass="dashboard-stat-icon">
+                                            styleClass="dashboard-stat-icon, dashboard-stat-icon-info">
 
                                             <ImageView
                                                 fitHeight="26"
@@ -580,7 +624,7 @@
 
                                             <Label
                                                 fx:id="lblQtdProdutos"
-                                                styleClass="dashboard-stat-value"
+                                                styleClass="dashboard-stat-value, dashboard-stat-info"
                                                 text="—" />
 
                                             <Label
@@ -601,7 +645,7 @@
 
                                         <VBox
                                             alignment="CENTER"
-                                            styleClass="dashboard-stat-icon">
+                                            styleClass="dashboard-stat-icon, dashboard-stat-icon-warning">
 
                                             <ImageView
                                                 fitHeight="26"
@@ -645,7 +689,7 @@
 
                                         <VBox
                                             alignment="CENTER"
-                                            styleClass="dashboard-stat-icon">
+                                            styleClass="dashboard-stat-icon, dashboard-stat-icon-success">
 
                                             <ImageView
                                                 fitHeight="26"
@@ -686,6 +730,7 @@
                                      ================================================== -->
 
                                 <GridPane
+                                    fx:id="gridFinanceiro"
                                     hgap="16"
                                     vgap="16">
 
@@ -789,7 +834,7 @@
 
                                         <VBox
                                             alignment="CENTER"
-                                            styleClass="dashboard-stat-icon">
+                                            styleClass="dashboard-stat-icon, dashboard-stat-icon-success">
 
                                             <ImageView
                                                 fitHeight="26"
@@ -812,7 +857,7 @@
 
                                             <Label
                                                 fx:id="lblMinhasVendas"
-                                                styleClass="dashboard-stat-value"
+                                                styleClass="dashboard-stat-value, dashboard-stat-success"
                                                 text="0" />
 
                                             <Label
@@ -830,6 +875,7 @@
                                      ================================================== -->
 
                                 <GridPane
+                                    fx:id="gridPaineis"
                                     hgap="18"
                                     vgap="18">
 
