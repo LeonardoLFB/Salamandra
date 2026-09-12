@@ -10,7 +10,7 @@ import model.Auditoria;
 import model.Cliente;
 import model.Usuario;
 
-public class ClienteDAO extends Cliente {
+public class ClienteDAO {
 
     // ============================================================
     // INSERIR CLIENTE

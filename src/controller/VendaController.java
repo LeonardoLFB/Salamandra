@@ -18,9 +18,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -35,6 +33,7 @@ import model.Cliente;
 import model.ItemVenda;
 import model.Produto;
 import model.Venda;
+import util.AlertaUtil;
 
 public class VendaController {
 
@@ -241,7 +240,7 @@ public class VendaController {
                         return todosClientes.stream()
                                 .filter(cliente ->
                                         cliente.getNome() != null
-                                        && cliente
+                                                && cliente
                                                 .getNome()
                                                 .equalsIgnoreCase(
                                                         texto.trim()
@@ -282,7 +281,7 @@ public class VendaController {
                                     todosClientes.stream()
                                             .filter(cliente ->
                                                     cliente.getNome() != null
-                                                    && cliente
+                                                            && cliente
                                                             .getNome()
                                                             .toLowerCase()
                                                             .contains(busca)
@@ -345,9 +344,9 @@ public class VendaController {
 
                                     String descricao =
                                             produto.getNome()
-                                            + " (Cód: "
-                                            + produto.getCodigo()
-                                            + ")";
+                                                    + " (Cód: "
+                                                    + produto.getCodigo()
+                                                    + ")";
 
                                     return descricao
                                             .equalsIgnoreCase(
@@ -391,7 +390,7 @@ public class VendaController {
 
                                                 boolean nome =
                                                         produto.getNome() != null
-                                                        && produto
+                                                                && produto
                                                                 .getNome()
                                                                 .toLowerCase()
                                                                 .contains(busca);
@@ -642,8 +641,8 @@ public class VendaController {
 
                                 setGraphic(
                                         empty
-                                            ? null
-                                            : btnRemover
+                                                ? null
+                                                : btnRemover
                                 );
                             }
                         }
@@ -678,10 +677,6 @@ public class VendaController {
                         "nomeCliente"
                 )
         );
-
-        // ========================================================
-        // RESPONSÁVEL PELA VENDA
-        // ========================================================
 
         colResponsavel.setCellValueFactory(
                 cellData -> {
@@ -808,198 +803,198 @@ public class VendaController {
         );
 
 
-     // ========================================================
-     // AÇÕES
-     // ========================================================
+        // ========================================================
+        // AÇÕES
+        // ========================================================
 
-     colAcoes.setCellFactory(
-             col ->
-                     new TableCell<Venda, Void>() {
+        colAcoes.setCellFactory(
+                col ->
+                        new TableCell<Venda, Void>() {
 
-                         private final Button btnDetalhes =
-                                 new Button("Ver");
+                            private final Button btnDetalhes =
+                                    new Button("Ver");
 
-                         private final Button btnConcluir =
-                                 new Button("Concluir");
+                            private final Button btnConcluir =
+                                    new Button("Concluir");
 
-                         private final Button btnCancelar =
-                                 new Button("Cancelar");
+                            private final Button btnCancelar =
+                                    new Button("Cancelar");
 
-                         private final Button btnExcluir =
-                                 new Button("Excluir");
+                            private final Button btnExcluir =
+                                    new Button("Excluir");
 
-                         private final HBox boxCompleto =
-                                 new HBox(
-                                         6,
-                                         btnDetalhes,
-                                         btnConcluir,
-                                         btnCancelar,
-                                         btnExcluir
-                                 );
+                            private final HBox boxCompleto =
+                                    new HBox(
+                                            6,
+                                            btnDetalhes,
+                                            btnConcluir,
+                                            btnCancelar,
+                                            btnExcluir
+                                    );
 
-                         private final HBox boxFinalizada =
-                                 new HBox(
-                                         6,
-                                         btnDetalhes,
-                                         btnExcluir
-                                 );
+                            private final HBox boxFinalizada =
+                                    new HBox(
+                                            6,
+                                            btnDetalhes,
+                                            btnExcluir
+                                    );
 
-                         {
-                             btnDetalhes
-                                     .getStyleClass()
-                                     .add(
-                                             "sale-action-view"
-                                     );
+                            {
+                                btnDetalhes
+                                        .getStyleClass()
+                                        .add(
+                                                "sale-action-view"
+                                        );
 
-                             btnConcluir
-                                     .getStyleClass()
-                                     .add(
-                                             "sale-action-complete"
-                                     );
+                                btnConcluir
+                                        .getStyleClass()
+                                        .add(
+                                                "sale-action-complete"
+                                        );
 
-                             btnCancelar
-                                     .getStyleClass()
-                                     .add(
-                                             "sale-action-cancel"
-                                     );
+                                btnCancelar
+                                        .getStyleClass()
+                                        .add(
+                                                "sale-action-cancel"
+                                        );
 
-                             btnExcluir
-                                     .getStyleClass()
-                                     .add(
-                                             "table-action-delete"
-                                     );
-
-
-                             btnDetalhes.setTooltip(
-                                     new Tooltip(
-                                             "Ver detalhes da venda"
-                                     )
-                             );
-
-                             btnConcluir.setTooltip(
-                                     new Tooltip(
-                                             "Concluir venda"
-                                     )
-                             );
-
-                             btnCancelar.setTooltip(
-                                     new Tooltip(
-                                             "Cancelar venda"
-                                     )
-                             );
-
-                             btnExcluir.setTooltip(
-                                     new Tooltip(
-                                             "Excluir venda"
-                                     )
-                             );
+                                btnExcluir
+                                        .getStyleClass()
+                                        .add(
+                                                "table-action-delete"
+                                        );
 
 
-                             btnDetalhes.setOnAction(e -> {
+                                btnDetalhes.setTooltip(
+                                        new Tooltip(
+                                                "Ver detalhes da venda"
+                                        )
+                                );
 
-                                 Venda venda =
-                                         getTableView()
-                                                 .getItems()
-                                                 .get(
-                                                         getIndex()
-                                                 );
+                                btnConcluir.setTooltip(
+                                        new Tooltip(
+                                                "Concluir venda"
+                                        )
+                                );
 
-                                 mostrarDetalhesVenda(
-                                         venda
-                                 );
-                             });
+                                btnCancelar.setTooltip(
+                                        new Tooltip(
+                                                "Cancelar venda"
+                                        )
+                                );
 
-
-                             btnConcluir.setOnAction(e -> {
-
-                                 Venda venda =
-                                         getTableView()
-                                                 .getItems()
-                                                 .get(
-                                                         getIndex()
-                                                 );
-
-                                 concluirVenda(
-                                         venda
-                                 );
-                             });
+                                btnExcluir.setTooltip(
+                                        new Tooltip(
+                                                "Excluir venda"
+                                        )
+                                );
 
 
-                             btnCancelar.setOnAction(e -> {
+                                btnDetalhes.setOnAction(e -> {
 
-                                 Venda venda =
-                                         getTableView()
-                                                 .getItems()
-                                                 .get(
-                                                         getIndex()
-                                                 );
+                                    Venda venda =
+                                            getTableView()
+                                                    .getItems()
+                                                    .get(
+                                                            getIndex()
+                                                    );
 
-                                 cancelarVenda(
-                                         venda
-                                 );
-                             });
-
-
-                             btnExcluir.setOnAction(e -> {
-
-                                 Venda venda =
-                                         getTableView()
-                                                 .getItems()
-                                                 .get(
-                                                         getIndex()
-                                                 );
-
-                                 excluirVenda(
-                                         venda
-                                 );
-                             });
-                         }
+                                    mostrarDetalhesVenda(
+                                            venda
+                                    );
+                                });
 
 
-                         @Override
-                         protected void updateItem(
-                                 Void item,
-                                 boolean empty) {
+                                btnConcluir.setOnAction(e -> {
 
-                             super.updateItem(
-                                     item,
-                                     empty
-                             );
+                                    Venda venda =
+                                            getTableView()
+                                                    .getItems()
+                                                    .get(
+                                                            getIndex()
+                                                    );
 
-                             if (empty) {
-
-                                 setGraphic(null);
-                                 return;
-                             }
-
-                             Venda venda =
-                                     getTableView()
-                                             .getItems()
-                                             .get(
-                                                     getIndex()
-                                             );
+                                    concluirVenda(
+                                            venda
+                                    );
+                                });
 
 
-                             if ("Concluída".equals(
-                                     venda.getStatus()
-                             )
-                                     || "Cancelada".equals(
-                                             venda.getStatus()
-                                     )) {
+                                btnCancelar.setOnAction(e -> {
 
-                                 setGraphic(
-                                         boxFinalizada
-                                 );
+                                    Venda venda =
+                                            getTableView()
+                                                    .getItems()
+                                                    .get(
+                                                            getIndex()
+                                                    );
 
-                             } else {
+                                    cancelarVenda(
+                                            venda
+                                    );
+                                });
 
-                                 setGraphic(
-                                         boxCompleto
-                                 );
-                             }
-                         }
-                     }
-     );
+
+                                btnExcluir.setOnAction(e -> {
+
+                                    Venda venda =
+                                            getTableView()
+                                                    .getItems()
+                                                    .get(
+                                                            getIndex()
+                                                    );
+
+                                    excluirVenda(
+                                            venda
+                                    );
+                                });
+                            }
+
+
+                            @Override
+                            protected void updateItem(
+                                    Void item,
+                                    boolean empty) {
+
+                                super.updateItem(
+                                        item,
+                                        empty
+                                );
+
+                                if (empty) {
+
+                                    setGraphic(null);
+                                    return;
+                                }
+
+                                Venda venda =
+                                        getTableView()
+                                                .getItems()
+                                                .get(
+                                                        getIndex()
+                                                );
+
+
+                                if ("Concluída".equals(
+                                        venda.getStatus()
+                                )
+                                        || "Cancelada".equals(
+                                        venda.getStatus()
+                                )) {
+
+                                    setGraphic(
+                                            boxFinalizada
+                                    );
+
+                                } else {
+
+                                    setGraphic(
+                                            boxCompleto
+                                    );
+                                }
+                            }
+                        }
+        );
 
         tableVendas.setItems(
                 vendasFiltradas
@@ -1032,20 +1027,20 @@ public class VendaController {
 
             todosClientes.setAll(
                     clientes != null
-                        ? clientes
-                        : new ArrayList<>()
+                            ? clientes
+                            : new ArrayList<>()
             );
 
             todosProdutos.setAll(
                     produtos != null
-                        ? produtos
-                        : new ArrayList<>()
+                            ? produtos
+                            : new ArrayList<>()
             );
 
             todasVendas.setAll(
                     vendas != null
-                        ? vendas
-                        : new ArrayList<>()
+                            ? vendas
+                            : new ArrayList<>()
             );
 
             vendasFiltradas.setAll(
@@ -1062,7 +1057,7 @@ public class VendaController {
 
         } catch (Exception e) {
 
-            mostrarErro(
+            AlertaUtil.erro(
                     "Erro ao carregar dados",
                     "Não foi possível carregar os dados da tela de vendas."
             );
@@ -1089,7 +1084,7 @@ public class VendaController {
 
         if (clienteSelecionado == null) {
 
-            mostrarAviso(
+            AlertaUtil.aviso(
                     "Cliente não selecionado",
                     "Selecione um cliente válido antes de adicionar produtos."
             );
@@ -1102,7 +1097,7 @@ public class VendaController {
 
         if (produtoSelecionado == null) {
 
-            mostrarAviso(
+            AlertaUtil.aviso(
                     "Produto não selecionado",
                     "Selecione um produto válido."
             );
@@ -1116,7 +1111,7 @@ public class VendaController {
         if (produtoSelecionado.getQtdeEstoque()
                 <= 0) {
 
-            mostrarAviso(
+            AlertaUtil.aviso(
                     "Produto sem estoque",
                     "Este produto não possui unidades disponíveis."
             );
@@ -1138,7 +1133,7 @@ public class VendaController {
 
             if (quantidade <= 0) {
 
-                mostrarAviso(
+                AlertaUtil.aviso(
                         "Quantidade inválida",
                         "A quantidade deve ser maior que zero."
                 );
@@ -1150,7 +1145,7 @@ public class VendaController {
 
         } catch (Exception e) {
 
-            mostrarAviso(
+            AlertaUtil.aviso(
                     "Quantidade inválida",
                     "Informe uma quantidade válida."
             );
@@ -1163,14 +1158,14 @@ public class VendaController {
 
         if (quantidade
                 > produtoSelecionado
-                        .getQtdeEstoque()) {
+                .getQtdeEstoque()) {
 
-            mostrarAviso(
+            AlertaUtil.aviso(
                     "Estoque insuficiente",
                     "Existem apenas "
-                    + produtoSelecionado
+                            + produtoSelecionado
                             .getQtdeEstoque()
-                    + " unidade(s) disponíveis."
+                            + " unidade(s) disponíveis."
             );
 
             return;
@@ -1197,7 +1192,7 @@ public class VendaController {
 
             if (precoUnitario <= 0) {
 
-                mostrarAviso(
+                AlertaUtil.aviso(
                         "Preço inválido",
                         "O preço deve ser maior que zero."
                 );
@@ -1209,7 +1204,7 @@ public class VendaController {
 
         } catch (Exception e) {
 
-            mostrarAviso(
+            AlertaUtil.aviso(
                     "Preço inválido",
                     "Informe um preço válido."
             );
@@ -1224,7 +1219,7 @@ public class VendaController {
                 itensVenda.stream()
                         .filter(item ->
                                 item.getIdProduto()
-                                    == produtoSelecionado.getId()
+                                        == produtoSelecionado.getId()
                         )
                         .findFirst();
 
@@ -1236,14 +1231,14 @@ public class VendaController {
 
             int novaQuantidade =
                     item.getQuantidade()
-                    + quantidade;
+                            + quantidade;
 
 
             if (novaQuantidade
                     > produtoSelecionado
-                            .getQtdeEstoque()) {
+                    .getQtdeEstoque()) {
 
-                mostrarAviso(
+                AlertaUtil.aviso(
                         "Estoque insuficiente",
                         "A quantidade total informada ultrapassa o estoque disponível."
                 );
@@ -1315,7 +1310,7 @@ public class VendaController {
 
         if (cliente == null) {
 
-            mostrarAviso(
+            AlertaUtil.aviso(
                     "Cliente não selecionado",
                     "Selecione um cliente antes de finalizar a venda."
             );
@@ -1328,7 +1323,7 @@ public class VendaController {
 
         if (itensVenda.isEmpty()) {
 
-            mostrarAviso(
+            AlertaUtil.aviso(
                     "Venda sem produtos",
                     "Adicione pelo menos um produto à venda."
             );
@@ -1345,7 +1340,7 @@ public class VendaController {
 
         if (data == null) {
 
-            mostrarAviso(
+            AlertaUtil.aviso(
                     "Data não informada",
                     "Informe a data da venda."
             );
@@ -1359,7 +1354,7 @@ public class VendaController {
         if (comboPagamento.getValue()
                 == null) {
 
-            mostrarAviso(
+            AlertaUtil.aviso(
                     "Forma de pagamento",
                     "Selecione uma forma de pagamento."
             );
@@ -1374,39 +1369,22 @@ public class VendaController {
                 comboPagamento.getValue();
 
 
-        Alert confirmacao =
-                new Alert(
-                        Alert.AlertType.CONFIRMATION
+        boolean confirmou =
+                AlertaUtil.confirmar(
+                        "Finalizar venda",
+                        "Confirmar registro da venda?"
+                                + "\n\nCliente: "
+                                + cliente.getNome()
+                                + "\nItens: "
+                                + itensVenda.size()
+                                + "\nTotal: "
+                                + moedaBrasil.format(
+                                        valorTotalVenda
+                                )
                 );
 
-        confirmacao.setTitle(
-                "Finalizar venda"
-        );
 
-        confirmacao.setHeaderText(
-                "Confirmar registro da venda?"
-        );
-
-        confirmacao.setContentText(
-                "Cliente: "
-                + cliente.getNome()
-                + "\nItens: "
-                + itensVenda.size()
-                + "\nTotal: "
-                + moedaBrasil.format(
-                        valorTotalVenda
-                )
-        );
-
-
-        Optional<ButtonType> resposta =
-                confirmacao.showAndWait();
-
-
-        if (resposta.isEmpty()
-                || resposta.get()
-                != ButtonType.OK) {
-
+        if (!confirmou) {
             return;
         }
 
@@ -1457,10 +1435,11 @@ public class VendaController {
                     "sucesso"
             )) {
 
-                mostrarSucesso(
+                AlertaUtil.sucesso(
+                        "Sucesso",
                         "Venda registrada com sucesso!\n"
-                        + "Venda #"
-                        + venda.getIdVenda()
+                                + "Venda #"
+                                + venda.getIdVenda()
                 );
 
                 limparFormulario();
@@ -1471,7 +1450,7 @@ public class VendaController {
 
             } else {
 
-                mostrarErro(
+                AlertaUtil.erro(
                         "Erro ao registrar venda",
                         resultado
                 );
@@ -1479,10 +1458,10 @@ public class VendaController {
 
         } catch (Exception e) {
 
-            mostrarErro(
+            AlertaUtil.erro(
                     "Erro ao registrar venda",
                     "Não foi possível salvar a venda."
-            );
+                );
 
             e.printStackTrace();
         }
@@ -1499,32 +1478,14 @@ public class VendaController {
 
         if (!itensVenda.isEmpty()) {
 
-            Alert confirmacao =
-                    new Alert(
-                            Alert.AlertType.CONFIRMATION
+            boolean confirmou =
+                    AlertaUtil.confirmar(
+                            "Limpar venda",
+                            "Descartar a venda atual?"
+                                    + "\n\nOs produtos adicionados serão removidos da venda atual."
                     );
 
-            confirmacao.setTitle(
-                    "Limpar venda"
-            );
-
-            confirmacao.setHeaderText(
-                    "Descartar a venda atual?"
-            );
-
-            confirmacao.setContentText(
-                    "Os produtos adicionados serão removidos da venda atual."
-            );
-
-
-            Optional<ButtonType> resultado =
-                    confirmacao.showAndWait();
-
-
-            if (resultado.isEmpty()
-                    || resultado.get()
-                    != ButtonType.OK) {
-
+            if (!confirmou) {
                 return;
             }
         }
@@ -1635,11 +1596,11 @@ public class VendaController {
 
         String busca =
                 txtBusca.getText() == null
-                    ? ""
-                    : txtBusca
-                            .getText()
-                            .toLowerCase()
-                            .trim();
+                        ? ""
+                        : txtBusca
+                        .getText()
+                        .toLowerCase()
+                        .trim();
 
         String status =
                 comboFiltroStatus.getValue();
@@ -1651,25 +1612,25 @@ public class VendaController {
 
                             boolean matchBusca =
                                     busca.isEmpty()
-                                    || (
-                                        venda.getNomeCliente()
-                                                != null
-                                        && venda
-                                                .getNomeCliente()
-                                                .toLowerCase()
-                                                .contains(busca)
+                                            || (
+                                            venda.getNomeCliente()
+                                                    != null
+                                                    && venda
+                                                    .getNomeCliente()
+                                                    .toLowerCase()
+                                                    .contains(busca)
                                     )
-                                    || String.valueOf(
+                                            || String.valueOf(
                                             venda.getIdVenda()
                                     ).contains(busca);
 
 
                             boolean matchStatus =
                                     status == null
-                                    || "Todos".equals(
+                                            || "Todos".equals(
                                             status
                                     )
-                                    || status.equals(
+                                            || status.equals(
                                             venda.getStatus()
                                     );
 
@@ -1689,7 +1650,7 @@ public class VendaController {
 
 
     // ============================================================
-    // DETALHES
+    // DETALHES DA VENDA
     // ============================================================
 
     private void mostrarDetalhesVenda(
@@ -1721,15 +1682,18 @@ public class VendaController {
         ).append(
                 "\n"
         );
-        
+
+
         String responsavel =
                 venda.getNomeUsuario();
 
         if (responsavel == null
                 || responsavel.isBlank()) {
 
-            responsavel = "Não informado";
+            responsavel =
+                    "Não informado";
         }
+
 
         detalhes.append(
                 "Responsável: "
@@ -1776,41 +1740,44 @@ public class VendaController {
         );
 
 
-        for (ItemVenda item : itens) {
+        if (itens != null) {
 
-            detalhes.append(
-                    item.getNomeProduto()
-            ).append(
-                    "\n"
-            );
+            for (ItemVenda item : itens) {
 
-            detalhes.append(
-                    "Quantidade: "
-            ).append(
-                    item.getQuantidade()
-            ).append(
-                    "\n"
-            );
+                detalhes.append(
+                        item.getNomeProduto()
+                ).append(
+                        "\n"
+                );
 
-            detalhes.append(
-                    "Preço unitário: "
-            ).append(
-                    moedaBrasil.format(
-                            item.getPrecoUnitario()
-                    )
-            ).append(
-                    "\n"
-            );
+                detalhes.append(
+                        "Quantidade: "
+                ).append(
+                        item.getQuantidade()
+                ).append(
+                        "\n"
+                );
 
-            detalhes.append(
-                    "Subtotal: "
-            ).append(
-                    moedaBrasil.format(
-                            item.getSubtotal()
-                    )
-            ).append(
-                    "\n\n"
-            );
+                detalhes.append(
+                        "Preço unitário: "
+                ).append(
+                        moedaBrasil.format(
+                                item.getPrecoUnitario()
+                        )
+                ).append(
+                        "\n"
+                );
+
+                detalhes.append(
+                        "Subtotal: "
+                ).append(
+                        moedaBrasil.format(
+                                item.getSubtotal()
+                        )
+                ).append(
+                        "\n\n"
+                );
+            }
         }
 
 
@@ -1827,24 +1794,10 @@ public class VendaController {
         );
 
 
-        Alert alert =
-                new Alert(
-                        Alert.AlertType.INFORMATION
-                );
-
-        alert.setTitle(
-                "Detalhes da Venda"
-        );
-
-        alert.setHeaderText(
-                null
-        );
-
-        alert.setContentText(
+        AlertaUtil.sucesso(
+                "Detalhes da Venda",
                 detalhes.toString()
         );
-
-        alert.showAndWait();
     }
 
 
@@ -1855,65 +1808,52 @@ public class VendaController {
     private void concluirVenda(
             Venda venda) {
 
-        Alert confirmacao =
-                new Alert(
-                        Alert.AlertType.CONFIRMATION
+        boolean confirmou =
+                AlertaUtil.confirmar(
+                        "Concluir venda",
+                        "Confirmar conclusão da venda?"
+                                + "\n\nVenda #"
+                                + venda.getIdVenda()
+                                + "\nCliente: "
+                                + venda.getNomeCliente()
                 );
 
-        confirmacao.setTitle(
-                "Concluir venda"
-        );
 
-        confirmacao.setHeaderText(
-                "Confirmar conclusão da venda?"
-        );
+        if (!confirmou) {
+            return;
+        }
 
-        confirmacao.setContentText(
-                "Venda #"
-                + venda.getIdVenda()
-                + "\nCliente: "
-                + venda.getNomeCliente()
+
+        venda.setStatus(
+                "Concluída"
         );
 
 
-        Optional<ButtonType> resultado =
-                confirmacao.showAndWait();
+        String mensagem =
+                vendaDAO.atualizar(
+                        venda
+                );
 
 
-        if (resultado.isPresent()
-                && resultado.get()
-                == ButtonType.OK) {
+        if (mensagem.contains(
+                "sucesso"
+        )) {
 
-            venda.setStatus(
-                    "Concluída"
+            AlertaUtil.sucesso(
+                    "Sucesso",
+                    "Venda concluída com sucesso!"
             );
 
+            carregarDadosIniciais();
 
-            String mensagem =
-                    vendaDAO.atualizar(
-                            venda
-                    );
+            aplicarFiltroVendas();
 
+        } else {
 
-            if (mensagem.contains(
-                    "sucesso"
-            )) {
-
-                mostrarSucesso(
-                        "Venda concluída com sucesso!"
-                );
-
-                carregarDadosIniciais();
-
-                aplicarFiltroVendas();
-
-            } else {
-
-                mostrarErro(
-                        "Erro ao concluir venda",
-                        mensagem
-                );
-            }
+            AlertaUtil.erro(
+                    "Erro ao concluir venda",
+                    mensagem
+            );
         }
     }
 
@@ -1925,38 +1865,81 @@ public class VendaController {
     private void cancelarVenda(
             Venda venda) {
 
-        Alert confirmacao =
-                new Alert(
-                        Alert.AlertType.CONFIRMATION
+        boolean confirmou =
+                AlertaUtil.confirmar(
+                        "Cancelar venda",
+                        "Confirmar cancelamento da venda?"
+                                + "\n\nVenda #"
+                                + venda.getIdVenda()
+                                + "\nCliente: "
+                                + venda.getNomeCliente()
+                                + "\n\nOs itens serão devolvidos ao estoque."
                 );
 
-        confirmacao.setTitle(
-                "Cancelar venda"
-        );
 
-        confirmacao.setHeaderText(
-                "Confirmar cancelamento da venda?"
-        );
-
-        confirmacao.setContentText(
-                "Venda #"
-                + venda.getIdVenda()
-                + "\nCliente: "
-                + venda.getNomeCliente()
-                + "\n\nOs itens serão devolvidos ao estoque."
-        );
+        if (!confirmou) {
+            return;
+        }
 
 
-        Optional<ButtonType> resultado =
-                confirmacao.showAndWait();
+        String mensagem =
+                vendaDAO.cancelar(
+                        venda.getIdVenda()
+                );
 
 
-        if (resultado.isPresent()
-                && resultado.get()
-                == ButtonType.OK) {
+        if (mensagem.contains(
+                "sucesso"
+        )) {
+
+            AlertaUtil.sucesso(
+                    "Sucesso",
+                    "Venda cancelada.\n"
+                            + "Os produtos foram devolvidos ao estoque."
+            );
+
+            carregarDadosIniciais();
+
+            aplicarFiltroVendas();
+
+        } else {
+
+            AlertaUtil.erro(
+                    "Erro ao cancelar venda",
+                    mensagem
+            );
+        }
+    }
+
+
+    // ============================================================
+    // EXCLUIR VENDA
+    // ============================================================
+
+    private void excluirVenda(
+            Venda venda) {
+
+        boolean confirmou =
+                AlertaUtil.confirmar(
+                        "Excluir venda",
+                        "Deseja realmente excluir esta venda?"
+                                + "\n\nVenda #"
+                                + venda.getIdVenda()
+                                + "\nCliente: "
+                                + venda.getNomeCliente()
+                                + "\n\nEsta ação não poderá ser desfeita."
+                );
+
+
+        if (!confirmou) {
+            return;
+        }
+
+
+        try {
 
             String mensagem =
-                    vendaDAO.cancelar(
+                    vendaDAO.deletar(
                             venda.getIdVenda()
                     );
 
@@ -1965,9 +1948,11 @@ public class VendaController {
                     "sucesso"
             )) {
 
-                mostrarSucesso(
-                        "Venda cancelada.\n"
-                        + "Os produtos foram devolvidos ao estoque."
+                AlertaUtil.sucesso(
+                        "Sucesso",
+                        "Venda #"
+                                + venda.getIdVenda()
+                                + " excluída com sucesso!"
                 );
 
                 carregarDadosIniciais();
@@ -1976,171 +1961,20 @@ public class VendaController {
 
             } else {
 
-                mostrarErro(
-                        "Erro ao cancelar venda",
+                AlertaUtil.erro(
+                        "Erro ao excluir venda",
                         mensagem
                 );
             }
+
+        } catch (Exception e) {
+
+            AlertaUtil.erro(
+                    "Erro ao excluir venda",
+                    "Não foi possível excluir a venda."
+            );
+
+            e.printStackTrace();
         }
-    }
-
- // ============================================================
- // EXCLUIR VENDA
- // ============================================================
-
- private void excluirVenda(
-         Venda venda) {
-
-     Alert confirmacao =
-             new Alert(
-                     Alert.AlertType.CONFIRMATION
-             );
-
-     confirmacao.setTitle(
-             "Excluir venda"
-     );
-
-     confirmacao.setHeaderText(
-             "Deseja realmente excluir esta venda?"
-     );
-
-     confirmacao.setContentText(
-             "Venda #"
-             + venda.getIdVenda()
-             + "\nCliente: "
-             + venda.getNomeCliente()
-             + "\n\n"
-             + "Esta ação não poderá ser desfeita."
-     );
-
-
-     Optional<ButtonType> resultado =
-             confirmacao.showAndWait();
-
-
-     if (resultado.isEmpty()
-             || resultado.get()
-             != ButtonType.OK) {
-
-         return;
-     }
-
-
-     try {
-
-         String mensagem =
-                 vendaDAO.deletar(
-                         venda.getIdVenda()
-                 );
-
-
-         if (mensagem.contains(
-                 "sucesso"
-         )) {
-
-             mostrarSucesso(
-                     "Venda #"
-                     + venda.getIdVenda()
-                     + " excluída com sucesso!"
-             );
-
-             carregarDadosIniciais();
-
-             aplicarFiltroVendas();
-
-         } else {
-
-             mostrarErro(
-                     "Erro ao excluir venda",
-                     mensagem
-             );
-         }
-
-     } catch (Exception e) {
-
-         mostrarErro(
-                 "Erro ao excluir venda",
-                 "Não foi possível excluir a venda."
-         );
-
-         e.printStackTrace();
-     }
- }
-
-    // ============================================================
-    // ALERTAS
-    // ============================================================
-
-    private void mostrarSucesso(
-            String mensagem) {
-
-        Alert alert =
-                new Alert(
-                        Alert.AlertType.INFORMATION
-                );
-
-        alert.setTitle(
-                "Sucesso"
-        );
-
-        alert.setHeaderText(
-                null
-        );
-
-        alert.setContentText(
-                mensagem
-        );
-
-        alert.showAndWait();
-    }
-
-
-    private void mostrarAviso(
-            String titulo,
-            String mensagem) {
-
-        Alert alert =
-                new Alert(
-                        Alert.AlertType.WARNING
-                );
-
-        alert.setTitle(
-                titulo
-        );
-
-        alert.setHeaderText(
-                null
-        );
-
-        alert.setContentText(
-                mensagem
-        );
-
-        alert.showAndWait();
-    }
-
-
-    private void mostrarErro(
-            String titulo,
-            String mensagem) {
-
-        Alert alert =
-                new Alert(
-                        Alert.AlertType.ERROR
-                );
-
-        alert.setTitle(
-                "Erro"
-        );
-
-        alert.setHeaderText(
-                titulo
-        );
-
-        alert.setContentText(
-                mensagem
-        );
-
-        alert.showAndWait();
     }
 }

@@ -17,7 +17,7 @@ import model.Usuario;
 // ============================================================
 
 @SuppressWarnings("unused")
-public class ProdutoDAO extends Produto {
+public class ProdutoDAO {
 
     public List<Produto> lista =
             new ArrayList<Produto>();

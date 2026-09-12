@@ -11,6 +11,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import model.Produto;
+import util.AlertaUtil;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -61,39 +62,27 @@ public class EstoqueController {
     @FXML
     private Label lblValorTotal;
 
-
     private final ObservableList<Produto> data =
             FXCollections.observableArrayList();
 
     private final ObservableList<Produto> dataOriginal =
             FXCollections.observableArrayList();
 
-
     private final ProdutoDAO produtoDAO =
             new ProdutoDAO();
-
 
     private final NumberFormat moedaBrasil =
             NumberFormat.getCurrencyInstance(
                     new Locale("pt", "BR")
             );
 
-
-    // ============================================================
-    // INICIALIZAÇÃO
-    // ============================================================
-
     @FXML
     private void initialize() {
 
         configurarColunas();
-
         configurarColunaQuantidade();
-
         configurarColunasPreco();
-
         addActionsColumn();
-
 
         productTable.setItems(data);
 
@@ -103,7 +92,6 @@ public class EstoqueController {
                 )
         );
 
-
         cbFiltroStatus.getItems().addAll(
                 "Todos",
                 "Em estoque",
@@ -111,11 +99,9 @@ public class EstoqueController {
                 "Fora de estoque"
         );
 
-
         cbFiltroStatus
                 .getSelectionModel()
                 .select("Todos");
-
 
         txtBuscar
                 .textProperty()
@@ -124,24 +110,16 @@ public class EstoqueController {
                                 aplicarFiltro()
                 );
 
-
         cbFiltroStatus.setOnAction(
                 e -> aplicarFiltro()
         );
-
 
         btnAtualizar.setOnAction(
                 e -> carregarProdutos()
         );
 
-
         carregarProdutos();
     }
-
-
-    // ============================================================
-    // CONFIGURAÇÃO DAS COLUNAS
-    // ============================================================
 
     private void configurarColunas() {
 
@@ -151,13 +129,11 @@ public class EstoqueController {
                 )
         );
 
-
         colCodigo.setCellValueFactory(
                 new PropertyValueFactory<>(
                         "codigo"
                 )
         );
-
 
         colQuantidade.setCellValueFactory(
                 new PropertyValueFactory<>(
@@ -165,13 +141,11 @@ public class EstoqueController {
                 )
         );
 
-
         colPrecoCusto.setCellValueFactory(
                 new PropertyValueFactory<>(
                         "precoCusto"
                 )
         );
-
 
         colPrecoVenda.setCellValueFactory(
                 new PropertyValueFactory<>(
@@ -179,18 +153,12 @@ public class EstoqueController {
                 )
         );
 
-
         colLote.setCellValueFactory(
                 new PropertyValueFactory<>(
                         "lote"
                 )
         );
     }
-
-
-    // ============================================================
-    // FORMATAÇÃO DE PREÇOS
-    // ============================================================
 
     private void configurarColunasPreco() {
 
@@ -207,7 +175,6 @@ public class EstoqueController {
                                 empty
                         );
 
-
                         if (empty || value == null) {
 
                             setText(null);
@@ -224,7 +191,6 @@ public class EstoqueController {
                 }
         );
 
-
         colPrecoVenda.setCellFactory(
                 col -> new TableCell<>() {
 
@@ -237,7 +203,6 @@ public class EstoqueController {
                                 value,
                                 empty
                         );
-
 
                         if (empty || value == null) {
 
@@ -256,11 +221,6 @@ public class EstoqueController {
         );
     }
 
-
-    // ============================================================
-    // FORMATAÇÃO DA QUANTIDADE
-    // ============================================================
-
     private void configurarColunaQuantidade() {
 
         colQuantidade.setCellFactory(
@@ -276,11 +236,8 @@ public class EstoqueController {
                                 empty
                         );
 
-
                         setGraphic(null);
-
                         setText(null);
-
 
                         if (empty
                                 || quantidade == null) {
@@ -288,16 +245,13 @@ public class EstoqueController {
                             return;
                         }
 
-
                         Label badge =
                                 new Label();
-
 
                         badge.getStyleClass()
                                 .add(
                                         "stock-badge"
                                 );
-
 
                         if (quantidade == 0) {
 
@@ -337,7 +291,6 @@ public class EstoqueController {
                                     );
                         }
 
-
                         setGraphic(
                                 badge
                         );
@@ -346,18 +299,12 @@ public class EstoqueController {
         );
     }
 
-
-    // ============================================================
-    // CARREGAR PRODUTOS
-    // ============================================================
-
     private void carregarProdutos() {
 
         try {
 
             List<Produto> produtos =
                     produtoDAO.getAll();
-
 
             if (produtos != null) {
 
@@ -370,15 +317,12 @@ public class EstoqueController {
                 dataOriginal.clear();
             }
 
-
             aplicarFiltro();
-
 
             lblStatus.setText(
                     "Produtos carregados: "
-                    + dataOriginal.size()
+                            + dataOriginal.size()
             );
-
 
         } catch (Exception e) {
 
@@ -386,23 +330,15 @@ public class EstoqueController {
                     "Erro ao carregar produtos"
             );
 
-
-            showAlert(
-                    Alert.AlertType.ERROR,
+            AlertaUtil.erro(
                     "Erro",
                     "Erro ao carregar produtos do banco: "
-                    + e.getMessage()
+                            + e.getMessage()
             );
-
 
             e.printStackTrace();
         }
     }
-
-
-    // ============================================================
-    // FILTRO
-    // ============================================================
 
     private void aplicarFiltro() {
 
@@ -414,39 +350,34 @@ public class EstoqueController {
                                 .trim()
                                 .toLowerCase();
 
-
         String statusFiltro =
                 cbFiltroStatus.getValue();
 
-
         ObservableList<Produto> filtrados =
                 FXCollections.observableArrayList();
-
 
         for (Produto produto : dataOriginal) {
 
             boolean correspondeBusca =
                     busca.isEmpty()
 
-                    || (
-                        produto.getNome() != null
+                            || (
+                            produto.getNome() != null
 
-                        && produto
-                                .getNome()
-                                .toLowerCase()
-                                .contains(busca)
+                                    && produto
+                                    .getNome()
+                                    .toLowerCase()
+                                    .contains(busca)
                     )
 
-                    || String
+                            || String
                             .valueOf(
                                     produto.getCodigo()
                             )
                             .contains(busca);
 
-
             boolean correspondeStatus =
                     true;
-
 
             if (statusFiltro != null
                     && !statusFiltro.equals(
@@ -455,7 +386,6 @@ public class EstoqueController {
 
                 int quantidade =
                         produto.getQtdeEstoque();
-
 
                 switch (statusFiltro) {
 
@@ -466,15 +396,13 @@ public class EstoqueController {
 
                         break;
 
-
                     case "Estoque baixo":
 
                         correspondeStatus =
                                 quantidade > 0
-                                && quantidade <= 10;
+                                        && quantidade <= 10;
 
                         break;
-
 
                     case "Fora de estoque":
 
@@ -482,7 +410,6 @@ public class EstoqueController {
                                 quantidade == 0;
 
                         break;
-
 
                     default:
 
@@ -493,7 +420,6 @@ public class EstoqueController {
                 }
             }
 
-
             if (correspondeBusca
                     && correspondeStatus) {
 
@@ -503,21 +429,14 @@ public class EstoqueController {
             }
         }
 
-
         data.setAll(
                 filtrados
         );
-
 
         atualizarResumo(
                 data
         );
     }
-
-
-    // ============================================================
-    // COLUNA DE AÇÕES
-    // ============================================================
 
     private void addActionsColumn() {
 
@@ -526,158 +445,122 @@ public class EstoqueController {
                 cellFactory = param ->
                 new TableCell<>() {
 
+                    private final Button btnEditar =
+                            new Button("✏");
 
-            private final Button btnEditar =
-                    new Button("✏");
+                    private final Button btnExcluir =
+                            new Button("🗑");
 
+                    private final HBox box =
+                            new HBox(
+                                    6,
+                                    btnEditar,
+                                    btnExcluir
+                            );
 
-            private final Button btnExcluir =
-                    new Button("🗑");
+                    {
 
+                        btnEditar
+                                .getStyleClass()
+                                .add(
+                                        "table-action-edit"
+                                );
 
-            private final HBox box =
-                    new HBox(
-                            6,
-                            btnEditar,
-                            btnExcluir
-                    );
-
-
-            {
-
-                // ========================================================
-                // BOTÃO EDITAR
-                // ========================================================
-
-                btnEditar
-                        .getStyleClass()
-                        .add(
-                                "table-action-edit"
+                        btnEditar.setTooltip(
+                                new Tooltip(
+                                        "Editar produto"
+                                )
                         );
 
+                        btnEditar.setOnAction(
+                                e -> {
 
-                btnEditar.setTooltip(
-                        new Tooltip(
-                                "Editar produto"
-                        )
-                );
+                                    Produto produto =
+                                            getTableView()
+                                                    .getItems()
+                                                    .get(
+                                                            getIndex()
+                                                    );
 
-
-                btnEditar.setOnAction(
-                        e -> {
-
-                            Produto produto =
-                                    getTableView()
-                                            .getItems()
-                                            .get(
-                                                    getIndex()
-                                            );
-
-
-                            editarProduto(
-                                    produto
-                            );
-                        }
-                );
-
-
-                // ========================================================
-                // BOTÃO EXCLUIR
-                // ========================================================
-
-                btnExcluir
-                        .getStyleClass()
-                        .add(
-                                "table-action-delete"
+                                    editarProduto(
+                                            produto
+                                    );
+                                }
                         );
 
+                        btnExcluir
+                                .getStyleClass()
+                                .add(
+                                        "table-action-delete"
+                                );
 
-                btnExcluir.setTooltip(
-                        new Tooltip(
-                                "Excluir produto"
-                        )
-                );
+                        btnExcluir.setTooltip(
+                                new Tooltip(
+                                        "Excluir produto"
+                                )
+                        );
 
+                        btnExcluir.setOnAction(
+                                e -> {
 
-                btnExcluir.setOnAction(
-                        e -> {
+                                    Produto produto =
+                                            getTableView()
+                                                    .getItems()
+                                                    .get(
+                                                            getIndex()
+                                                    );
 
-                            Produto produto =
-                                    getTableView()
-                                            .getItems()
-                                            .get(
-                                                    getIndex()
-                                            );
+                                    excluirProduto(
+                                            produto
+                                    );
+                                }
+                        );
+                    }
 
+                    @Override
+                    protected void updateItem(
+                            Void item,
+                            boolean empty) {
 
-                            excluirProduto(
-                                    produto
-                            );
-                        }
-                );
-            }
+                        super.updateItem(
+                                item,
+                                empty
+                        );
 
-
-            @Override
-            protected void updateItem(
-                    Void item,
-                    boolean empty) {
-
-                super.updateItem(
-                        item,
-                        empty
-                );
-
-
-                setGraphic(
-                        empty
-                                ? null
-                                : box
-                );
-            }
-        };
-
+                        setGraphic(
+                                empty
+                                        ? null
+                                        : box
+                        );
+                    }
+                };
 
         colAcoes.setCellFactory(
                 cellFactory
         );
     }
 
-
-    // ============================================================
-    // EDITAR PRODUTO
-    // ============================================================
-
     private void editarProduto(
             Produto produto) {
 
-
         Dialog<ButtonType> dialog =
                 new Dialog<>();
-
 
         dialog.setTitle(
                 "Editar produto"
         );
 
-
         dialog.setHeaderText(
                 "Editar produto #"
-                + produto.getId()
-                + " - "
-                + produto.getNome()
+                        + produto.getId()
+                        + " - "
+                        + produto.getNome()
         );
-
-
-        // ============================================================
-        // CAMPOS
-        // ============================================================
 
         TextField txtNome =
                 new TextField(
                         produto.getNome()
                 );
-
 
         TextField txtCodigo =
                 new TextField(
@@ -686,18 +569,15 @@ public class EstoqueController {
                         )
                 );
 
-
         TextField txtLote =
                 new TextField(
                         produto.getLote()
                 );
 
-
         TextField txtDescricao =
                 new TextField(
                         produto.getDescricao()
                 );
-
 
         TextField txtPrecoCusto =
                 new TextField(
@@ -706,7 +586,6 @@ public class EstoqueController {
                         )
                 );
 
-
         TextField txtPrecoVenda =
                 new TextField(
                         String.valueOf(
@@ -714,18 +593,12 @@ public class EstoqueController {
                         )
                 );
 
-
         TextField txtQuantidade =
                 new TextField(
                         String.valueOf(
                                 produto.getQtdeEstoque()
                         )
                 );
-
-
-        // ============================================================
-        // VALIDAÇÕES DOS CAMPOS
-        // ============================================================
 
         txtCodigo
                 .textProperty()
@@ -746,7 +619,6 @@ public class EstoqueController {
                         }
                 );
 
-
         txtQuantidade
                 .textProperty()
                 .addListener(
@@ -766,7 +638,6 @@ public class EstoqueController {
                         }
                 );
 
-
         txtLote
                 .textProperty()
                 .addListener(
@@ -780,7 +651,6 @@ public class EstoqueController {
                             }
                         }
                 );
-
 
         txtPrecoCusto
                 .textProperty()
@@ -798,7 +668,6 @@ public class EstoqueController {
                         }
                 );
 
-
         txtPrecoVenda
                 .textProperty()
                 .addListener(
@@ -815,14 +684,8 @@ public class EstoqueController {
                         }
                 );
 
-
-        // ============================================================
-        // LAYOUT DO FORMULÁRIO
-        // ============================================================
-
         GridPane grid =
                 new GridPane();
-
 
         grid.setHgap(
                 12
@@ -841,7 +704,6 @@ public class EstoqueController {
                 )
         );
 
-
         grid.add(
                 new Label("Nome:"),
                 0,
@@ -853,7 +715,6 @@ public class EstoqueController {
                 1,
                 0
         );
-
 
         grid.add(
                 new Label("Código:"),
@@ -867,7 +728,6 @@ public class EstoqueController {
                 1
         );
 
-
         grid.add(
                 new Label("Lote:"),
                 0,
@@ -879,7 +739,6 @@ public class EstoqueController {
                 1,
                 2
         );
-
 
         grid.add(
                 new Label("Descrição:"),
@@ -893,7 +752,6 @@ public class EstoqueController {
                 3
         );
 
-
         grid.add(
                 new Label("Preço de custo:"),
                 0,
@@ -905,7 +763,6 @@ public class EstoqueController {
                 1,
                 4
         );
-
 
         grid.add(
                 new Label("Preço de venda:"),
@@ -919,7 +776,6 @@ public class EstoqueController {
                 5
         );
 
-
         grid.add(
                 new Label("Quantidade:"),
                 0,
@@ -932,11 +788,9 @@ public class EstoqueController {
                 6
         );
 
-
         txtNome.setPrefWidth(
                 300
         );
-
 
         dialog
                 .getDialogPane()
@@ -944,24 +798,17 @@ public class EstoqueController {
                         grid
                 );
 
-
-        // ============================================================
-        // BOTÕES
-        // ============================================================
-
         ButtonType btnSalvar =
                 new ButtonType(
                         "Salvar alterações",
                         ButtonBar.ButtonData.OK_DONE
                 );
 
-
         ButtonType btnCancelar =
                 new ButtonType(
                         "Cancelar",
                         ButtonBar.ButtonData.CANCEL_CLOSE
                 );
-
 
         dialog
                 .getDialogPane()
@@ -971,11 +818,6 @@ public class EstoqueController {
                         btnCancelar
                 );
 
-
-        // ============================================================
-        // IMPEDIR FECHAMENTO SE OS CAMPOS ESTIVEREM INVÁLIDOS
-        // ============================================================
-
         Button salvarButton =
                 (Button) dialog
                         .getDialogPane()
@@ -983,19 +825,16 @@ public class EstoqueController {
                                 btnSalvar
                         );
 
-
         salvarButton.addEventFilter(
                 javafx.event.ActionEvent.ACTION,
                 event -> {
-
 
                     if (txtNome
                             .getText()
                             .trim()
                             .isEmpty()) {
 
-                        showAlert(
-                                Alert.AlertType.ERROR,
+                        AlertaUtil.erro(
                                 "Campo obrigatório",
                                 "Informe o nome do produto."
                         );
@@ -1005,14 +844,12 @@ public class EstoqueController {
                         return;
                     }
 
-
                     if (txtCodigo
                             .getText()
                             .trim()
                             .isEmpty()) {
 
-                        showAlert(
-                                Alert.AlertType.ERROR,
+                        AlertaUtil.erro(
                                 "Campo obrigatório",
                                 "Informe o código do produto."
                         );
@@ -1022,14 +859,12 @@ public class EstoqueController {
                         return;
                     }
 
-
                     if (txtLote
                             .getText()
                             .trim()
                             .isEmpty()) {
 
-                        showAlert(
-                                Alert.AlertType.ERROR,
+                        AlertaUtil.erro(
                                 "Campo obrigatório",
                                 "Informe o lote do produto."
                         );
@@ -1039,14 +874,12 @@ public class EstoqueController {
                         return;
                     }
 
-
                     if (txtPrecoCusto
                             .getText()
                             .trim()
                             .isEmpty()) {
 
-                        showAlert(
-                                Alert.AlertType.ERROR,
+                        AlertaUtil.erro(
                                 "Campo obrigatório",
                                 "Informe o preço de custo."
                         );
@@ -1056,14 +889,12 @@ public class EstoqueController {
                         return;
                     }
 
-
                     if (txtPrecoVenda
                             .getText()
                             .trim()
                             .isEmpty()) {
 
-                        showAlert(
-                                Alert.AlertType.ERROR,
+                        AlertaUtil.erro(
                                 "Campo obrigatório",
                                 "Informe o preço de venda."
                         );
@@ -1073,14 +904,12 @@ public class EstoqueController {
                         return;
                     }
 
-
                     if (txtQuantidade
                             .getText()
                             .trim()
                             .isEmpty()) {
 
-                        showAlert(
-                                Alert.AlertType.ERROR,
+                        AlertaUtil.erro(
                                 "Campo obrigatório",
                                 "Informe a quantidade em estoque."
                         );
@@ -1089,7 +918,6 @@ public class EstoqueController {
 
                         return;
                     }
-
 
                     try {
 
@@ -1104,7 +932,6 @@ public class EstoqueController {
                                                 )
                                 );
 
-
                         double precoVenda =
                                 Double.parseDouble(
                                         txtPrecoVenda
@@ -1116,7 +943,6 @@ public class EstoqueController {
                                                 )
                                 );
 
-
                         int quantidade =
                                 Integer.parseInt(
                                         txtQuantidade
@@ -1124,11 +950,9 @@ public class EstoqueController {
                                                 .trim()
                                 );
 
-
                         if (precoCusto < 0) {
 
-                            showAlert(
-                                    Alert.AlertType.ERROR,
+                            AlertaUtil.erro(
                                     "Valor inválido",
                                     "O preço de custo não pode ser negativo."
                             );
@@ -1138,11 +962,9 @@ public class EstoqueController {
                             return;
                         }
 
-
                         if (precoVenda < 0) {
 
-                            showAlert(
-                                    Alert.AlertType.ERROR,
+                            AlertaUtil.erro(
                                     "Valor inválido",
                                     "O preço de venda não pode ser negativo."
                             );
@@ -1152,11 +974,9 @@ public class EstoqueController {
                             return;
                         }
 
-
                         if (quantidade < 0) {
 
-                            showAlert(
-                                    Alert.AlertType.ERROR,
+                            AlertaUtil.erro(
                                     "Valor inválido",
                                     "A quantidade não pode ser negativa."
                             );
@@ -1164,11 +984,9 @@ public class EstoqueController {
                             event.consume();
                         }
 
-
                     } catch (NumberFormatException e) {
 
-                        showAlert(
-                                Alert.AlertType.ERROR,
+                        AlertaUtil.erro(
                                 "Valor inválido",
                                 "Verifique os campos numéricos."
                         );
@@ -1178,14 +996,8 @@ public class EstoqueController {
                 }
         );
 
-
         Optional<ButtonType> resultado =
                 dialog.showAndWait();
-
-
-        // ============================================================
-        // SALVAR ALTERAÇÃO
-        // ============================================================
 
         if (resultado.isPresent()
                 && resultado.get()
@@ -1199,7 +1011,6 @@ public class EstoqueController {
                                 .trim()
                 );
 
-
                 produto.setCodigo(
                         Integer.parseInt(
                                 txtCodigo
@@ -1208,20 +1019,17 @@ public class EstoqueController {
                         )
                 );
 
-
                 produto.setLote(
                         txtLote
                                 .getText()
                                 .trim()
                 );
 
-
                 produto.setDescricao(
                         txtDescricao
                                 .getText()
                                 .trim()
                 );
-
 
                 produto.setPrecoCusto(
                         Double.parseDouble(
@@ -1235,7 +1043,6 @@ public class EstoqueController {
                         )
                 );
 
-
                 produto.setPrecoVenda(
                         Double.parseDouble(
                                 txtPrecoVenda
@@ -1248,7 +1055,6 @@ public class EstoqueController {
                         )
                 );
 
-
                 produto.setQtdeEstoque(
                         Integer.parseInt(
                                 txtQuantidade
@@ -1257,162 +1063,111 @@ public class EstoqueController {
                         )
                 );
 
-
                 String retorno =
                         produtoDAO.atualizar(
                                 produto
                         );
 
-
                 if (retorno.contains(
                         "sucesso"
                 )) {
 
                     carregarProdutos();
-
 
                     lblStatus.setText(
                             "Produto atualizado com sucesso"
                     );
 
-
-                    showAlert(
-                            Alert.AlertType.INFORMATION,
+                    AlertaUtil.sucesso(
                             "Produto atualizado",
                             "As alterações foram salvas com sucesso!"
                     );
 
-
                 } else {
 
-                    showAlert(
-                            Alert.AlertType.ERROR,
+                    AlertaUtil.erro(
                             "Erro",
                             retorno
                     );
                 }
 
-
             } catch (Exception e) {
 
-                showAlert(
-                        Alert.AlertType.ERROR,
+                AlertaUtil.erro(
                         "Erro",
                         "Não foi possível atualizar o produto.\n\n"
-                        + e.getMessage()
+                                + e.getMessage()
                 );
-
 
                 e.printStackTrace();
             }
         }
     }
 
-
-    // ============================================================
-    // EXCLUIR PRODUTO
-    // ============================================================
-
     private void excluirProduto(
             Produto produto) {
 
-        Alert confirmacao =
-                new Alert(
-                        Alert.AlertType.CONFIRMATION
+        boolean confirmou =
+                AlertaUtil.confirmar(
+                        "Confirmar exclusão",
+                        "Deseja realmente excluir o produto \""
+                                + produto.getNome()
+                                + "\"?"
                 );
 
+        if (!confirmou) {
+            return;
+        }
 
-        confirmacao.setTitle(
-                "Confirmar exclusão"
-        );
+        try {
 
-
-        confirmacao.setHeaderText(
-                "Excluir produto?"
-        );
-
-
-        confirmacao.setContentText(
-                "Deseja realmente excluir o produto \""
-                + produto.getNome()
-                + "\"?"
-        );
-
-
-        Optional<ButtonType> resultado =
-                confirmacao.showAndWait();
-
-
-        if (resultado.isPresent()
-                && resultado.get()
-                == ButtonType.OK) {
-
-            try {
-
-                String retorno =
-                        produtoDAO.deletar(
-                                produto.getId()
-                        );
-
-
-                if (retorno.contains(
-                        "sucesso"
-                )) {
-
-                    carregarProdutos();
-
-
-                    lblStatus.setText(
-                            "Produto removido com sucesso"
+            String retorno =
+                    produtoDAO.deletar(
+                            produto.getId()
                     );
 
+            if (retorno.contains(
+                    "sucesso"
+            )) {
 
-                    showAlert(
-                            Alert.AlertType.INFORMATION,
-                            "Sucesso",
-                            "Produto removido com sucesso!"
-                    );
+                carregarProdutos();
 
+                lblStatus.setText(
+                        "Produto removido com sucesso"
+                );
 
-                } else {
+                AlertaUtil.sucesso(
+                        "Produto removido",
+                        "Produto removido com sucesso!"
+                );
 
-                    lblStatus.setText(
-                            "Erro ao remover produto"
-                    );
-
-
-                    showAlert(
-                            Alert.AlertType.ERROR,
-                            "Erro",
-                            retorno
-                    );
-                }
-
-
-            } catch (Exception e) {
+            } else {
 
                 lblStatus.setText(
                         "Erro ao remover produto"
                 );
 
-
-                showAlert(
-                        Alert.AlertType.ERROR,
+                AlertaUtil.erro(
                         "Erro",
-                        "Erro ao excluir produto: "
-                        + e.getMessage()
+                        retorno
                 );
-
-
-                e.printStackTrace();
             }
+
+        } catch (Exception e) {
+
+            lblStatus.setText(
+                    "Erro ao remover produto"
+            );
+
+            AlertaUtil.erro(
+                    "Erro",
+                    "Erro ao excluir produto: "
+                            + e.getMessage()
+            );
+
+            e.printStackTrace();
         }
     }
-
-
-    // ============================================================
-    // RESUMO DO ESTOQUE
-    // ============================================================
 
     private void atualizarResumo(
             ObservableList<Produto> lista) {
@@ -1420,18 +1175,15 @@ public class EstoqueController {
         int totalProdutos =
                 lista.size();
 
-
         double valorTotalEstoque =
                 0.0;
-
 
         for (Produto produto : lista) {
 
             valorTotalEstoque +=
                     produto.getQtdeEstoque()
-                    * produto.getPrecoCusto();
+                            * produto.getPrecoCusto();
         }
-
 
         lblTotalItens.setText(
                 String.valueOf(
@@ -1439,12 +1191,10 @@ public class EstoqueController {
                 )
         );
 
-
         String valorFormatado =
                 moedaBrasil.format(
                         valorTotalEstoque
                 );
-
 
         valorFormatado =
                 valorFormatado
@@ -1454,43 +1204,8 @@ public class EstoqueController {
                         )
                         .trim();
 
-
         lblValorTotal.setText(
                 valorFormatado
         );
-    }
-
-
-    // ============================================================
-    // ALERTAS
-    // ============================================================
-
-    private void showAlert(
-            Alert.AlertType tipo,
-            String titulo,
-            String mensagem) {
-
-        Alert alert =
-                new Alert(
-                        tipo
-                );
-
-
-        alert.setTitle(
-                titulo
-        );
-
-
-        alert.setHeaderText(
-                null
-        );
-
-
-        alert.setContentText(
-                mensagem
-        );
-
-
-        alert.showAndWait();
     }
 }
