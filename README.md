@@ -1,4 +1,4 @@
-# 🔥 Salamandra Management System
+# Salamandra Management System
 
 Sistema desktop de gestão desenvolvido em **Java, JavaFX e PostgreSQL** para a **Salamandra**, empresa do segmento de incensaria.
 
