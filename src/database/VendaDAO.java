@@ -2,490 +2,1648 @@ package database;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import application.SessaoUsuario;
+
+import model.Auditoria;
+import model.ClienteMaisComprou;
 import model.ItemVenda;
+import model.ProdutoMaisVendido;
+import model.Usuario;
 import model.Venda;
 
 public class VendaDAO {
-    
-    /**
-     * Insere uma nova venda no banco de dados junto com seus itens
-     * @param venda - objeto Venda preenchido
-     * @param itens - lista de ItemVenda
-     * @return mensagem de sucesso ou erro
-     */
+
+    // ============================================================
+    // INSERIR VENDA
+    // ============================================================
+
     public String inserir(Venda venda, List<ItemVenda> itens) {
-        String s = "Venda inserida com sucesso!";
+
+        String mensagem = "Venda inserida com sucesso!";
         BD bd = new BD();
-        
+
         try {
+
+            Usuario usuarioLogado =
+                    SessaoUsuario.getUsuarioLogado();
+
+            if (usuarioLogado == null) {
+                return "Nenhum usuário está logado no sistema.";
+            }
+
             bd.getConnection();
-            
-            // Desabilita auto-commit para fazer transação
             bd.con.setAutoCommit(false);
-            
-            // 1. Inserir a venda
-            String sqlVenda = "INSERT INTO venda (id_cliente, data, valor_total, status, observacao) " +
-                             "VALUES (?, ?, ?, ?, ?) RETURNING id_venda";
-            
+
+            // ============================================================
+            // 1. INSERIR VENDA
+            // ============================================================
+
+            String sqlVenda =
+                    "INSERT INTO venda " +
+                    "(id_cliente, id_usuario, data, valor_total, status, observacao) " +
+                    "VALUES (?, ?, ?, ?, ?, ?) " +
+                    "RETURNING id_venda";
+
             bd.st = bd.con.prepareStatement(sqlVenda);
-            bd.st.setInt(1, venda.getIdCliente());
-            bd.st.setTimestamp(2, Timestamp.valueOf(venda.getData()));
-            bd.st.setDouble(3, venda.getValorTotal());
-            bd.st.setString(4, venda.getStatus());
-            bd.st.setString(5, venda.getObservacao());
-            
+
+            bd.st.setInt(
+                    1,
+                    venda.getIdCliente()
+            );
+
+            bd.st.setInt(
+                    2,
+                    usuarioLogado.getId()
+            );
+
+            bd.st.setTimestamp(
+                    3,
+                    Timestamp.valueOf(
+                            venda.getData()
+                    )
+            );
+
+            bd.st.setDouble(
+                    4,
+                    venda.getValorTotal()
+            );
+
+            bd.st.setString(
+                    5,
+                    venda.getStatus()
+            );
+
+            bd.st.setString(
+                    6,
+                    venda.getObservacao()
+            );
+
             bd.rs = bd.st.executeQuery();
-            
-            int idVendaGerado = 0;
+
+            int idVendaGerado;
+
             if (bd.rs.next()) {
-                idVendaGerado = bd.rs.getInt(1);
-                venda.setIdVenda(idVendaGerado);
+
+                idVendaGerado =
+                        bd.rs.getInt(
+                                "id_venda"
+                        );
+
+                venda.setIdVenda(
+                        idVendaGerado
+                );
+
+                venda.setIdUsuario(
+                        usuarioLogado.getId()
+                );
+
+                venda.setNomeUsuario(
+                        usuarioLogado.getNome()
+                );
+
             } else {
-                throw new SQLException("Falha ao obter ID da venda gerada.");
+
+                throw new SQLException(
+                        "Não foi possível obter o ID da venda."
+                );
             }
-            
-            // 2. Inserir os itens da venda
-            String sqlItem = "INSERT INTO item_venda (id_venda, id_produto, quantidade, preco_unitario, subtotal) " +
-                            "VALUES (?, ?, ?, ?, ?)";
-            
-            bd.st = bd.con.prepareStatement(sqlItem);
-            
+
+            // ============================================================
+            // 2. INSERIR ITENS
+            // ============================================================
+
+            String sqlItem =
+                    "INSERT INTO item_venda " +
+                    "(id_venda, id_produto, quantidade, preco_unitario, subtotal) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+
+            bd.st = bd.con.prepareStatement(
+                    sqlItem
+            );
+
             for (ItemVenda item : itens) {
-                bd.st.setInt(1, idVendaGerado);
-                bd.st.setInt(2, item.getIdProduto());
-                bd.st.setInt(3, item.getQuantidade());
-                bd.st.setDouble(4, item.getPrecoUnitario());
-                bd.st.setDouble(5, item.getSubtotal());
+
+                bd.st.setInt(
+                        1,
+                        idVendaGerado
+                );
+
+                bd.st.setInt(
+                        2,
+                        item.getIdProduto()
+                );
+
+                bd.st.setInt(
+                        3,
+                        item.getQuantidade()
+                );
+
+                bd.st.setDouble(
+                        4,
+                        item.getPrecoUnitario()
+                );
+
+                bd.st.setDouble(
+                        5,
+                        item.getSubtotal()
+                );
+
                 bd.st.addBatch();
             }
-            
+
             bd.st.executeBatch();
-            
-            // 3. Atualizar estoque dos produtos
-            String sqlUpdateEstoque = "UPDATE produto SET quantidade_estoque = quantidade_estoque - ? " +
-                                     "WHERE id_produto = ?";
-            
-            bd.st = bd.con.prepareStatement(sqlUpdateEstoque);
-            
+
+            // ============================================================
+            // 3. BAIXAR ESTOQUE
+            // ============================================================
+
+            String sqlEstoque =
+                    "UPDATE produto " +
+                    "SET quantidade_estoque = quantidade_estoque - ? " +
+                    "WHERE id_produto = ? " +
+                    "AND quantidade_estoque >= ?";
+
+            bd.st = bd.con.prepareStatement(
+                    sqlEstoque
+            );
+
             for (ItemVenda item : itens) {
-                bd.st.setInt(1, item.getQuantidade());
-                bd.st.setInt(2, item.getIdProduto());
-                bd.st.addBatch();
+
+                bd.st.setInt(
+                        1,
+                        item.getQuantidade()
+                );
+
+                bd.st.setInt(
+                        2,
+                        item.getIdProduto()
+                );
+
+                bd.st.setInt(
+                        3,
+                        item.getQuantidade()
+                );
+
+                int linhasAfetadas =
+                        bd.st.executeUpdate();
+
+                if (linhasAfetadas == 0) {
+
+                    throw new SQLException(
+                            "Estoque insuficiente para o produto: "
+                                    + item.getNomeProduto()
+                    );
+                }
             }
-            
-            bd.st.executeBatch();
-            
-            // Commit da transação
+
+            // ============================================================
+            // 4. CONFIRMAR TRANSAÇÃO
+            // ============================================================
+
             bd.con.commit();
-            
-            System.out.println("Venda inserida com sucesso - ID: " + idVendaGerado);
-            
+
+            // ============================================================
+            // 5. AUDITORIA - CADASTRO
+            // ============================================================
+
+            Auditoria auditoria =
+                    new Auditoria(
+                            usuarioLogado.getId(),
+                            "CADASTRO_VENDA",
+                            "Cadastrou a venda #" + idVendaGerado
+                    );
+
+            new AuditoriaDAO().registrar(
+                    auditoria
+            );
+
+            System.out.println(
+                    "Venda inserida com sucesso - ID: "
+                            + idVendaGerado
+                            + " - Usuário: "
+                            + usuarioLogado.getNome()
+            );
+
         } catch (SQLException e) {
-            s = "Falha ao inserir venda: " + e.getMessage();
+
+            mensagem =
+                    "Falha ao inserir venda: "
+                            + e.getMessage();
+
             e.printStackTrace();
-            
+
             try {
+
                 if (bd.con != null) {
-                    bd.con.rollback(); // Desfaz tudo em caso de erro
-                    System.out.println("Transação revertida devido a erro.");
+
+                    bd.con.rollback();
+
+                    System.out.println(
+                            "Transação da venda revertida."
+                    );
                 }
-            } catch (SQLException ex) {
-                System.err.println("Erro ao fazer rollback: " + ex.getMessage());
-                ex.printStackTrace();
+
+            } catch (SQLException rollbackException) {
+
+                System.err.println(
+                        "Erro ao realizar rollback: "
+                                + rollbackException.getMessage()
+                );
+
+                rollbackException.printStackTrace();
             }
+
         } finally {
-            try {
-                if (bd.con != null) {
-                    bd.con.setAutoCommit(true);
-                }
-            } catch (SQLException e) {
-                System.err.println("Erro ao restaurar auto-commit: " + e.getMessage());
-                e.printStackTrace();
-            }
+
+            restaurarAutoCommit(bd);
             bd.close();
         }
-        
-        return s;
+
+        return mensagem;
     }
-    
-    /**
-     * Atualiza uma venda existente
-     * @param venda
-     * @return mensagem de sucesso ou erro
-     */
+
+
+    // ============================================================
+    // ATUALIZAR / CONCLUIR VENDA
+    // ============================================================
+
     public String atualizar(Venda venda) {
-        String s = "Venda atualizada com sucesso!";
+
+        String mensagem =
+                "Venda atualizada com sucesso!";
+
         BD bd = new BD();
-        
+
         try {
+
             bd.getConnection();
-            
-            String sql = "UPDATE venda SET status = ?, observacao = ?, valor_total = ? WHERE id_venda = ?";
-            
-            bd.st = bd.con.prepareStatement(sql);
-            bd.st.setString(1, venda.getStatus());
-            bd.st.setString(2, venda.getObservacao());
-            bd.st.setDouble(3, venda.getValorTotal());
-            bd.st.setInt(4, venda.getIdVenda());
-            
-            int n = bd.st.executeUpdate();
-            
-            if (n == 0) {
-                s = "Venda não encontrada.";
+
+            String sql =
+                    "UPDATE venda " +
+                    "SET status = ?, observacao = ?, valor_total = ? " +
+                    "WHERE id_venda = ?";
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+            bd.st.setString(
+                    1,
+                    venda.getStatus()
+            );
+
+            bd.st.setString(
+                    2,
+                    venda.getObservacao()
+            );
+
+            bd.st.setDouble(
+                    3,
+                    venda.getValorTotal()
+            );
+
+            bd.st.setInt(
+                    4,
+                    venda.getIdVenda()
+            );
+
+            int linhasAfetadas =
+                    bd.st.executeUpdate();
+
+            if (linhasAfetadas == 0) {
+
+                mensagem =
+                        "Venda não encontrada.";
+
             } else {
-                System.out.println("Venda atualizada - ID: " + venda.getIdVenda());
+
+                System.out.println(
+                        "Venda atualizada - ID: "
+                                + venda.getIdVenda()
+                );
+
+                // ========================================================
+                // AUDITORIA - CONCLUSÃO
+                // ========================================================
+
+                if ("Concluída".equals(
+                        venda.getStatus()
+                )) {
+
+                    Usuario usuarioLogado =
+                            SessaoUsuario.getUsuarioLogado();
+
+                    if (usuarioLogado != null) {
+
+                        Auditoria auditoria =
+                                new Auditoria(
+                                        usuarioLogado.getId(),
+                                        "CONCLUSAO_VENDA",
+                                        "Concluiu a venda #"
+                                                + venda.getIdVenda()
+                                );
+
+                        new AuditoriaDAO().registrar(
+                                auditoria
+                        );
+                    }
+                }
             }
-            
+
         } catch (SQLException e) {
-            s = "Falha ao atualizar venda: " + e.getMessage();
+
+            mensagem =
+                    "Falha ao atualizar venda: "
+                            + e.getMessage();
+
             e.printStackTrace();
+
         } finally {
+
             bd.close();
         }
-        
-        return s;
+
+        return mensagem;
     }
-    
-    /**
-     * Cancela uma venda e devolve ao estoque os produtos dos seus itens.
-     * A operação é transacional: ou o status muda e o estoque volta, ou nada acontece.
-     * @param idVenda
-     * @return mensagem de sucesso ou erro
-     */
+
+
+    // ============================================================
+    // CANCELAR VENDA
+    // ============================================================
+
     public String cancelar(int idVenda) {
-        String s = "Venda cancelada com sucesso!";
+
+        String mensagem =
+                "Venda cancelada com sucesso!";
+
         BD bd = new BD();
 
         try {
-            bd.getConnection();
 
+            bd.getConnection();
             bd.con.setAutoCommit(false);
 
-            // 1. Marca como cancelada somente se ainda não estiver.
-            //    A condição dentro do próprio UPDATE garante que uma venda
-            //    cancelada duas vezes não devolva o estoque em duplicidade.
-            String sqlStatus = "UPDATE venda SET status = 'Cancelada' " +
-                               "WHERE id_venda = ? AND status <> 'Cancelada'";
+            // ============================================================
+            // 1. ALTERAR STATUS
+            // ============================================================
 
-            bd.st = bd.con.prepareStatement(sqlStatus);
-            bd.st.setInt(1, idVenda);
+            String sqlStatus =
+                    "UPDATE venda " +
+                    "SET status = 'Cancelada' " +
+                    "WHERE id_venda = ? " +
+                    "AND status = 'Pendente'";
 
-            int n = bd.st.executeUpdate();
+            bd.st = bd.con.prepareStatement(
+                    sqlStatus
+            );
 
-            if (n == 0) {
+            bd.st.setInt(
+                    1,
+                    idVenda
+            );
+
+            int linhasAfetadas =
+                    bd.st.executeUpdate();
+
+            if (linhasAfetadas == 0) {
+
                 bd.con.rollback();
-                return "Venda não encontrada ou já cancelada.";
+
+                return "A venda não foi encontrada ou não está pendente.";
             }
 
-            // 2. Devolve ao estoque a quantidade de cada item da venda
-            String sqlEstoque = "UPDATE produto p " +
-                                "SET quantidade_estoque = p.quantidade_estoque + i.quantidade " +
-                                "FROM item_venda i " +
-                                "WHERE i.id_produto = p.id_produto AND i.id_venda = ?";
+            // ============================================================
+            // 2. DEVOLVER PRODUTOS AO ESTOQUE
+            // ============================================================
 
-            bd.st = bd.con.prepareStatement(sqlEstoque);
-            bd.st.setInt(1, idVenda);
+            String sqlEstoque =
+                    "UPDATE produto p " +
+                    "SET quantidade_estoque = " +
+                    "p.quantidade_estoque + i.quantidade " +
+                    "FROM item_venda i " +
+                    "WHERE i.id_produto = p.id_produto " +
+                    "AND i.id_venda = ?";
+
+            bd.st = bd.con.prepareStatement(
+                    sqlEstoque
+            );
+
+            bd.st.setInt(
+                    1,
+                    idVenda
+            );
+
             bd.st.executeUpdate();
 
+            // ============================================================
+            // 3. CONFIRMAR CANCELAMENTO
+            // ============================================================
+
             bd.con.commit();
 
-            System.out.println("Venda cancelada e estoque devolvido - ID: " + idVenda);
+            // ============================================================
+            // 4. AUDITORIA - CANCELAMENTO
+            // ============================================================
+
+            Usuario usuarioLogado =
+                    SessaoUsuario.getUsuarioLogado();
+
+            if (usuarioLogado != null) {
+
+                Auditoria auditoria =
+                        new Auditoria(
+                                usuarioLogado.getId(),
+                                "CANCELAMENTO_VENDA",
+                                "Cancelou a venda #" + idVenda
+                        );
+
+                new AuditoriaDAO().registrar(
+                        auditoria
+                );
+            }
+
+            System.out.println(
+                    "Venda cancelada e estoque devolvido - ID: "
+                            + idVenda
+            );
 
         } catch (SQLException e) {
-            s = "Falha ao cancelar venda: " + e.getMessage();
+
+            mensagem =
+                    "Falha ao cancelar venda: "
+                            + e.getMessage();
+
             e.printStackTrace();
 
             try {
+
                 if (bd.con != null) {
+
                     bd.con.rollback();
-                    System.out.println("Transação revertida devido a erro.");
+
+                    System.out.println(
+                            "Transação de cancelamento revertida."
+                    );
                 }
-            } catch (SQLException ex) {
-                System.err.println("Erro ao fazer rollback: " + ex.getMessage());
-                ex.printStackTrace();
+
+            } catch (SQLException rollbackException) {
+
+                System.err.println(
+                        "Erro ao realizar rollback: "
+                                + rollbackException.getMessage()
+                );
+
+                rollbackException.printStackTrace();
             }
+
         } finally {
-            try {
-                if (bd.con != null) {
-                    bd.con.setAutoCommit(true);
-                }
-            } catch (SQLException e) {
-                System.err.println("Erro ao restaurar auto-commit: " + e.getMessage());
-                e.printStackTrace();
-            }
+
+            restaurarAutoCommit(bd);
             bd.close();
         }
 
-        return s;
+        return mensagem;
     }
 
-    /**
-     * Deleta uma venda (CASCADE deleta os itens automaticamente)
-     * @param idVenda
-     * @return mensagem de sucesso ou erro
-     */
+
+    // ============================================================
+    // EXCLUIR VENDA
+    // ============================================================
+
     public String deletar(int idVenda) {
-        String s = "Venda deletada com sucesso!";
+
+        String mensagem =
+                "Venda deletada com sucesso!";
+
         BD bd = new BD();
-        
+
         try {
+
             bd.getConnection();
-            
-            String sql = "DELETE FROM venda WHERE id_venda = ? RETURNING id_venda";
-            
-            bd.st = bd.con.prepareStatement(sql);
-            bd.st.setInt(1, idVenda);
-            
+            bd.con.setAutoCommit(false);
+
+            // ============================================================
+            // 1. CONSULTAR STATUS
+            // ============================================================
+
+            String sqlBusca =
+                    "SELECT status " +
+                    "FROM venda " +
+                    "WHERE id_venda = ?";
+
+            bd.st = bd.con.prepareStatement(
+                    sqlBusca
+            );
+
+            bd.st.setInt(
+                    1,
+                    idVenda
+            );
+
             bd.rs = bd.st.executeQuery();
-            
+
             if (!bd.rs.next()) {
-                s = "Venda não encontrada ou não foi possível deletar.";
-            } else {
-                int deletedId = bd.rs.getInt(1);
-                System.out.println("Venda deletada - ID: " + deletedId);
+
+                bd.con.rollback();
+
+                return "Venda não encontrada.";
             }
-            
+
+            String status =
+                    bd.rs.getString(
+                            "status"
+                    );
+
+            // ============================================================
+            // 2. DEVOLVER ESTOQUE SE NECESSÁRIO
+            // ============================================================
+
+            if (!"Cancelada".equals(status)) {
+
+                String sqlEstoque =
+                        "UPDATE produto p " +
+                        "SET quantidade_estoque = " +
+                        "p.quantidade_estoque + i.quantidade " +
+                        "FROM item_venda i " +
+                        "WHERE i.id_produto = p.id_produto " +
+                        "AND i.id_venda = ?";
+
+                bd.st = bd.con.prepareStatement(
+                        sqlEstoque
+                );
+
+                bd.st.setInt(
+                        1,
+                        idVenda
+                );
+
+                bd.st.executeUpdate();
+            }
+
+            // ============================================================
+            // 3. EXCLUIR VENDA
+            // ============================================================
+
+            String sqlDelete =
+                    "DELETE FROM venda " +
+                    "WHERE id_venda = ?";
+
+            bd.st = bd.con.prepareStatement(
+                    sqlDelete
+            );
+
+            bd.st.setInt(
+                    1,
+                    idVenda
+            );
+
+            int linhasAfetadas =
+                    bd.st.executeUpdate();
+
+            if (linhasAfetadas == 0) {
+
+                throw new SQLException(
+                        "Não foi possível excluir a venda."
+                );
+            }
+
+            // ============================================================
+            // 4. CONFIRMAR EXCLUSÃO
+            // ============================================================
+
+            bd.con.commit();
+
+            // ============================================================
+            // 5. AUDITORIA - EXCLUSÃO
+            // ============================================================
+
+            Usuario usuarioLogado =
+                    SessaoUsuario.getUsuarioLogado();
+
+            if (usuarioLogado != null) {
+
+                Auditoria auditoria =
+                        new Auditoria(
+                                usuarioLogado.getId(),
+                                "EXCLUSAO_VENDA",
+                                "Excluiu a venda #" + idVenda
+                        );
+
+                new AuditoriaDAO().registrar(
+                        auditoria
+                );
+            }
+
+            System.out.println(
+                    "Venda deletada - ID: "
+                            + idVenda
+            );
+
         } catch (SQLException e) {
-            s = "Falha ao deletar venda: " + e.getMessage();
+
+            mensagem =
+                    "Falha ao deletar venda: "
+                            + e.getMessage();
+
             e.printStackTrace();
+
+            try {
+
+                if (bd.con != null) {
+
+                    bd.con.rollback();
+
+                    System.out.println(
+                            "Exclusão da venda revertida."
+                    );
+                }
+
+            } catch (SQLException rollbackException) {
+
+                System.err.println(
+                        "Erro ao realizar rollback: "
+                                + rollbackException.getMessage()
+                );
+
+                rollbackException.printStackTrace();
+            }
+
         } finally {
+
+            restaurarAutoCommit(bd);
             bd.close();
         }
-        
-        return s;
+
+        return mensagem;
     }
-    
-    /**
-     * Retorna todas as vendas com o nome do cliente
-     * @return lista de vendas
-     */
+
+
+    // ============================================================
+    // LISTAR TODAS AS VENDAS
+    // ============================================================
+
     public List<Venda> getAll() {
-        List<Venda> lista = new ArrayList<>();
+
+        List<Venda> lista =
+                new ArrayList<>();
+
         BD bd = new BD();
-        
+
         try {
+
             bd.getConnection();
-            
-            String sql = "SELECT v.id_venda, v.id_cliente, c.nome AS nome_cliente, v.data, " +
-                         "v.valor_total, v.status, v.observacao " +
-                         "FROM venda v " +
-                         "LEFT JOIN cliente c ON v.id_cliente = c.id_cliente " +
-                         "ORDER BY v.data DESC";
-            
-            bd.st = bd.con.prepareStatement(sql);
+
+            String sql =
+                    "SELECT " +
+                    "v.id_venda, " +
+                    "v.id_cliente, " +
+                    "v.id_usuario, " +
+                    "c.nome AS nome_cliente, " +
+                    "u.nome AS nome_usuario, " +
+                    "v.data, " +
+                    "v.valor_total, " +
+                    "v.status, " +
+                    "v.observacao " +
+                    "FROM venda v " +
+                    "LEFT JOIN cliente c " +
+                    "ON v.id_cliente = c.id_cliente " +
+                    "LEFT JOIN usuario u " +
+                    "ON v.id_usuario = u.id_usuario " +
+                    "ORDER BY v.data DESC";
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
             bd.rs = bd.st.executeQuery();
-            
+
             while (bd.rs.next()) {
-                int idVenda = bd.rs.getInt("id_venda");
-                int idCliente = bd.rs.getInt("id_cliente");
-                String nomeCliente = bd.rs.getString("nome_cliente");
-                Timestamp ts = bd.rs.getTimestamp("data");
-                double valorTotal = bd.rs.getDouble("valor_total");
-                String status = bd.rs.getString("status");
-                String observacao = bd.rs.getString("observacao");
-                
-                Venda v = new Venda(idVenda, idCliente, nomeCliente, 
-                                   ts != null ? ts.toLocalDateTime() : null, 
-                                   valorTotal, status, observacao);
-                lista.add(v);
+
+                int idVenda =
+                        bd.rs.getInt(
+                                "id_venda"
+                        );
+
+                int idCliente =
+                        bd.rs.getInt(
+                                "id_cliente"
+                        );
+
+                int idUsuario =
+                        bd.rs.getInt(
+                                "id_usuario"
+                        );
+
+                String nomeCliente =
+                        bd.rs.getString(
+                                "nome_cliente"
+                        );
+
+                String nomeUsuario =
+                        bd.rs.getString(
+                                "nome_usuario"
+                        );
+
+                Timestamp timestamp =
+                        bd.rs.getTimestamp(
+                                "data"
+                        );
+
+                double valorTotal =
+                        bd.rs.getDouble(
+                                "valor_total"
+                        );
+
+                String status =
+                        bd.rs.getString(
+                                "status"
+                        );
+
+                String observacao =
+                        bd.rs.getString(
+                                "observacao"
+                        );
+
+                Venda venda =
+                        new Venda(
+                                idVenda,
+                                idCliente,
+                                nomeCliente,
+                                timestamp != null
+                                        ? timestamp.toLocalDateTime()
+                                        : null,
+                                valorTotal,
+                                status,
+                                observacao
+                        );
+
+                venda.setIdUsuario(
+                        idUsuario
+                );
+
+                venda.setNomeUsuario(
+                        nomeUsuario
+                );
+
+                lista.add(
+                        venda
+                );
             }
-            
+
         } catch (SQLException e) {
-            System.err.println("Erro em VendaDAO.getAll(): " + e.getMessage());
+
+            System.err.println(
+                    "Erro em VendaDAO.getAll(): "
+                            + e.getMessage()
+            );
+
             e.printStackTrace();
+
         } finally {
+
             bd.close();
         }
-        
-        System.out.println("VendaDAO.getAll() retornou " + lista.size() + " registros.");
+
+        System.out.println(
+                "VendaDAO.getAll() retornou "
+                        + lista.size()
+                        + " registros."
+        );
+
         return lista;
     }
-    
-    /**
-     * Busca uma venda por ID
-     * @param idVenda
-     * @return objeto Venda ou null
-     */
+
+
+    // ============================================================
+    // BUSCAR VENDA POR ID
+    // ============================================================
+
     public Venda buscarPorId(int idVenda) {
+
         Venda venda = null;
         BD bd = new BD();
-        
+
         try {
+
             bd.getConnection();
-            
-            String sql = "SELECT v.id_venda, v.id_cliente, c.nome AS nome_cliente, v.data, " +
-                         "v.valor_total, v.status, v.observacao " +
-                         "FROM venda v " +
-                         "LEFT JOIN cliente c ON v.id_cliente = c.id_cliente " +
-                         "WHERE v.id_venda = ?";
-            
-            bd.st = bd.con.prepareStatement(sql);
-            bd.st.setInt(1, idVenda);
+
+            String sql =
+                    "SELECT " +
+                    "v.id_venda, " +
+                    "v.id_cliente, " +
+                    "c.nome AS nome_cliente, " +
+                    "v.data, " +
+                    "v.valor_total, " +
+                    "v.status, " +
+                    "v.observacao " +
+                    "FROM venda v " +
+                    "LEFT JOIN cliente c " +
+                    "ON v.id_cliente = c.id_cliente " +
+                    "WHERE v.id_venda = ?";
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+            bd.st.setInt(
+                    1,
+                    idVenda
+            );
+
             bd.rs = bd.st.executeQuery();
-            
+
             if (bd.rs.next()) {
-                int idCliente = bd.rs.getInt("id_cliente");
-                String nomeCliente = bd.rs.getString("nome_cliente");
-                Timestamp ts = bd.rs.getTimestamp("data");
-                double valorTotal = bd.rs.getDouble("valor_total");
-                String status = bd.rs.getString("status");
-                String observacao = bd.rs.getString("observacao");
-                
-                venda = new Venda(idVenda, idCliente, nomeCliente, 
-                                 ts != null ? ts.toLocalDateTime() : null, 
-                                 valorTotal, status, observacao);
+
+                int idCliente =
+                        bd.rs.getInt(
+                                "id_cliente"
+                        );
+
+                String nomeCliente =
+                        bd.rs.getString(
+                                "nome_cliente"
+                        );
+
+                Timestamp timestamp =
+                        bd.rs.getTimestamp(
+                                "data"
+                        );
+
+                double valorTotal =
+                        bd.rs.getDouble(
+                                "valor_total"
+                        );
+
+                String status =
+                        bd.rs.getString(
+                                "status"
+                        );
+
+                String observacao =
+                        bd.rs.getString(
+                                "observacao"
+                        );
+
+                venda =
+                        new Venda(
+                                idVenda,
+                                idCliente,
+                                nomeCliente,
+                                timestamp != null
+                                        ? timestamp.toLocalDateTime()
+                                        : null,
+                                valorTotal,
+                                status,
+                                observacao
+                        );
             }
-            
+
         } catch (SQLException e) {
-            System.err.println("Erro ao buscar venda por ID: " + e.getMessage());
+
+            System.err.println(
+                    "Erro ao buscar venda por ID: "
+                            + e.getMessage()
+            );
+
             e.printStackTrace();
+
         } finally {
+
             bd.close();
         }
-        
+
         return venda;
     }
-    
-    /**
-     * Busca os itens de uma venda específica
-     * @param idVenda
-     * @return lista de itens
-     */
-    public List<ItemVenda> buscarItensPorVenda(int idVenda) {
-        List<ItemVenda> lista = new ArrayList<>();
+
+
+    // ============================================================
+    // BUSCAR ITENS DA VENDA
+    // ============================================================
+
+    public List<ItemVenda> buscarItensPorVenda(
+            int idVenda) {
+
+        List<ItemVenda> lista =
+                new ArrayList<>();
+
         BD bd = new BD();
-        
+
         try {
+
             bd.getConnection();
-            
-            String sql = "SELECT iv.id_venda, iv.id_produto, p.nome AS nome_produto, " +
-                         "iv.quantidade, iv.preco_unitario, iv.subtotal " +
-                         "FROM item_venda iv " +
-                         "JOIN produto p ON iv.id_produto = p.id_produto " +
-                         "WHERE iv.id_venda = ?";
-            
-            bd.st = bd.con.prepareStatement(sql);
-            bd.st.setInt(1, idVenda);
+
+            String sql =
+                    "SELECT " +
+                    "iv.id_venda, " +
+                    "iv.id_produto, " +
+                    "p.nome AS nome_produto, " +
+                    "iv.quantidade, " +
+                    "iv.preco_unitario, " +
+                    "iv.subtotal " +
+                    "FROM item_venda iv " +
+                    "JOIN produto p " +
+                    "ON iv.id_produto = p.id_produto " +
+                    "WHERE iv.id_venda = ?";
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+            bd.st.setInt(
+                    1,
+                    idVenda
+            );
+
             bd.rs = bd.st.executeQuery();
-            
+
             while (bd.rs.next()) {
-                int idProduto = bd.rs.getInt("id_produto");
-                String nomeProduto = bd.rs.getString("nome_produto");
-                int quantidade = bd.rs.getInt("quantidade");
-                double precoUnitario = bd.rs.getDouble("preco_unitario");
-                double subtotal = bd.rs.getDouble("subtotal");
-                
-                ItemVenda item = new ItemVenda(idVenda, idProduto, nomeProduto, 
-                                               quantidade, precoUnitario, subtotal);
-                lista.add(item);
+
+                int idProduto =
+                        bd.rs.getInt(
+                                "id_produto"
+                        );
+
+                String nomeProduto =
+                        bd.rs.getString(
+                                "nome_produto"
+                        );
+
+                int quantidade =
+                        bd.rs.getInt(
+                                "quantidade"
+                        );
+
+                double precoUnitario =
+                        bd.rs.getDouble(
+                                "preco_unitario"
+                        );
+
+                double subtotal =
+                        bd.rs.getDouble(
+                                "subtotal"
+                        );
+
+                ItemVenda item =
+                        new ItemVenda(
+                                idVenda,
+                                idProduto,
+                                nomeProduto,
+                                quantidade,
+                                precoUnitario,
+                                subtotal
+                        );
+
+                lista.add(
+                        item
+                );
             }
-            
+
         } catch (SQLException e) {
-            System.err.println("Erro ao buscar itens da venda: " + e.getMessage());
+
+            System.err.println(
+                    "Erro ao buscar itens da venda: "
+                            + e.getMessage()
+            );
+
             e.printStackTrace();
+
         } finally {
+
             bd.close();
         }
-        
+
         return lista;
     }
-    
-    /**
-     * Busca vendas por nome de cliente
-     * @param nomeCliente
-     * @return lista de vendas
-     */
-    public List<Venda> buscarPorCliente(String nomeCliente) {
-        List<Venda> lista = new ArrayList<>();
+
+
+    // ============================================================
+    // BUSCAR POR CLIENTE
+    // ============================================================
+
+    public List<Venda> buscarPorCliente(
+            String nomeCliente) {
+
+        List<Venda> lista =
+                new ArrayList<>();
+
         BD bd = new BD();
-        
+
         try {
+
             bd.getConnection();
-            
-            String sql = "SELECT v.id_venda, v.id_cliente, c.nome AS nome_cliente, v.data, " +
-                         "v.valor_total, v.status, v.observacao " +
-                         "FROM venda v " +
-                         "LEFT JOIN cliente c ON v.id_cliente = c.id_cliente " +
-                         "WHERE LOWER(c.nome) LIKE LOWER(?) " +
-                         "ORDER BY v.data DESC";
-            
-            bd.st = bd.con.prepareStatement(sql);
-            bd.st.setString(1, "%" + nomeCliente + "%");
+
+            String sql =
+                    "SELECT " +
+                    "v.id_venda, " +
+                    "v.id_cliente, " +
+                    "c.nome AS nome_cliente, " +
+                    "v.data, " +
+                    "v.valor_total, " +
+                    "v.status, " +
+                    "v.observacao " +
+                    "FROM venda v " +
+                    "LEFT JOIN cliente c " +
+                    "ON v.id_cliente = c.id_cliente " +
+                    "WHERE LOWER(c.nome) LIKE LOWER(?) " +
+                    "ORDER BY v.data DESC";
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+            bd.st.setString(
+                    1,
+                    "%"
+                            + nomeCliente
+                            + "%"
+            );
+
             bd.rs = bd.st.executeQuery();
-            
+
             while (bd.rs.next()) {
-                int idVenda = bd.rs.getInt("id_venda");
-                int idCliente = bd.rs.getInt("id_cliente");
-                String nome = bd.rs.getString("nome_cliente");
-                Timestamp ts = bd.rs.getTimestamp("data");
-                double valorTotal = bd.rs.getDouble("valor_total");
-                String status = bd.rs.getString("status");
-                String observacao = bd.rs.getString("observacao");
-                
-                Venda v = new Venda(idVenda, idCliente, nome, 
-                                   ts != null ? ts.toLocalDateTime() : null, 
-                                   valorTotal, status, observacao);
-                lista.add(v);
+
+                int idVenda =
+                        bd.rs.getInt(
+                                "id_venda"
+                        );
+
+                int idCliente =
+                        bd.rs.getInt(
+                                "id_cliente"
+                        );
+
+                String nome =
+                        bd.rs.getString(
+                                "nome_cliente"
+                        );
+
+                Timestamp timestamp =
+                        bd.rs.getTimestamp(
+                                "data"
+                        );
+
+                double valorTotal =
+                        bd.rs.getDouble(
+                                "valor_total"
+                        );
+
+                String status =
+                        bd.rs.getString(
+                                "status"
+                        );
+
+                String observacao =
+                        bd.rs.getString(
+                                "observacao"
+                        );
+
+                Venda venda =
+                        new Venda(
+                                idVenda,
+                                idCliente,
+                                nome,
+                                timestamp != null
+                                        ? timestamp.toLocalDateTime()
+                                        : null,
+                                valorTotal,
+                                status,
+                                observacao
+                        );
+
+                lista.add(
+                        venda
+                );
             }
-            
+
         } catch (SQLException e) {
-            System.err.println("Erro ao buscar vendas por cliente: " + e.getMessage());
+
+            System.err.println(
+                    "Erro ao buscar vendas por cliente: "
+                            + e.getMessage()
+            );
+
             e.printStackTrace();
+
         } finally {
+
             bd.close();
         }
-        
+
         return lista;
     }
-    
-    /**
-     * Busca vendas por status
-     * @param status
-     * @return lista de vendas
-     */
-    public List<Venda> buscarPorStatus(String status) {
-        List<Venda> lista = new ArrayList<>();
+
+
+    // ============================================================
+    // BUSCAR POR STATUS
+    // ============================================================
+
+    public List<Venda> buscarPorStatus(
+            String status) {
+
+        List<Venda> lista =
+                new ArrayList<>();
+
         BD bd = new BD();
-        
+
         try {
+
             bd.getConnection();
-            
-            String sql = "SELECT v.id_venda, v.id_cliente, c.nome AS nome_cliente, v.data, " +
-                         "v.valor_total, v.status, v.observacao " +
-                         "FROM venda v " +
-                         "LEFT JOIN cliente c ON v.id_cliente = c.id_cliente " +
-                         "WHERE v.status = ? " +
-                         "ORDER BY v.data DESC";
-            
-            bd.st = bd.con.prepareStatement(sql);
-            bd.st.setString(1, status);
+
+            String sql =
+                    "SELECT " +
+                    "v.id_venda, " +
+                    "v.id_cliente, " +
+                    "c.nome AS nome_cliente, " +
+                    "v.data, " +
+                    "v.valor_total, " +
+                    "v.status, " +
+                    "v.observacao " +
+                    "FROM venda v " +
+                    "LEFT JOIN cliente c " +
+                    "ON v.id_cliente = c.id_cliente " +
+                    "WHERE v.status = ? " +
+                    "ORDER BY v.data DESC";
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+            bd.st.setString(
+                    1,
+                    status
+            );
+
             bd.rs = bd.st.executeQuery();
-            
+
             while (bd.rs.next()) {
-                int idVenda = bd.rs.getInt("id_venda");
-                int idCliente = bd.rs.getInt("id_cliente");
-                String nomeCliente = bd.rs.getString("nome_cliente");
-                Timestamp ts = bd.rs.getTimestamp("data");
-                double valorTotal = bd.rs.getDouble("valor_total");
-                String statusVenda = bd.rs.getString("status");
-                String observacao = bd.rs.getString("observacao");
-                
-                Venda v = new Venda(idVenda, idCliente, nomeCliente, 
-                                   ts != null ? ts.toLocalDateTime() : null, 
-                                   valorTotal, statusVenda, observacao);
-                lista.add(v);
+
+                int idVenda =
+                        bd.rs.getInt(
+                                "id_venda"
+                        );
+
+                int idCliente =
+                        bd.rs.getInt(
+                                "id_cliente"
+                        );
+
+                String nomeCliente =
+                        bd.rs.getString(
+                                "nome_cliente"
+                        );
+
+                Timestamp timestamp =
+                        bd.rs.getTimestamp(
+                                "data"
+                        );
+
+                double valorTotal =
+                        bd.rs.getDouble(
+                                "valor_total"
+                        );
+
+                String statusVenda =
+                        bd.rs.getString(
+                                "status"
+                        );
+
+                String observacao =
+                        bd.rs.getString(
+                                "observacao"
+                        );
+
+                Venda venda =
+                        new Venda(
+                                idVenda,
+                                idCliente,
+                                nomeCliente,
+                                timestamp != null
+                                        ? timestamp.toLocalDateTime()
+                                        : null,
+                                valorTotal,
+                                statusVenda,
+                                observacao
+                        );
+
+                lista.add(
+                        venda
+                );
             }
-            
+
         } catch (SQLException e) {
-            System.err.println("Erro ao buscar vendas por status: " + e.getMessage());
+
+            System.err.println(
+                    "Erro ao buscar vendas por status: "
+                            + e.getMessage()
+            );
+
             e.printStackTrace();
+
         } finally {
+
             bd.close();
         }
-        
+
         return lista;
+    }
+
+
+    // ============================================================
+    // BUSCAR POR PERÍODO
+    // ============================================================
+
+    public List<Venda> buscarPorPeriodo(
+            LocalDateTime dataInicial,
+            LocalDateTime dataFinal) {
+
+        List<Venda> lista =
+                new ArrayList<>();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT " +
+                    "v.id_venda, " +
+                    "v.id_cliente, " +
+                    "c.nome AS nome_cliente, " +
+                    "v.data, " +
+                    "v.valor_total, " +
+                    "v.status, " +
+                    "v.observacao " +
+                    "FROM venda v " +
+                    "LEFT JOIN cliente c " +
+                    "ON v.id_cliente = c.id_cliente " +
+                    "WHERE v.data BETWEEN ? AND ? " +
+                    "ORDER BY v.data DESC";
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+            bd.st.setTimestamp(
+                    1,
+                    Timestamp.valueOf(
+                            dataInicial
+                    )
+            );
+
+            bd.st.setTimestamp(
+                    2,
+                    Timestamp.valueOf(
+                            dataFinal
+                    )
+            );
+
+            bd.rs = bd.st.executeQuery();
+
+            while (bd.rs.next()) {
+
+                int idVenda =
+                        bd.rs.getInt(
+                                "id_venda"
+                        );
+
+                int idCliente =
+                        bd.rs.getInt(
+                                "id_cliente"
+                        );
+
+                String nomeCliente =
+                        bd.rs.getString(
+                                "nome_cliente"
+                        );
+
+                Timestamp timestamp =
+                        bd.rs.getTimestamp(
+                                "data"
+                        );
+
+                double valorTotal =
+                        bd.rs.getDouble(
+                                "valor_total"
+                        );
+
+                String status =
+                        bd.rs.getString(
+                                "status"
+                        );
+
+                String observacao =
+                        bd.rs.getString(
+                                "observacao"
+                        );
+
+                Venda venda =
+                        new Venda(
+                                idVenda,
+                                idCliente,
+                                nomeCliente,
+                                timestamp != null
+                                        ? timestamp.toLocalDateTime()
+                                        : null,
+                                valorTotal,
+                                status,
+                                observacao
+                        );
+
+                lista.add(
+                        venda
+                );
+            }
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao buscar vendas por período: "
+                            + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return lista;
+    }
+
+
+    // ============================================================
+    // PRODUTOS MAIS VENDIDOS
+    // ============================================================
+
+    public List<ProdutoMaisVendido> buscarProdutosMaisVendidos(
+            LocalDateTime dataInicial,
+            LocalDateTime dataFinal) {
+
+        List<ProdutoMaisVendido> lista =
+                new ArrayList<>();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT " +
+                    "p.id_produto, " +
+                    "p.nome AS nome_produto, " +
+                    "SUM(iv.quantidade) AS quantidade_vendida, " +
+                    "SUM(iv.subtotal) AS valor_total " +
+                    "FROM item_venda iv " +
+                    "INNER JOIN produto p " +
+                    "ON iv.id_produto = p.id_produto " +
+                    "INNER JOIN venda v " +
+                    "ON iv.id_venda = v.id_venda " +
+                    "WHERE v.data BETWEEN ? AND ? " +
+                    "AND LOWER(v.status) <> 'cancelada' " +
+                    "GROUP BY p.id_produto, p.nome " +
+                    "ORDER BY quantidade_vendida DESC";
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+            bd.st.setTimestamp(
+                    1,
+                    Timestamp.valueOf(
+                            dataInicial
+                    )
+            );
+
+            bd.st.setTimestamp(
+                    2,
+                    Timestamp.valueOf(
+                            dataFinal
+                    )
+            );
+
+            bd.rs = bd.st.executeQuery();
+
+            while (bd.rs.next()) {
+
+                ProdutoMaisVendido produto =
+                        new ProdutoMaisVendido(
+                                bd.rs.getInt(
+                                        "id_produto"
+                                ),
+                                bd.rs.getString(
+                                        "nome_produto"
+                                ),
+                                bd.rs.getInt(
+                                        "quantidade_vendida"
+                                ),
+                                bd.rs.getDouble(
+                                        "valor_total"
+                                )
+                        );
+
+                lista.add(
+                        produto
+                );
+            }
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao buscar produtos mais vendidos: "
+                            + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return lista;
+    }
+
+
+    // ============================================================
+    // CLIENTES QUE MAIS COMPRARAM
+    // ============================================================
+
+    public List<ClienteMaisComprou> buscarClientesQueMaisCompraram(
+            LocalDateTime dataInicial,
+            LocalDateTime dataFinal) {
+
+        List<ClienteMaisComprou> lista =
+                new ArrayList<>();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT " +
+                    "c.id_cliente, " +
+                    "c.nome AS nome_cliente, " +
+                    "COUNT(v.id_venda) AS quantidade_compras, " +
+                    "SUM(v.valor_total) AS valor_total " +
+                    "FROM venda v " +
+                    "INNER JOIN cliente c " +
+                    "ON v.id_cliente = c.id_cliente " +
+                    "WHERE v.data BETWEEN ? AND ? " +
+                    "AND LOWER(v.status) = LOWER('Concluída') " +
+                    "GROUP BY c.id_cliente, c.nome " +
+                    "ORDER BY valor_total DESC";
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+            bd.st.setTimestamp(
+                    1,
+                    Timestamp.valueOf(
+                            dataInicial
+                    )
+            );
+
+            bd.st.setTimestamp(
+                    2,
+                    Timestamp.valueOf(
+                            dataFinal
+                    )
+            );
+
+            bd.rs = bd.st.executeQuery();
+
+            while (bd.rs.next()) {
+
+                ClienteMaisComprou cliente =
+                        new ClienteMaisComprou(
+                                bd.rs.getInt(
+                                        "id_cliente"
+                                ),
+                                bd.rs.getString(
+                                        "nome_cliente"
+                                ),
+                                bd.rs.getInt(
+                                        "quantidade_compras"
+                                ),
+                                bd.rs.getDouble(
+                                        "valor_total"
+                                )
+                        );
+
+                lista.add(
+                        cliente
+                );
+            }
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao buscar clientes que mais compraram: "
+                            + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return lista;
+    }
+
+
+    // ============================================================
+    // CONTAR VENDAS POR USUÁRIO
+    // ============================================================
+
+    public int contarVendasPorUsuario(
+            int idUsuario) {
+
+        int quantidade = 0;
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT COUNT(*) AS quantidade " +
+                    "FROM venda " +
+                    "WHERE id_usuario = ? " +
+                    "AND status = 'Concluída'";
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+            bd.st.setInt(
+                    1,
+                    idUsuario
+            );
+
+            bd.rs = bd.st.executeQuery();
+
+            if (bd.rs.next()) {
+
+                quantidade =
+                        bd.rs.getInt(
+                                "quantidade"
+                        );
+            }
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao contar vendas do usuário: "
+                            + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return quantidade;
+    }
+
+
+    // ============================================================
+    // AUXILIAR
+    // ============================================================
+
+    private void restaurarAutoCommit(
+            BD bd) {
+
+        try {
+
+            if (bd.con != null) {
+
+                bd.con.setAutoCommit(
+                        true
+                );
+            }
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao restaurar auto-commit: "
+                            + e.getMessage()
+            );
+
+            e.printStackTrace();
+        }
     }
 }

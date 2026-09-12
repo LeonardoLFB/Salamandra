@@ -11,6 +11,8 @@ public class Venda {
     private double valorTotal;
     private String status;
     private String observacao;
+    private int idUsuario;
+    private String nomeUsuario;
     
     public Venda() {
     }
@@ -100,5 +102,21 @@ public class Venda {
     
     public String getValorFormatado() {
         return String.format("R$ %.2f", valorTotal);
+    }
+    
+    public int getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
+    public String getNomeUsuario() {
+        return nomeUsuario;
+    }
+
+    public void setNomeUsuario(String nomeUsuario) {
+        this.nomeUsuario = nomeUsuario;
     }
 }
