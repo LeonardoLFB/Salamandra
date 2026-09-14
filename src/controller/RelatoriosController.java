@@ -31,6 +31,8 @@ import model.Produto;
 
 import model.ClienteMaisComprou;
 
+import model.RelatorioLucroProduto;
+
 public class RelatoriosController implements Initializable {
 
     // ============================================================
@@ -101,6 +103,43 @@ public class RelatoriosController implements Initializable {
 
     @FXML
     private TableColumn<ProdutoMaisVendido, String> colProdutoValorTotal;
+    
+ // ============================================================
+ // RELATÓRIO DE LUCRO
+ // ============================================================
+
+ @FXML
+ private Label lblLucroFaturamento;
+
+ @FXML
+ private Label lblLucroCusto;
+
+ @FXML
+ private Label lblLucroBruto;
+
+ @FXML
+ private TableView<RelatorioLucroProduto> tabelaLucro;
+
+ @FXML
+ private TableColumn<RelatorioLucroProduto, Integer> colLucroProdutoId;
+
+ @FXML
+ private TableColumn<RelatorioLucroProduto, String> colLucroProduto;
+
+ @FXML
+ private TableColumn<RelatorioLucroProduto, Integer> colLucroQuantidade;
+
+ @FXML
+ private TableColumn<RelatorioLucroProduto, String> colLucroFaturamento;
+
+ @FXML
+ private TableColumn<RelatorioLucroProduto, String> colLucroCusto;
+
+ @FXML
+ private TableColumn<RelatorioLucroProduto, String> colLucroValor;
+
+ @FXML
+ private TableColumn<RelatorioLucroProduto, String> colLucroMargem;
     
     // ============================================================
     // RELATÓRIO DE ESTOQUE BAIXO
@@ -173,6 +212,10 @@ public class RelatoriosController implements Initializable {
         configurarTabelaEstoqueBaixo();
         
         configurarTabelaClientesMaisCompraram();
+        
+        configurarTabelaClientesMaisCompraram();
+
+        configurarTabelaLucro();
 
         // Começa mostrando o mês atual
         LocalDate hoje = LocalDate.now();
@@ -362,6 +405,11 @@ public class RelatoriosController implements Initializable {
         );
         
         buscarClientesMaisCompraram(
+                inicio,
+                fim
+        );
+        
+        buscarLucro(
                 inicio,
                 fim
         );
@@ -780,6 +828,110 @@ private void buscarClientesMaisCompraram(
  lblClientesRanking.setText(
          String.valueOf(clientes.size())
  );
+}
+
+private void configurarTabelaLucro() {
+
+    colLucroProdutoId.setCellValueFactory(
+            new PropertyValueFactory<>(
+                    "idProduto"
+            )
+    );
+
+    colLucroProduto.setCellValueFactory(
+            new PropertyValueFactory<>(
+                    "nomeProduto"
+            )
+    );
+
+    colLucroQuantidade.setCellValueFactory(
+            new PropertyValueFactory<>(
+                    "quantidadeVendida"
+            )
+    );
+
+    colLucroFaturamento.setCellValueFactory(
+            new PropertyValueFactory<>(
+                    "faturamentoFormatado"
+            )
+    );
+
+    colLucroCusto.setCellValueFactory(
+            new PropertyValueFactory<>(
+                    "custoFormatado"
+            )
+    );
+
+    colLucroValor.setCellValueFactory(
+            new PropertyValueFactory<>(
+                    "lucroFormatado"
+            )
+    );
+
+    colLucroMargem.setCellValueFactory(
+            new PropertyValueFactory<>(
+                    "margemFormatada"
+            )
+    );
+}
+
+private void buscarLucro(
+        LocalDateTime inicio,
+        LocalDateTime fim) {
+
+    List<RelatorioLucroProduto> lista =
+            vendaDAO.buscarLucroPorProduto(
+                    inicio,
+                    fim
+            );
+
+    tabelaLucro.setItems(
+            FXCollections.observableArrayList(
+                    lista
+            )
+    );
+
+    double faturamento = 0;
+    double custo = 0;
+    double lucro = 0;
+
+    for (RelatorioLucroProduto item : lista) {
+
+        faturamento +=
+                item.getFaturamento();
+
+        custo +=
+                item.getCusto();
+
+        lucro +=
+                item.getLucro();
+    }
+
+    NumberFormat moeda =
+            NumberFormat.getCurrencyInstance(
+                    new Locale(
+                            "pt",
+                            "BR"
+                    )
+            );
+
+    lblLucroFaturamento.setText(
+            moeda.format(
+                    faturamento
+            )
+    );
+
+    lblLucroCusto.setText(
+            moeda.format(
+                    custo
+            )
+    );
+
+    lblLucroBruto.setText(
+            moeda.format(
+                    lucro
+            )
+    );
 }
 
 }

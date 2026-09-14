@@ -430,6 +430,89 @@
                         </VBox>
 
                     </Tab>
+                    
+                    <Tab text="Lucro">
+    <content>
+        <VBox spacing="20.0"
+              styleClass="relatorio-container">
+
+            <padding>
+                <Insets top="20.0"
+                        right="20.0"
+                        bottom="20.0"
+                        left="20.0"/>
+            </padding>
+
+            <!-- RESUMO -->
+            <HBox spacing="20.0">
+
+                <VBox spacing="8.0"
+                      styleClass="card-relatorio">
+                    <Label text="Faturamento"/>
+                    <Label fx:id="lblLucroFaturamento"
+                           text="R$ 0,00"
+                           styleClass="valor-relatorio"/>
+                </VBox>
+
+                <VBox spacing="8.0"
+                      styleClass="card-relatorio">
+                    <Label text="Custo dos produtos"/>
+                    <Label fx:id="lblLucroCusto"
+                           text="R$ 0,00"
+                           styleClass="valor-relatorio"/>
+                </VBox>
+
+                <VBox spacing="8.0"
+                      styleClass="card-relatorio">
+                    <Label text="Lucro bruto"/>
+                    <Label fx:id="lblLucroBruto"
+                           text="R$ 0,00"
+                           styleClass="valor-relatorio"/>
+                </VBox>
+
+            </HBox>
+
+            <!-- TABELA -->
+            <TableView fx:id="tabelaLucro"
+                       VBox.vgrow="ALWAYS">
+
+                <columns>
+
+                    <TableColumn fx:id="colLucroProdutoId"
+                                 text="ID"
+                                 prefWidth="70.0"/>
+
+                    <TableColumn fx:id="colLucroProduto"
+                                 text="PRODUTO"
+                                 prefWidth="220.0"/>
+
+                    <TableColumn fx:id="colLucroQuantidade"
+                                 text="QTD. VENDIDA"
+                                 prefWidth="120.0"/>
+
+                    <TableColumn fx:id="colLucroFaturamento"
+                                 text="FATURAMENTO"
+                                 prefWidth="140.0"/>
+
+                    <TableColumn fx:id="colLucroCusto"
+                                 text="CUSTO FIFO"
+                                 prefWidth="140.0"/>
+
+                    <TableColumn fx:id="colLucroValor"
+                                 text="LUCRO"
+                                 prefWidth="140.0"/>
+
+                    <TableColumn fx:id="colLucroMargem"
+                                 text="MARGEM"
+                                 prefWidth="110.0"/>
+
+                </columns>
+
+            </TableView>
+
+        </VBox>
+    </content>
+</Tab>
 
                     <!-- ==================================================
                          ESTOQUE BAIXO

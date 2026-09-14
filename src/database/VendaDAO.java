@@ -17,6 +17,8 @@ import model.ProdutoMaisVendido;
 import model.Usuario;
 import model.Venda;
 
+import model.RelatorioLucroProduto;
+
 public class VendaDAO {
 
     // ============================================================
@@ -2205,6 +2207,147 @@ public class VendaDAO {
         return lista;
     }
 
+    
+    public List<RelatorioLucroProduto> buscarLucroPorProduto(
+            LocalDateTime inicio,
+            LocalDateTime fim) {
+
+        List<RelatorioLucroProduto> relatorio = new ArrayList<>();
+
+        BD bd = new BD();
+
+        String sql = """
+        	    SELECT
+        	        p.id_produto,
+        	        p.nome,
+        	        SUM(iv.quantidade) AS quantidade_vendida,
+        	        SUM(iv.subtotal) AS faturamento,
+        	        COALESCE(
+        	            SUM(custo_item.custo),
+        	            0
+        	        ) AS custo
+        	    FROM venda v
+
+        	    INNER JOIN item_venda iv
+        	        ON iv.id_venda = v.id_venda
+
+        	    INNER JOIN produto p
+        	        ON p.id_produto = iv.id_produto
+
+        	    INNER JOIN (
+        	        SELECT
+        	            id_item,
+        	            SUM(quantidade) AS quantidade_alocada,
+        	            SUM(quantidade * custo_unitario) AS custo
+        	        FROM item_venda_lote
+        	        GROUP BY id_item
+        	    ) custo_item
+        	        ON custo_item.id_item = iv.id_item
+        	        AND custo_item.quantidade_alocada = iv.quantidade
+
+        	    WHERE v.data BETWEEN ? AND ?
+        	    AND v.status = 'Concluída'
+
+        	    GROUP BY
+        	        p.id_produto,
+        	        p.nome
+
+        	    ORDER BY faturamento DESC
+        	    """;
+
+        try {
+
+            if (!bd.getConnection()) {
+                return relatorio;
+            }
+
+            try (PreparedStatement ps =
+                    bd.con.prepareStatement(sql)) {
+
+                ps.setTimestamp(
+                        1,
+                        Timestamp.valueOf(inicio)
+                );
+
+                ps.setTimestamp(
+                        2,
+                        Timestamp.valueOf(fim)
+                );
+
+                try (ResultSet rs =
+                        ps.executeQuery()) {
+
+                    while (rs.next()) {
+
+                        int idProduto =
+                                rs.getInt(
+                                        "id_produto"
+                                );
+
+                        String nomeProduto =
+                                rs.getString(
+                                        "nome"
+                                );
+
+                        int quantidadeVendida =
+                                rs.getInt(
+                                        "quantidade_vendida"
+                                );
+
+                        double faturamento =
+                                rs.getDouble(
+                                        "faturamento"
+                                );
+
+                        double custo =
+                                rs.getDouble(
+                                        "custo"
+                                );
+
+                        double lucro =
+                                faturamento - custo;
+
+                        double margem = 0.0;
+
+                        if (faturamento > 0) {
+
+                            margem =
+                                    (lucro / faturamento)
+                                    * 100;
+                        }
+
+                        RelatorioLucroProduto item =
+                                new RelatorioLucroProduto(
+                                        idProduto,
+                                        nomeProduto,
+                                        quantidadeVendida,
+                                        faturamento,
+                                        custo,
+                                        lucro,
+                                        margem
+                                );
+
+                        relatorio.add(item);
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao buscar relatório de lucro por produto: "
+                    + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return relatorio;
+    }
 
     // ============================================================
     // PRODUTOS MAIS VENDIDOS
@@ -2562,4 +2705,5 @@ public class VendaDAO {
             e.printStackTrace();
         }
     }
+    
 }
