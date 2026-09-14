@@ -668,4 +668,7 @@ public class ProdutoDAO {
 
         return mensagem;
     }
+    
+    private final LoteProdutoDAO loteProdutoDAO =
+            new LoteProdutoDAO();
 }

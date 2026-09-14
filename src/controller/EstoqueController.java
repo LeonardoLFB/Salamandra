@@ -1,6 +1,8 @@
 package controller;
 
+import database.LoteProdutoDAO;
 import database.ProdutoDAO;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -10,10 +12,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
+
+import model.LoteProduto;
 import model.Produto;
+
 import util.AlertaUtil;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -42,13 +49,7 @@ public class EstoqueController {
     private TableColumn<Produto, Integer> colQuantidade;
 
     @FXML
-    private TableColumn<Produto, Double> colPrecoCusto;
-
-    @FXML
     private TableColumn<Produto, Double> colPrecoVenda;
-
-    @FXML
-    private TableColumn<Produto, String> colLote;
 
     @FXML
     private TableColumn<Produto, Void> colAcoes;
@@ -62,35 +63,60 @@ public class EstoqueController {
     @FXML
     private Label lblValorTotal;
 
+
     private final ObservableList<Produto> data =
             FXCollections.observableArrayList();
 
     private final ObservableList<Produto> dataOriginal =
             FXCollections.observableArrayList();
 
+
     private final ProdutoDAO produtoDAO =
             new ProdutoDAO();
+
+    private final LoteProdutoDAO loteProdutoDAO =
+            new LoteProdutoDAO();
+
 
     private final NumberFormat moedaBrasil =
             NumberFormat.getCurrencyInstance(
                     new Locale("pt", "BR")
             );
 
+
+    private final DateTimeFormatter formatoData =
+            DateTimeFormatter.ofPattern(
+                    "dd/MM/yyyy HH:mm"
+            );
+
+
+    // ============================================================
+    // INICIALIZAÇÃO
+    // ============================================================
+
     @FXML
     private void initialize() {
 
         configurarColunas();
+
         configurarColunaQuantidade();
-        configurarColunasPreco();
+
+        configurarColunaPrecoVenda();
+
         addActionsColumn();
 
-        productTable.setItems(data);
+
+        productTable.setItems(
+                data
+        );
+
 
         productTable.setPlaceholder(
                 new Label(
                         "Nenhum produto encontrado."
                 )
         );
+
 
         cbFiltroStatus.getItems().addAll(
                 "Todos",
@@ -99,27 +125,39 @@ public class EstoqueController {
                 "Fora de estoque"
         );
 
+
         cbFiltroStatus
                 .getSelectionModel()
-                .select("Todos");
+                .select(
+                        "Todos"
+                );
+
 
         txtBuscar
                 .textProperty()
                 .addListener(
-                        (obs, oldV, newV) ->
+                        (obs, antigo, novo) ->
                                 aplicarFiltro()
                 );
+
 
         cbFiltroStatus.setOnAction(
                 e -> aplicarFiltro()
         );
 
+
         btnAtualizar.setOnAction(
                 e -> carregarProdutos()
         );
 
+
         carregarProdutos();
     }
+
+
+    // ============================================================
+    // CONFIGURAÇÃO DAS COLUNAS
+    // ============================================================
 
     private void configurarColunas() {
 
@@ -129,11 +167,13 @@ public class EstoqueController {
                 )
         );
 
+
         colCodigo.setCellValueFactory(
                 new PropertyValueFactory<>(
                         "codigo"
                 )
         );
+
 
         colQuantidade.setCellValueFactory(
                 new PropertyValueFactory<>(
@@ -141,55 +181,20 @@ public class EstoqueController {
                 )
         );
 
-        colPrecoCusto.setCellValueFactory(
-                new PropertyValueFactory<>(
-                        "precoCusto"
-                )
-        );
 
         colPrecoVenda.setCellValueFactory(
                 new PropertyValueFactory<>(
                         "precoVenda"
                 )
         );
-
-        colLote.setCellValueFactory(
-                new PropertyValueFactory<>(
-                        "lote"
-                )
-        );
     }
 
-    private void configurarColunasPreco() {
 
-        colPrecoCusto.setCellFactory(
-                col -> new TableCell<>() {
+    // ============================================================
+    // PREÇO DE VENDA
+    // ============================================================
 
-                    @Override
-                    protected void updateItem(
-                            Double value,
-                            boolean empty) {
-
-                        super.updateItem(
-                                value,
-                                empty
-                        );
-
-                        if (empty || value == null) {
-
-                            setText(null);
-
-                        } else {
-
-                            setText(
-                                    moedaBrasil.format(
-                                            value
-                                    )
-                            );
-                        }
-                    }
-                }
-        );
+    private void configurarColunaPrecoVenda() {
 
         colPrecoVenda.setCellFactory(
                 col -> new TableCell<>() {
@@ -204,9 +209,13 @@ public class EstoqueController {
                                 empty
                         );
 
-                        if (empty || value == null) {
 
-                            setText(null);
+                        if (empty
+                                || value == null) {
+
+                            setText(
+                                    null
+                            );
 
                         } else {
 
@@ -220,6 +229,11 @@ public class EstoqueController {
                 }
         );
     }
+
+
+    // ============================================================
+    // QUANTIDADE
+    // ============================================================
 
     private void configurarColunaQuantidade() {
 
@@ -236,8 +250,15 @@ public class EstoqueController {
                                 empty
                         );
 
-                        setGraphic(null);
-                        setText(null);
+
+                        setGraphic(
+                                null
+                        );
+
+                        setText(
+                                null
+                        );
+
 
                         if (empty
                                 || quantidade == null) {
@@ -245,13 +266,17 @@ public class EstoqueController {
                             return;
                         }
 
+
                         Label badge =
                                 new Label();
 
-                        badge.getStyleClass()
+
+                        badge
+                                .getStyleClass()
                                 .add(
                                         "stock-badge"
                                 );
+
 
                         if (quantidade == 0) {
 
@@ -259,7 +284,9 @@ public class EstoqueController {
                                     "0 - Sem estoque"
                             );
 
-                            badge.getStyleClass()
+
+                            badge
+                                    .getStyleClass()
                                     .add(
                                             "stock-badge-empty"
                                     );
@@ -272,7 +299,9 @@ public class EstoqueController {
                                     )
                             );
 
-                            badge.getStyleClass()
+
+                            badge
+                                    .getStyleClass()
                                     .add(
                                             "stock-badge-low"
                                     );
@@ -285,11 +314,14 @@ public class EstoqueController {
                                     )
                             );
 
-                            badge.getStyleClass()
+
+                            badge
+                                    .getStyleClass()
                                     .add(
                                             "stock-badge-ok"
                                     );
                         }
+
 
                         setGraphic(
                                 badge
@@ -299,12 +331,18 @@ public class EstoqueController {
         );
     }
 
+
+    // ============================================================
+    // CARREGAR PRODUTOS
+    // ============================================================
+
     private void carregarProdutos() {
 
         try {
 
             List<Produto> produtos =
                     produtoDAO.getAll();
+
 
             if (produtos != null) {
 
@@ -317,12 +355,15 @@ public class EstoqueController {
                 dataOriginal.clear();
             }
 
+
             aplicarFiltro();
+
 
             lblStatus.setText(
                     "Produtos carregados: "
                             + dataOriginal.size()
             );
+
 
         } catch (Exception e) {
 
@@ -330,15 +371,22 @@ public class EstoqueController {
                     "Erro ao carregar produtos"
             );
 
+
             AlertaUtil.erro(
                     "Erro",
                     "Erro ao carregar produtos do banco: "
                             + e.getMessage()
             );
 
+
             e.printStackTrace();
         }
     }
+
+
+    // ============================================================
+    // FILTROS
+    // ============================================================
 
     private void aplicarFiltro() {
 
@@ -350,11 +398,14 @@ public class EstoqueController {
                                 .trim()
                                 .toLowerCase();
 
+
         String statusFiltro =
                 cbFiltroStatus.getValue();
 
+
         ObservableList<Produto> filtrados =
                 FXCollections.observableArrayList();
+
 
         for (Produto produto : dataOriginal) {
 
@@ -367,17 +418,23 @@ public class EstoqueController {
                                     && produto
                                     .getNome()
                                     .toLowerCase()
-                                    .contains(busca)
+                                    .contains(
+                                            busca
+                                    )
                     )
 
                             || String
                             .valueOf(
                                     produto.getCodigo()
                             )
-                            .contains(busca);
+                            .contains(
+                                    busca
+                            );
+
 
             boolean correspondeStatus =
                     true;
+
 
             if (statusFiltro != null
                     && !statusFiltro.equals(
@@ -386,6 +443,7 @@ public class EstoqueController {
 
                 int quantidade =
                         produto.getQtdeEstoque();
+
 
                 switch (statusFiltro) {
 
@@ -396,6 +454,7 @@ public class EstoqueController {
 
                         break;
 
+
                     case "Estoque baixo":
 
                         correspondeStatus =
@@ -404,12 +463,14 @@ public class EstoqueController {
 
                         break;
 
+
                     case "Fora de estoque":
 
                         correspondeStatus =
                                 quantidade == 0;
 
                         break;
+
 
                     default:
 
@@ -420,6 +481,7 @@ public class EstoqueController {
                 }
             }
 
+
             if (correspondeBusca
                     && correspondeStatus) {
 
@@ -429,36 +491,141 @@ public class EstoqueController {
             }
         }
 
+
         data.setAll(
                 filtrados
         );
+
 
         atualizarResumo(
                 data
         );
     }
 
+
+    // ============================================================
+    // COLUNA DE AÇÕES
+    // ============================================================
+
     private void addActionsColumn() {
 
-        Callback<TableColumn<Produto, Void>,
-                TableCell<Produto, Void>>
-                cellFactory = param ->
+        Callback<
+                TableColumn<Produto, Void>,
+                TableCell<Produto, Void>
+                > cellFactory = param ->
+
                 new TableCell<>() {
 
+
+                    private final Button btnEntrada =
+                            new Button(
+                                    "➕"
+                            );
+
+
+                    private final Button btnLotes =
+                            new Button(
+                                    "📦"
+                            );
+
+
                     private final Button btnEditar =
-                            new Button("✏");
+                            new Button(
+                                    "✏"
+                            );
+
 
                     private final Button btnExcluir =
-                            new Button("🗑");
+                            new Button(
+                                    "🗑"
+                            );
+
 
                     private final HBox box =
                             new HBox(
                                     6,
+                                    btnEntrada,
+                                    btnLotes,
                                     btnEditar,
                                     btnExcluir
                             );
 
+
                     {
+
+                        // ====================================================
+                        // ENTRADA DE ESTOQUE
+                        // ====================================================
+
+                        btnEntrada
+                                .getStyleClass()
+                                .add(
+                                        "table-action-edit"
+                                );
+
+
+                        btnEntrada.setTooltip(
+                                new Tooltip(
+                                        "Registrar entrada de estoque"
+                                )
+                        );
+
+
+                        btnEntrada.setOnAction(
+                                e -> {
+
+                                    Produto produto =
+                                            getProdutoDaLinha();
+
+
+                                    if (produto != null) {
+
+                                        registrarEntradaEstoque(
+                                                produto
+                                        );
+                                    }
+                                }
+                        );
+
+
+                        // ====================================================
+                        // VISUALIZAR LOTES
+                        // ====================================================
+
+                        btnLotes
+                                .getStyleClass()
+                                .add(
+                                        "table-action-edit"
+                                );
+
+
+                        btnLotes.setTooltip(
+                                new Tooltip(
+                                        "Visualizar lotes"
+                                )
+                        );
+
+
+                        btnLotes.setOnAction(
+                                e -> {
+
+                                    Produto produto =
+                                            getProdutoDaLinha();
+
+
+                                    if (produto != null) {
+
+                                        visualizarLotes(
+                                                produto
+                                        );
+                                    }
+                                }
+                        );
+
+
+                        // ====================================================
+                        // EDITAR PRODUTO
+                        // ====================================================
 
                         btnEditar
                                 .getStyleClass()
@@ -466,27 +633,34 @@ public class EstoqueController {
                                         "table-action-edit"
                                 );
 
+
                         btnEditar.setTooltip(
                                 new Tooltip(
                                         "Editar produto"
                                 )
                         );
 
+
                         btnEditar.setOnAction(
                                 e -> {
 
                                     Produto produto =
-                                            getTableView()
-                                                    .getItems()
-                                                    .get(
-                                                            getIndex()
-                                                    );
+                                            getProdutoDaLinha();
 
-                                    editarProduto(
-                                            produto
-                                    );
+
+                                    if (produto != null) {
+
+                                        editarProduto(
+                                                produto
+                                        );
+                                    }
                                 }
                         );
+
+
+                        // ====================================================
+                        // EXCLUIR PRODUTO
+                        // ====================================================
 
                         btnExcluir
                                 .getStyleClass()
@@ -494,28 +668,54 @@ public class EstoqueController {
                                         "table-action-delete"
                                 );
 
+
                         btnExcluir.setTooltip(
                                 new Tooltip(
                                         "Excluir produto"
                                 )
                         );
 
+
                         btnExcluir.setOnAction(
                                 e -> {
 
                                     Produto produto =
-                                            getTableView()
-                                                    .getItems()
-                                                    .get(
-                                                            getIndex()
-                                                    );
+                                            getProdutoDaLinha();
 
-                                    excluirProduto(
-                                            produto
-                                    );
+
+                                    if (produto != null) {
+
+                                        excluirProduto(
+                                                produto
+                                        );
+                                    }
                                 }
                         );
                     }
+
+
+                    private Produto getProdutoDaLinha() {
+
+                        int indice =
+                                getIndex();
+
+
+                        if (indice < 0
+                                || indice >= getTableView()
+                                        .getItems()
+                                        .size()) {
+
+                            return null;
+                        }
+
+
+                        return getTableView()
+                                .getItems()
+                                .get(
+                                        indice
+                                );
+                    }
+
 
                     @Override
                     protected void updateItem(
@@ -527,6 +727,7 @@ public class EstoqueController {
                                 empty
                         );
 
+
                         setGraphic(
                                 empty
                                         ? null
@@ -535,89 +736,67 @@ public class EstoqueController {
                     }
                 };
 
+
         colAcoes.setCellFactory(
                 cellFactory
         );
     }
 
-    private void editarProduto(
+
+    // ============================================================
+    // REGISTRAR ENTRADA DE ESTOQUE
+    // ============================================================
+
+    private void registrarEntradaEstoque(
             Produto produto) {
+
 
         Dialog<ButtonType> dialog =
                 new Dialog<>();
 
+
         dialog.setTitle(
-                "Editar produto"
+                "Entrada de estoque"
         );
+
 
         dialog.setHeaderText(
-                "Editar produto #"
-                        + produto.getId()
-                        + " - "
-                        + produto.getNome()
+                produto.getNome()
+                        + " - Estoque atual: "
+                        + produto.getQtdeEstoque()
         );
 
-        TextField txtNome =
-                new TextField(
-                        produto.getNome()
-                );
-
-        TextField txtCodigo =
-                new TextField(
-                        String.valueOf(
-                                produto.getCodigo()
-                        )
-                );
 
         TextField txtLote =
-                new TextField(
-                        produto.getLote()
-                );
+                new TextField();
 
-        TextField txtDescricao =
-                new TextField(
-                        produto.getDescricao()
-                );
 
-        TextField txtPrecoCusto =
-                new TextField(
-                        String.valueOf(
-                                produto.getPrecoCusto()
-                        )
-                );
+        txtLote.setPromptText(
+                "Ex.: L002"
+        );
 
-        TextField txtPrecoVenda =
-                new TextField(
-                        String.valueOf(
-                                produto.getPrecoVenda()
-                        )
-                );
 
         TextField txtQuantidade =
-                new TextField(
-                        String.valueOf(
-                                produto.getQtdeEstoque()
-                        )
-                );
+                new TextField();
 
-        txtCodigo
-                .textProperty()
-                .addListener(
-                        (obs, antigo, novo) -> {
 
-                            if (!novo.matches(
-                                    "\\d*"
-                            )) {
+        txtQuantidade.setPromptText(
+                "Ex.: 50"
+        );
 
-                                txtCodigo.setText(
-                                        novo.replaceAll(
-                                                "[^\\d]",
-                                                ""
-                                        )
-                                );
-                            }
-                        }
-                );
+
+        TextField txtCusto =
+                new TextField();
+
+
+        txtCusto.setPromptText(
+                "Ex.: 4,50"
+        );
+
+
+        // ============================================================
+        // SOMENTE NÚMEROS NA QUANTIDADE
+        // ============================================================
 
         txtQuantidade
                 .textProperty()
@@ -638,21 +817,12 @@ public class EstoqueController {
                         }
                 );
 
-        txtLote
-                .textProperty()
-                .addListener(
-                        (obs, antigo, novo) -> {
 
-                            if (novo.length() > 5) {
+        // ============================================================
+        // VALIDAÇÃO DO CUSTO
+        // ============================================================
 
-                                txtLote.setText(
-                                        antigo
-                                );
-                            }
-                        }
-                );
-
-        txtPrecoCusto
+        txtCusto
                 .textProperty()
                 .addListener(
                         (obs, antigo, novo) -> {
@@ -661,12 +831,786 @@ public class EstoqueController {
                                     "\\d*([,.]\\d*)?"
                             )) {
 
-                                txtPrecoCusto.setText(
+                                txtCusto.setText(
                                         antigo
                                 );
                             }
                         }
                 );
+
+
+        GridPane grid =
+                new GridPane();
+
+
+        grid.setHgap(
+                12
+        );
+
+
+        grid.setVgap(
+                12
+        );
+
+
+        grid.setPadding(
+                new Insets(
+                        20,
+                        20,
+                        10,
+                        20
+                )
+        );
+
+
+        grid.add(
+                new Label(
+                        "Produto:"
+                ),
+                0,
+                0
+        );
+
+
+        grid.add(
+                new Label(
+                        produto.getNome()
+                ),
+                1,
+                0
+        );
+
+
+        grid.add(
+                new Label(
+                        "Estoque atual:"
+                ),
+                0,
+                1
+        );
+
+
+        grid.add(
+                new Label(
+                        String.valueOf(
+                                produto.getQtdeEstoque()
+                        )
+                ),
+                1,
+                1
+        );
+
+
+        grid.add(
+                new Label(
+                        "Novo lote:"
+                ),
+                0,
+                2
+        );
+
+
+        grid.add(
+                txtLote,
+                1,
+                2
+        );
+
+
+        grid.add(
+                new Label(
+                        "Quantidade recebida:"
+                ),
+                0,
+                3
+        );
+
+
+        grid.add(
+                txtQuantidade,
+                1,
+                3
+        );
+
+
+        grid.add(
+                new Label(
+                        "Custo unitário:"
+                ),
+                0,
+                4
+        );
+
+
+        grid.add(
+                txtCusto,
+                1,
+                4
+        );
+
+
+        dialog
+                .getDialogPane()
+                .setContent(
+                        grid
+                );
+
+
+        ButtonType btnConfirmar =
+                new ButtonType(
+                        "Registrar entrada",
+                        ButtonBar.ButtonData.OK_DONE
+                );
+
+
+        ButtonType btnCancelar =
+                new ButtonType(
+                        "Cancelar",
+                        ButtonBar.ButtonData.CANCEL_CLOSE
+                );
+
+
+        dialog
+                .getDialogPane()
+                .getButtonTypes()
+                .addAll(
+                        btnConfirmar,
+                        btnCancelar
+                );
+
+
+        Button confirmarButton =
+                (Button) dialog
+                        .getDialogPane()
+                        .lookupButton(
+                                btnConfirmar
+                        );
+
+
+        confirmarButton.addEventFilter(
+                javafx.event.ActionEvent.ACTION,
+                event -> {
+
+
+                    if (txtLote
+                            .getText()
+                            .trim()
+                            .isEmpty()) {
+
+                        AlertaUtil.erro(
+                                "Campo obrigatório",
+                                "Informe o lote."
+                        );
+
+
+                        event.consume();
+
+                        return;
+                    }
+
+
+                    if (txtQuantidade
+                            .getText()
+                            .trim()
+                            .isEmpty()) {
+
+                        AlertaUtil.erro(
+                                "Campo obrigatório",
+                                "Informe a quantidade recebida."
+                        );
+
+
+                        event.consume();
+
+                        return;
+                    }
+
+
+                    if (txtCusto
+                            .getText()
+                            .trim()
+                            .isEmpty()) {
+
+                        AlertaUtil.erro(
+                                "Campo obrigatório",
+                                "Informe o custo unitário."
+                        );
+
+
+                        event.consume();
+
+                        return;
+                    }
+
+
+                    try {
+
+                        int quantidade =
+                                Integer.parseInt(
+                                        txtQuantidade
+                                                .getText()
+                                                .trim()
+                                );
+
+
+                        BigDecimal custo =
+                                new BigDecimal(
+                                        txtCusto
+                                                .getText()
+                                                .trim()
+                                                .replace(
+                                                        ",",
+                                                        "."
+                                                )
+                                );
+
+
+                        if (quantidade <= 0) {
+
+                            AlertaUtil.erro(
+                                    "Quantidade inválida",
+                                    "A quantidade deve ser maior que zero."
+                            );
+
+
+                            event.consume();
+
+                            return;
+                        }
+
+
+                        if (custo.compareTo(
+                                BigDecimal.ZERO
+                        ) < 0) {
+
+                            AlertaUtil.erro(
+                                    "Custo inválido",
+                                    "O custo não pode ser negativo."
+                            );
+
+
+                            event.consume();
+                        }
+
+
+                    } catch (NumberFormatException e) {
+
+                        AlertaUtil.erro(
+                                "Valor inválido",
+                                "Verifique a quantidade e o custo informados."
+                        );
+
+
+                        event.consume();
+                    }
+                }
+        );
+
+
+        Optional<ButtonType> resultado =
+                dialog.showAndWait();
+
+
+        if (resultado.isPresent()
+                && resultado.get()
+                == btnConfirmar) {
+
+
+            try {
+
+                int quantidade =
+                        Integer.parseInt(
+                                txtQuantidade
+                                        .getText()
+                                        .trim()
+                        );
+
+
+                BigDecimal custo =
+                        new BigDecimal(
+                                txtCusto
+                                        .getText()
+                                        .trim()
+                                        .replace(
+                                                ",",
+                                                "."
+                                        )
+                        );
+
+
+                LoteProduto lote =
+                        new LoteProduto();
+
+
+                lote.setIdProduto(
+                        produto.getId()
+                );
+
+
+                lote.setCodigoLote(
+                        txtLote
+                                .getText()
+                                .trim()
+                );
+
+
+                lote.setQuantidade(
+                        quantidade
+                );
+
+
+                lote.setCustoUnitario(
+                        custo
+                );
+
+
+                boolean sucesso =
+                        loteProdutoDAO
+                                .registrarEntrada(
+                                        lote
+                                );
+
+
+                if (sucesso) {
+
+                    carregarProdutos();
+
+
+                    lblStatus.setText(
+                            "Entrada de estoque registrada"
+                    );
+
+
+                    AlertaUtil.sucesso(
+                            "Entrada registrada",
+                            quantidade
+                                    + " unidade(s) de "
+                                    + produto.getNome()
+                                    + " adicionadas ao estoque."
+                    );
+
+
+                } else {
+
+                    AlertaUtil.erro(
+                            "Erro",
+                            "Não foi possível registrar a entrada de estoque."
+                    );
+                }
+
+
+            } catch (Exception e) {
+
+                AlertaUtil.erro(
+                        "Erro",
+                        "Erro ao registrar entrada.\n\n"
+                                + e.getMessage()
+                );
+
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    // ============================================================
+    // VISUALIZAR LOTES
+    // ============================================================
+
+    private void visualizarLotes(
+            Produto produto) {
+
+
+        List<LoteProduto> lotes =
+                loteProdutoDAO
+                        .buscarPorProduto(
+                                produto.getId()
+                        );
+
+
+        Dialog<ButtonType> dialog =
+                new Dialog<>();
+
+
+        dialog.setTitle(
+                "Lotes do produto"
+        );
+
+
+        dialog.setHeaderText(
+                produto.getNome()
+                        + " - Código "
+                        + produto.getCodigo()
+        );
+
+
+        TableView<LoteProduto> tabela =
+                new TableView<>();
+
+
+        tabela.setPrefWidth(
+                650
+        );
+
+
+        tabela.setPrefHeight(
+                320
+        );
+
+
+        tabela.setPlaceholder(
+                new Label(
+                        "Nenhum lote encontrado para este produto."
+                )
+        );
+
+
+        // ============================================================
+        // COLUNA LOTE
+        // ============================================================
+
+        TableColumn<LoteProduto, String> colLote =
+                new TableColumn<>(
+                        "LOTE"
+                );
+
+
+        colLote.setPrefWidth(
+                130
+        );
+
+
+        colLote.setCellValueFactory(
+                new PropertyValueFactory<>(
+                        "codigoLote"
+                )
+        );
+
+
+        // ============================================================
+        // COLUNA QUANTIDADE
+        // ============================================================
+
+        TableColumn<LoteProduto, Integer> colQuantidadeLote =
+                new TableColumn<>(
+                        "QUANTIDADE"
+                );
+
+
+        colQuantidadeLote.setPrefWidth(
+                120
+        );
+
+
+        colQuantidadeLote.setCellValueFactory(
+                new PropertyValueFactory<>(
+                        "quantidade"
+                )
+        );
+
+
+        // ============================================================
+        // COLUNA CUSTO
+        // ============================================================
+
+        TableColumn<LoteProduto, BigDecimal> colCusto =
+                new TableColumn<>(
+                        "CUSTO UNITÁRIO"
+                );
+
+
+        colCusto.setPrefWidth(
+                150
+        );
+
+
+        colCusto.setCellValueFactory(
+                new PropertyValueFactory<>(
+                        "custoUnitario"
+                )
+        );
+
+
+        colCusto.setCellFactory(
+                coluna -> new TableCell<>() {
+
+                    @Override
+                    protected void updateItem(
+                            BigDecimal valor,
+                            boolean empty) {
+
+                        super.updateItem(
+                                valor,
+                                empty
+                        );
+
+
+                        if (empty
+                                || valor == null) {
+
+                            setText(
+                                    null
+                            );
+
+                        } else {
+
+                            setText(
+                                    moedaBrasil.format(
+                                            valor
+                                    )
+                            );
+                        }
+                    }
+                }
+        );
+
+
+        // ============================================================
+        // COLUNA DATA
+        // ============================================================
+
+        TableColumn<LoteProduto, java.time.LocalDateTime> colData =
+                new TableColumn<>(
+                        "ENTRADA"
+                );
+
+
+        colData.setPrefWidth(
+                180
+        );
+
+
+        colData.setCellValueFactory(
+                new PropertyValueFactory<>(
+                        "dataEntrada"
+                )
+        );
+
+
+        colData.setCellFactory(
+                coluna -> new TableCell<>() {
+
+                    @Override
+                    protected void updateItem(
+                            java.time.LocalDateTime data,
+                            boolean empty) {
+
+                        super.updateItem(
+                                data,
+                                empty
+                        );
+
+
+                        if (empty
+                                || data == null) {
+
+                            setText(
+                                    null
+                            );
+
+                        } else {
+
+                            setText(
+                                    data.format(
+                                            formatoData
+                                    )
+                            );
+                        }
+                    }
+                }
+        );
+
+
+        tabela.getColumns().addAll(
+                colLote,
+                colQuantidadeLote,
+                colCusto,
+                colData
+        );
+
+
+        tabela.setItems(
+                FXCollections.observableArrayList(
+                        lotes
+                )
+        );
+
+
+        // ============================================================
+        // RESUMO DOS LOTES
+        // ============================================================
+
+        int quantidadeTotal =
+                0;
+
+
+        BigDecimal valorTotal =
+                BigDecimal.ZERO;
+
+
+        for (LoteProduto lote : lotes) {
+
+            quantidadeTotal +=
+                    lote.getQuantidade();
+
+
+            BigDecimal valorLote =
+                    lote.getCustoUnitario()
+                            .multiply(
+                                    BigDecimal.valueOf(
+                                            lote.getQuantidade()
+                                    )
+                            );
+
+
+            valorTotal =
+                    valorTotal.add(
+                            valorLote
+                    );
+        }
+
+
+        Label lblResumo =
+                new Label(
+                        "Estoque nos lotes: "
+                                + quantidadeTotal
+                                + " unidade(s)"
+                                + "   |   Valor: "
+                                + moedaBrasil.format(
+                                        valorTotal
+                                )
+                );
+
+
+        GridPane conteudo =
+                new GridPane();
+
+
+        conteudo.setVgap(
+                12
+        );
+
+
+        conteudo.setPadding(
+                new Insets(
+                        10
+                )
+        );
+
+
+        conteudo.add(
+                tabela,
+                0,
+                0
+        );
+
+
+        conteudo.add(
+                lblResumo,
+                0,
+                1
+        );
+
+
+        dialog
+                .getDialogPane()
+                .setContent(
+                        conteudo
+                );
+
+
+        dialog
+                .getDialogPane()
+                .getButtonTypes()
+                .add(
+                        ButtonType.CLOSE
+                );
+
+
+        dialog.showAndWait();
+    }
+
+
+    // ============================================================
+    // EDITAR PRODUTO
+    // ============================================================
+
+    private void editarProduto(
+            Produto produto) {
+
+
+        Dialog<ButtonType> dialog =
+                new Dialog<>();
+
+
+        dialog.setTitle(
+                "Editar produto"
+        );
+
+
+        dialog.setHeaderText(
+                "Editar produto #"
+                        + produto.getId()
+                        + " - "
+                        + produto.getNome()
+        );
+
+
+        // ============================================================
+        // CAMPOS QUE PERTENCEM AO PRODUTO
+        // ============================================================
+
+        TextField txtNome =
+                new TextField(
+                        produto.getNome()
+                );
+
+
+        TextField txtCodigo =
+                new TextField(
+                        String.valueOf(
+                                produto.getCodigo()
+                        )
+                );
+
+
+        TextField txtDescricao =
+                new TextField(
+                        produto.getDescricao()
+                                == null
+                                ? ""
+                                : produto.getDescricao()
+                );
+
+
+        TextField txtPrecoVenda =
+                new TextField(
+                        String.valueOf(
+                                produto.getPrecoVenda()
+                        )
+                );
+
+
+        txtCodigo
+                .textProperty()
+                .addListener(
+                        (obs, antigo, novo) -> {
+
+                            if (!novo.matches(
+                                    "\\d*"
+                            )) {
+
+                                txtCodigo.setText(
+                                        novo.replaceAll(
+                                                "[^\\d]",
+                                                ""
+                                        )
+                                );
+                            }
+                        }
+                );
+
 
         txtPrecoVenda
                 .textProperty()
@@ -684,16 +1628,20 @@ public class EstoqueController {
                         }
                 );
 
+
         GridPane grid =
                 new GridPane();
+
 
         grid.setHgap(
                 12
         );
 
+
         grid.setVgap(
                 12
         );
+
 
         grid.setPadding(
                 new Insets(
@@ -704,11 +1652,15 @@ public class EstoqueController {
                 )
         );
 
+
         grid.add(
-                new Label("Nome:"),
+                new Label(
+                        "Nome:"
+                ),
                 0,
                 0
         );
+
 
         grid.add(
                 txtNome,
@@ -716,11 +1668,15 @@ public class EstoqueController {
                 0
         );
 
+
         grid.add(
-                new Label("Código:"),
+                new Label(
+                        "Código:"
+                ),
                 0,
                 1
         );
+
 
         grid.add(
                 txtCodigo,
@@ -728,69 +1684,58 @@ public class EstoqueController {
                 1
         );
 
+
         grid.add(
-                new Label("Lote:"),
+                new Label(
+                        "Descrição:"
+                ),
                 0,
                 2
         );
 
-        grid.add(
-                txtLote,
-                1,
-                2
-        );
-
-        grid.add(
-                new Label("Descrição:"),
-                0,
-                3
-        );
 
         grid.add(
                 txtDescricao,
                 1,
+                2
+        );
+
+
+        grid.add(
+                new Label(
+                        "Preço de venda:"
+                ),
+                0,
                 3
         );
 
-        grid.add(
-                new Label("Preço de custo:"),
-                0,
-                4
-        );
-
-        grid.add(
-                txtPrecoCusto,
-                1,
-                4
-        );
-
-        grid.add(
-                new Label("Preço de venda:"),
-                0,
-                5
-        );
 
         grid.add(
                 txtPrecoVenda,
                 1,
-                5
+                3
         );
 
+
+        Label avisoEstoque =
+                new Label(
+                        "Quantidade, lote e custo são controlados pela entrada de estoque."
+                );
+
+
         grid.add(
-                new Label("Quantidade:"),
+                avisoEstoque,
                 0,
-                6
+                4,
+                2,
+                1
         );
 
-        grid.add(
-                txtQuantidade,
-                1,
-                6
-        );
 
         txtNome.setPrefWidth(
                 300
         );
+
 
         dialog
                 .getDialogPane()
@@ -798,17 +1743,20 @@ public class EstoqueController {
                         grid
                 );
 
+
         ButtonType btnSalvar =
                 new ButtonType(
                         "Salvar alterações",
                         ButtonBar.ButtonData.OK_DONE
                 );
 
+
         ButtonType btnCancelar =
                 new ButtonType(
                         "Cancelar",
                         ButtonBar.ButtonData.CANCEL_CLOSE
                 );
+
 
         dialog
                 .getDialogPane()
@@ -818,6 +1766,7 @@ public class EstoqueController {
                         btnCancelar
                 );
 
+
         Button salvarButton =
                 (Button) dialog
                         .getDialogPane()
@@ -825,9 +1774,11 @@ public class EstoqueController {
                                 btnSalvar
                         );
 
+
         salvarButton.addEventFilter(
                 javafx.event.ActionEvent.ACTION,
                 event -> {
+
 
                     if (txtNome
                             .getText()
@@ -839,10 +1790,12 @@ public class EstoqueController {
                                 "Informe o nome do produto."
                         );
 
+
                         event.consume();
 
                         return;
                     }
+
 
                     if (txtCodigo
                             .getText()
@@ -854,40 +1807,12 @@ public class EstoqueController {
                                 "Informe o código do produto."
                         );
 
-                        event.consume();
-
-                        return;
-                    }
-
-                    if (txtLote
-                            .getText()
-                            .trim()
-                            .isEmpty()) {
-
-                        AlertaUtil.erro(
-                                "Campo obrigatório",
-                                "Informe o lote do produto."
-                        );
 
                         event.consume();
 
                         return;
                     }
 
-                    if (txtPrecoCusto
-                            .getText()
-                            .trim()
-                            .isEmpty()) {
-
-                        AlertaUtil.erro(
-                                "Campo obrigatório",
-                                "Informe o preço de custo."
-                        );
-
-                        event.consume();
-
-                        return;
-                    }
 
                     if (txtPrecoVenda
                             .getText()
@@ -899,38 +1824,14 @@ public class EstoqueController {
                                 "Informe o preço de venda."
                         );
 
-                        event.consume();
-
-                        return;
-                    }
-
-                    if (txtQuantidade
-                            .getText()
-                            .trim()
-                            .isEmpty()) {
-
-                        AlertaUtil.erro(
-                                "Campo obrigatório",
-                                "Informe a quantidade em estoque."
-                        );
 
                         event.consume();
 
                         return;
                     }
+
 
                     try {
-
-                        double precoCusto =
-                                Double.parseDouble(
-                                        txtPrecoCusto
-                                                .getText()
-                                                .trim()
-                                                .replace(
-                                                        ",",
-                                                        "."
-                                                )
-                                );
 
                         double precoVenda =
                                 Double.parseDouble(
@@ -943,24 +1844,6 @@ public class EstoqueController {
                                                 )
                                 );
 
-                        int quantidade =
-                                Integer.parseInt(
-                                        txtQuantidade
-                                                .getText()
-                                                .trim()
-                                );
-
-                        if (precoCusto < 0) {
-
-                            AlertaUtil.erro(
-                                    "Valor inválido",
-                                    "O preço de custo não pode ser negativo."
-                            );
-
-                            event.consume();
-
-                            return;
-                        }
 
                         if (precoVenda < 0) {
 
@@ -969,39 +1852,33 @@ public class EstoqueController {
                                     "O preço de venda não pode ser negativo."
                             );
 
-                            event.consume();
-
-                            return;
-                        }
-
-                        if (quantidade < 0) {
-
-                            AlertaUtil.erro(
-                                    "Valor inválido",
-                                    "A quantidade não pode ser negativa."
-                            );
 
                             event.consume();
                         }
+
 
                     } catch (NumberFormatException e) {
 
                         AlertaUtil.erro(
                                 "Valor inválido",
-                                "Verifique os campos numéricos."
+                                "Verifique o preço de venda informado."
                         );
+
 
                         event.consume();
                     }
                 }
         );
 
+
         Optional<ButtonType> resultado =
                 dialog.showAndWait();
+
 
         if (resultado.isPresent()
                 && resultado.get()
                 == btnSalvar) {
+
 
             try {
 
@@ -1011,6 +1888,7 @@ public class EstoqueController {
                                 .trim()
                 );
 
+
                 produto.setCodigo(
                         Integer.parseInt(
                                 txtCodigo
@@ -1019,11 +1897,6 @@ public class EstoqueController {
                         )
                 );
 
-                produto.setLote(
-                        txtLote
-                                .getText()
-                                .trim()
-                );
 
                 produto.setDescricao(
                         txtDescricao
@@ -1031,17 +1904,6 @@ public class EstoqueController {
                                 .trim()
                 );
 
-                produto.setPrecoCusto(
-                        Double.parseDouble(
-                                txtPrecoCusto
-                                        .getText()
-                                        .trim()
-                                        .replace(
-                                                ",",
-                                                "."
-                                        )
-                        )
-                );
 
                 produto.setPrecoVenda(
                         Double.parseDouble(
@@ -1055,18 +1917,24 @@ public class EstoqueController {
                         )
                 );
 
-                produto.setQtdeEstoque(
-                        Integer.parseInt(
-                                txtQuantidade
-                                        .getText()
-                                        .trim()
-                        )
-                );
+
+                /*
+                 * NÃO alteramos:
+                 *
+                 * produto.setLote(...)
+                 * produto.setPrecoCusto(...)
+                 * produto.setQtdeEstoque(...)
+                 *
+                 * Esses dados agora são controlados
+                 * através dos lotes/entradas de estoque.
+                 */
+
 
                 String retorno =
                         produtoDAO.atualizar(
                                 produto
                         );
+
 
                 if (retorno.contains(
                         "sucesso"
@@ -1074,14 +1942,17 @@ public class EstoqueController {
 
                     carregarProdutos();
 
+
                     lblStatus.setText(
                             "Produto atualizado com sucesso"
                     );
+
 
                     AlertaUtil.sucesso(
                             "Produto atualizado",
                             "As alterações foram salvas com sucesso!"
                     );
+
 
                 } else {
 
@@ -1091,6 +1962,7 @@ public class EstoqueController {
                     );
                 }
 
+
             } catch (Exception e) {
 
                 AlertaUtil.erro(
@@ -1099,13 +1971,20 @@ public class EstoqueController {
                                 + e.getMessage()
                 );
 
+
                 e.printStackTrace();
             }
         }
     }
 
+
+    // ============================================================
+    // EXCLUIR PRODUTO
+    // ============================================================
+
     private void excluirProduto(
             Produto produto) {
+
 
         boolean confirmou =
                 AlertaUtil.confirmar(
@@ -1115,9 +1994,12 @@ public class EstoqueController {
                                 + "\"?"
                 );
 
+
         if (!confirmou) {
+
             return;
         }
+
 
         try {
 
@@ -1126,20 +2008,24 @@ public class EstoqueController {
                             produto.getId()
                     );
 
+
             if (retorno.contains(
                     "sucesso"
             )) {
 
                 carregarProdutos();
 
+
                 lblStatus.setText(
                         "Produto removido com sucesso"
                 );
+
 
                 AlertaUtil.sucesso(
                         "Produto removido",
                         "Produto removido com sucesso!"
                 );
+
 
             } else {
 
@@ -1147,11 +2033,13 @@ public class EstoqueController {
                         "Erro ao remover produto"
                 );
 
+
                 AlertaUtil.erro(
                         "Erro",
                         retorno
                 );
             }
+
 
         } catch (Exception e) {
 
@@ -1159,31 +2047,71 @@ public class EstoqueController {
                     "Erro ao remover produto"
             );
 
+
             AlertaUtil.erro(
                     "Erro",
                     "Erro ao excluir produto: "
                             + e.getMessage()
             );
 
+
             e.printStackTrace();
         }
     }
 
+
+    // ============================================================
+    // RESUMO DO ESTOQUE
+    // ============================================================
+
     private void atualizarResumo(
             ObservableList<Produto> lista) {
+
 
         int totalProdutos =
                 lista.size();
 
-        double valorTotalEstoque =
-                0.0;
+
+        BigDecimal valorTotalEstoque =
+                BigDecimal.ZERO;
+
+
+        /*
+         * Agora o valor do estoque não usa mais
+         * produto.precoCusto.
+         *
+         * O cálculo é feito utilizando:
+         *
+         * quantidade do lote × custo unitário do lote.
+         */
 
         for (Produto produto : lista) {
 
-            valorTotalEstoque +=
-                    produto.getQtdeEstoque()
-                            * produto.getPrecoCusto();
+            List<LoteProduto> lotes =
+                    loteProdutoDAO
+                            .buscarPorProduto(
+                                    produto.getId()
+                            );
+
+
+            for (LoteProduto lote : lotes) {
+
+                BigDecimal valorLote =
+                        lote.getCustoUnitario()
+                                .multiply(
+                                        BigDecimal.valueOf(
+                                                lote.getQuantidade()
+                                        )
+                                );
+
+
+                valorTotalEstoque =
+                        valorTotalEstoque.add(
+                                valorLote
+                        );
+            }
         }
+
 
         lblTotalItens.setText(
                 String.valueOf(
@@ -1191,10 +2119,12 @@ public class EstoqueController {
                 )
         );
 
+
         String valorFormatado =
                 moedaBrasil.format(
                         valorTotalEstoque
                 );
+
 
         valorFormatado =
                 valorFormatado
@@ -1203,6 +2133,7 @@ public class EstoqueController {
                                 ""
                         )
                         .trim();
+
 
         lblValorTotal.setText(
                 valorFormatado
