@@ -1402,6 +1402,31 @@
     -fx-padding: 12 0 12 0;
 }
 
+/* ---------- Links dos painéis do dashboard ---------- */
+
+.dashboard-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: -brand-dark;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 6 8 6 8;
+    -fx-background-radius: 7;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_RIGHT;
+    -fx-max-width: Infinity;
+}
+
+.dashboard-link:hover {
+    -fx-background-color: -brand-soft;
+    -fx-text-fill: -brand-dark;
+    -fx-effect: none;
+}
+
+.dashboard-link:pressed {
+    -fx-background-color: derive(-brand-soft, -8%);
+    -fx-opacity: 0.85;
+    -fx-effect: none;
+}
 
 /* ============================================================
    RODAPÉ

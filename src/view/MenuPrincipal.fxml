@@ -872,97 +872,107 @@
                                 </GridPane>
 
                                 <!-- ==================================================
-                                     ÚLTIMAS VENDAS / ESTOQUE BAIXO
-                                     ================================================== -->
+     ÚLTIMAS VENDAS / ESTOQUE BAIXO
+     ================================================== -->
 
-                                <GridPane
-                                    fx:id="gridPaineis"
-                                    hgap="18"
-                                    vgap="18">
+<GridPane
+    fx:id="gridPaineis"
+    hgap="18"
+    vgap="18">
 
-                                    <columnConstraints>
+    <columnConstraints>
 
-                                        <ColumnConstraints
-                                            percentWidth="50"
-                                            hgrow="ALWAYS" />
+        <ColumnConstraints
+            percentWidth="50"
+            hgrow="ALWAYS" />
 
-                                        <ColumnConstraints
-                                            percentWidth="50"
-                                            hgrow="ALWAYS" />
+        <ColumnConstraints
+            percentWidth="50"
+            hgrow="ALWAYS" />
 
-                                    </columnConstraints>
+    </columnConstraints>
 
-                                    <!-- ÚLTIMAS VENDAS -->
+    <!-- ÚLTIMAS VENDAS -->
 
-                                    <VBox
-                                        spacing="14"
-                                        styleClass="dashboard-section"
-                                        GridPane.columnIndex="0">
+    <VBox
+        spacing="14"
+        styleClass="dashboard-section"
+        GridPane.columnIndex="0">
 
-                                        <HBox alignment="CENTER_LEFT">
+        <HBox alignment="CENTER_LEFT">
 
-                                            <VBox spacing="3">
+            <VBox spacing="3">
 
-                                                <Label
-                                                    styleClass="dashboard-section-title"
-                                                    text="Últimas vendas" />
+                <Label
+                    styleClass="dashboard-section-title"
+                    text="Últimas vendas" />
 
-                                                <Label
-                                                    styleClass="dashboard-section-subtitle"
-                                                    text="Movimentações mais recentes" />
+                <Label
+                    styleClass="dashboard-section-subtitle"
+                    text="Movimentações mais recentes" />
 
-                                            </VBox>
+            </VBox>
 
-                                        </HBox>
+        </HBox>
 
-                                        <VBox
-                                            fx:id="boxUltimasVendas"
-                                            spacing="4">
+        <VBox
+            fx:id="boxUltimasVendas"
+            spacing="4">
 
-                                            <Label
-                                                styleClass="dashboard-empty"
-                                                text="Nenhuma venda encontrada." />
+            <Label
+                styleClass="dashboard-empty"
+                text="Nenhuma venda encontrada." />
 
-                                        </VBox>
+        </VBox>
 
-                                    </VBox>
+        <JFXButton
+            text="Ver todas as vendas →"
+            onAction="#OnBtVendasClick"
+            styleClass="dashboard-link" />
 
-                                    <!-- ESTOQUE BAIXO -->
+    </VBox>
 
-                                    <VBox
-                                        spacing="14"
-                                        styleClass="dashboard-section"
-                                        GridPane.columnIndex="1">
+    <!-- ESTOQUE BAIXO -->
 
-                                        <HBox alignment="CENTER_LEFT">
+    <VBox
+        spacing="14"
+        styleClass="dashboard-section"
+        GridPane.columnIndex="1">
 
-                                            <VBox spacing="3">
+        <HBox alignment="CENTER_LEFT">
 
-                                                <Label
-                                                    styleClass="dashboard-section-title"
-                                                    text="Produtos com estoque baixo" />
+            <VBox spacing="3">
 
-                                                <Label
-                                                    styleClass="dashboard-section-subtitle"
-                                                    text="Itens que precisam de atenção" />
+                <Label
+                    styleClass="dashboard-section-title"
+                    text="Produtos com estoque baixo" />
 
-                                            </VBox>
+                <Label
+                    styleClass="dashboard-section-subtitle"
+                    text="Itens que precisam de atenção" />
 
-                                        </HBox>
+            </VBox>
 
-                                        <VBox
-                                            fx:id="boxEstoqueBaixo"
-                                            spacing="4">
+        </HBox>
 
-                                            <Label
-                                                styleClass="dashboard-empty"
-                                                text="Nenhum produto com estoque baixo." />
+        <VBox
+            fx:id="boxEstoqueBaixo"
+            spacing="4">
 
-                                        </VBox>
+            <Label
+                styleClass="dashboard-empty"
+                text="Nenhum produto com estoque baixo." />
 
-                                    </VBox>
+        </VBox>
 
-                                </GridPane>
+        <JFXButton
+            text="Ver todo o estoque →"
+            onAction="#OnBtEstoqueClick"
+            styleClass="dashboard-link" />
+
+    </VBox>
+
+</GridPane>
 
                                 <Region
                                     minHeight="5"
