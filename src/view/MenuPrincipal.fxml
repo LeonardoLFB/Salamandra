@@ -422,9 +422,10 @@
                 <StackPane fx:id="conteudoPrincipal">
 
                     <ScrollPane
-                        fitToWidth="true"
-                        hbarPolicy="NEVER"
-                        styleClass="dashboard-scroll">
+    					fx:id="scrollDashboard"
+					    fitToWidth="true"
+					    hbarPolicy="NEVER"
+					    styleClass="dashboard-scroll">
 
                         <content>
 

@@ -42,6 +42,8 @@ import model.Produto;
 import model.Usuario;
 import model.Venda;
 
+import javafx.scene.control.ScrollPane;
+
 public class MenuController implements Initializable {
 
     // ============================================================
@@ -164,8 +166,9 @@ public class MenuController implements Initializable {
 
     @FXML
     private JFXButton btSair;
-
-    private Parent dashboardInicial;
+    
+    @FXML
+    private ScrollPane scrollDashboard;
 
     private JFXButton botaoMenuAtivo;
 
@@ -196,8 +199,6 @@ public class MenuController implements Initializable {
 
         Menu.setOnMouseClicked(e -> openSidebar());
         MenuClose.setOnMouseClicked(e -> closeSidebar());
-
-        dashboardInicial = dashboardPrincipal;
 
         carregarUsuarioLogado();
         carregarIndicadores();
@@ -429,7 +430,7 @@ public class MenuController implements Initializable {
             ).reversed()
         );
 
-        int limite = Math.min(vendas.size(), 5);
+        int limite = Math.min(vendas.size(), 4);
 
         for (int i = 0; i < limite; i++) {
 
@@ -527,7 +528,7 @@ public class MenuController implements Initializable {
                         Produto::getQtdeEstoque
                     )
                 )
-                .limit(5)
+                .limit(4)
                 .toList();
 
         if (produtosBaixos.isEmpty()) {
@@ -840,7 +841,7 @@ public class MenuController implements Initializable {
 
         conteudoPrincipal
             .getChildren()
-            .add(dashboardInicial);
+            .add(scrollDashboard);
 
         marcarItemAtivo(null);
 
