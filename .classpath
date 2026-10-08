@@ -8,7 +8,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/javafx21"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/javaFx21"/>
-	<classpathentry kind="lib" path="src/database/postgresql-42.7.8.jar"/>
-	<classpathentry kind="lib" path="src/database/jfoenix-9.0.10 (1).jar"/>
+	<classpathentry kind="lib" path="lib/jfoenix-9.0.10 (1).jar"/>
+	<classpathentry kind="lib" path="lib/postgresql-42.7.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

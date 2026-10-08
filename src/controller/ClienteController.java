@@ -242,8 +242,7 @@ public class ClienteController {
                 clienteEmEdicao.setCep(cep);
                 
                 resultado = clienteDAO.atualizar(clienteEmEdicao);
-                clienteEmEdicao = null;
-                btnCadastrar.setText("Cadastrar Cliente");
+              
                 
             } else {
                 Cliente novo = new Cliente(nome, email, cpf, rua, numero, bairro, cidade, estado, cep);
@@ -285,7 +284,15 @@ public class ClienteController {
         tfEstado.clear();
         tfCep.clear();
         clienteEmEdicao = null;
-        btnCadastrar.setText("Cadastrar Cliente");
+
+        btnCadastrar.setText("Cadastrar cliente");
+
+        btnCadastrar.getStyleClass().remove("btn-editing");
+
+        if (!btnCadastrar.getStyleClass().contains("btn-primary")) {
+            btnCadastrar.getStyleClass().add("btn-primary");
+        }
+
         tfNome.requestFocus();
     }
 
@@ -315,8 +322,11 @@ public class ClienteController {
             private final HBox box = new HBox(8, btnEdit, btnDelete);
 
             {
-                btnEdit.setStyle("-fx-background-color: transparent; -fx-font-size: 14; -fx-cursor: hand;");
-                btnDelete.setStyle("-fx-background-color: transparent; -fx-font-size: 14; -fx-cursor: hand;");
+            	btnEdit.getStyleClass().add("table-action-edit");
+            	btnDelete.getStyleClass().add("table-action-delete");
+
+            	btnEdit.setTooltip(new Tooltip("Editar cliente"));
+            	btnDelete.setTooltip(new Tooltip("Excluir cliente"));
 
                 btnEdit.setOnAction(e -> {
                     Cliente c = getTableView().getItems().get(getIndex());
@@ -350,7 +360,14 @@ public class ClienteController {
         tfEstado.setText(c.getEstado());
         tfCep.setText(c.getCep());
         
-        btnCadastrar.setText("Atualizar Cliente");
+        btnCadastrar.setText("Salvar alterações");
+
+        btnCadastrar.getStyleClass().remove("btn-primary");
+
+        if (!btnCadastrar.getStyleClass().contains("btn-editing")) {
+            btnCadastrar.getStyleClass().add("btn-editing");
+        }
+
         tfNome.requestFocus();
     }
 

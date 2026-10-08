@@ -1,209 +1,1142 @@
 package database;
 
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 import model.Usuario;
 
-public class UsuarioDAO extends Usuario {
+public class UsuarioDAO {
 
-	public List<Usuario> lista = new ArrayList<Usuario>();
+    // ============================================================
+    // CONFIGURAÇÃO DAS SENHAS
+    // ============================================================
 
-	public String inserir(Usuario u) {
-		String s = "Usuario inserido com sucesso!";
-		BD bd = new BD();
-		bd.getConnection();
-		String sql = "INSERT INTO usuario (nome, login, senha, email, tipo_acesso) " + "VALUES (?,?,?,?,?)";
+    private static final String ALGORITMO =
+            "PBKDF2WithHmacSHA256";
 
-		try {
-			bd.st = bd.con.prepareStatement(sql);
-			bd.st.setString(1, u.getNome());
-			bd.st.setString(2, u.getLogin());
-			bd.st.setString(3, u.getSenha());
-			bd.st.setString(4, u.getEmail());
-			bd.st.setString(5, u.getTipo());
+    private static final int ITERACOES =
+            120000;
 
-			int n = bd.st.executeUpdate();
+    private static final int TAMANHO_SALT =
+            16;
 
-			if (n == 0) {
-				s = "Usuario nao encontrado.";
-			}
+    private static final int TAMANHO_HASH =
+            256;
 
-		} catch (SQLException e) {
-			s = "Falha na inclusao do usuario " + e;
-		} finally {
-			bd.close();
-		}
-		return s;
-	}
 
-	public String deletar(int id) {
-		String s = "Usuário deletado com sucesso!";
-		BD bd = new BD();
-		bd.getConnection();
+    // ============================================================
+    // INSERIR
+    // ============================================================
 
-		String sql = "DELETE FROM usuario WHERE id_usuario = ? RETURNING id_usuario";
+    public String inserir(Usuario usuario) {
 
-		try {
-			bd.st = bd.con.prepareStatement(sql);
-			bd.st.setInt(1, id);
+        String mensagem =
+                "Usuário inserido com sucesso!";
 
-			bd.rs = bd.st.executeQuery();
+        BD bd = new BD();
 
-			if (!bd.rs.next()) {
-				s = "Usuário não encontrado ou não foi possível deletar.";
-			} else {
-				int deletedId = bd.rs.getInt(1);
-				System.out.println("Deleted id: " + deletedId);
-			}
+        try {
 
-		} catch (SQLException e) {
-			s = "Falha ao deletar o usuário: " + e.getMessage();
-			e.printStackTrace();
-		} finally {
-			bd.close();
-		}
-		return s;
-	}
+            bd.getConnection();
 
-	public String atualizar(Usuario u) {
-		String s = "Usuário atualizado com sucesso!";
-		BD bd = new BD();
-		bd.getConnection();
 
-		String sql = "UPDATE usuario SET nome = ?, login = ?, senha = ?, email = ?, tipo_acesso = ? "
-				+ "WHERE id_usuario = ?";
+            // ====================================================
+            // LOGIN DUPLICADO
+            // ====================================================
 
-		try {
-			bd.st = bd.con.prepareStatement(sql);
-			bd.st.setString(1, u.getNome());
-			bd.st.setString(2, u.getLogin());
-			bd.st.setString(3, u.getSenha());
-			bd.st.setString(4, u.getEmail());
-			bd.st.setString(5, u.getTipo());
-			bd.st.setInt(6, u.getId()); // id do usuário
+            if (loginJaExiste(
+                    bd,
+                    usuario.getLogin(),
+                    0)) {
 
-			int n = bd.st.executeUpdate();
+                return "Já existe um usuário com este login.";
+            }
 
-			if (n == 0) {
-				s = "Usuário não encontrado.";
-			}
 
-		} catch (SQLException e) {
-			s = "Falha ao atualizar o usuário: " + e;
-		} finally {
-			bd.close();
-		}
+            // ====================================================
+            // E-MAIL DUPLICADO
+            // ====================================================
 
-		return s;
-	}
+            if (emailJaExiste(
+                    bd,
+                    usuario.getEmail(),
+                    0)) {
 
-	public List<Usuario> getAll() {
-		List<Usuario> lista = new ArrayList<>();
+                return "Já existe um usuário com este e-mail.";
+            }
 
-		BD bd = new BD();
-		bd.getConnection();
 
-		String sql = "SELECT * FROM usuario";
+            // ====================================================
+            // SENHA SEGURA
+            // ====================================================
 
-		try {
-			bd.st = bd.con.prepareStatement(sql);
-			bd.rs = bd.st.executeQuery();
+            String senhaSegura =
+                    gerarHashSenha(
+                            usuario.getSenha()
+                    );
 
-			while (bd.rs.next()) {
 
-				int id = bd.rs.getInt("id_usuario");
-				String nome = bd.rs.getString("nome");
-				String login = bd.rs.getString("login");
-				String senha = bd.rs.getString("senha");
-				String email = bd.rs.getString("email");
-				String tipo = bd.rs.getString("tipo_acesso");
+            // ====================================================
+            // INSERT
+            // ====================================================
 
-				Usuario u = new Usuario(id, nome, login, senha, email, tipo);
-				lista.add(u);
-			}
+            String sql =
+                    "INSERT INTO usuario " +
+                    "(nome, login, senha, email, tipo_acesso) " +
+                    "VALUES (?, ?, ?, ?, ?)";
 
-		} catch (SQLException e) {
-			// NÃO retorne null — apenas logue e continue com lista vazia
-			System.err.println("Erro em UsuarioDAO.getAll(): " + e.getMessage());
-			e.printStackTrace();
-		} finally {
-			bd.close();
-		}
 
-		System.out.println("UsuarioDAO.getAll() retornou " + lista.size() + " registros.");
-		return lista;
-	}
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
 
-	public Usuario autenticar(String login, String senha) {
-		Usuario usuario = null;
-		BD bd = new BD();
-		bd.getConnection();
 
-		String sql = "SELECT * FROM usuario WHERE login = ? AND senha = ?";
+            bd.st.setString(
+                    1,
+                    usuario.getNome().trim()
+            );
 
-		try {
-			bd.st = bd.con.prepareStatement(sql);
-			bd.st.setString(1, login);
-			bd.st.setString(2, senha);
-			bd.rs = bd.st.executeQuery();
 
-			if (bd.rs.next()) {
-				int id = bd.rs.getInt("id_usuario");
-				String nome = bd.rs.getString("nome");
-				String loginDb = bd.rs.getString("login");
-				String senhaDb = bd.rs.getString("senha");
-				String email = bd.rs.getString("email");
-				String tipo = bd.rs.getString("tipo_acesso");
+            bd.st.setString(
+                    2,
+                    usuario.getLogin().trim()
+            );
 
-				usuario = new Usuario(id, nome, loginDb, senhaDb, email, tipo);
-			}
 
-		} catch (SQLException e) {
-			System.err.println("Erro ao autenticar usuário: " + e.getMessage());
-			e.printStackTrace();
-		} finally {
-			bd.close();
-		}
+            bd.st.setString(
+                    3,
+                    senhaSegura
+            );
 
-		return usuario;
-	}
-	
-	public void criarUsuarioPadrao() {
-	    BD bd = new BD();
-	    bd.getConnection();
-	    
-	    // Verifica se já existe algum usuário admin
-	    String sqlCheck = "SELECT COUNT(*) FROM usuario WHERE login = 'admin'";
-	    
-	    try {
-	        bd.st = bd.con.prepareStatement(sqlCheck);
-	        bd.rs = bd.st.executeQuery();
-	        
-	        if (bd.rs.next() && bd.rs.getInt(1) == 0) {
-	            // Não existe admin, vamos criar
-	            String sqlInsert = "INSERT INTO usuario (nome, login, senha, email, tipo_acesso) " +
-	                             "VALUES ('Administrador', 'admin', 'admin123', 'admin@sistema.com', 'Administrador')";
-	            
-	            bd.st = bd.con.prepareStatement(sqlInsert);
-	            int resultado = bd.st.executeUpdate();
-	            
-	            if (resultado > 0) {
-	                System.out.println("✅ Usuário admin criado com sucesso!");
-	                System.out.println("Login: admin");
-	                System.out.println("Senha: admin123");
-	            }
-	        } else {
-	            System.out.println("ℹ️ Usuário admin já existe no banco.");
-	        }
-	        
-	    } catch (SQLException e) {
-	        System.err.println("Erro ao criar usuário padrão: " + e.getMessage());
-	        e.printStackTrace();
-	    } finally {
-	        bd.close();
-	    }
-	}
 
+            bd.st.setString(
+                    4,
+                    usuario.getEmail().trim()
+            );
+
+
+            bd.st.setString(
+                    5,
+                    usuario.getTipo()
+            );
+
+
+            int linhasAfetadas =
+                    bd.st.executeUpdate();
+
+
+            if (linhasAfetadas == 0) {
+
+                mensagem =
+                        "Não foi possível cadastrar o usuário.";
+            }
+
+
+        } catch (SQLException e) {
+
+            mensagem =
+                    tratarErroBanco(
+                            e,
+                            "Falha ao cadastrar usuário."
+                    );
+
+            e.printStackTrace();
+
+
+        } catch (Exception e) {
+
+            mensagem =
+                    "Falha ao proteger a senha do usuário.";
+
+            e.printStackTrace();
+
+
+        } finally {
+
+            bd.close();
+        }
+
+
+        return mensagem;
+    }
+
+
+    // ============================================================
+    // ATUALIZAR
+    // ============================================================
+
+    public String atualizar(Usuario usuario) {
+
+        String mensagem =
+                "Usuário atualizado com sucesso!";
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+
+            // ====================================================
+            // LOGIN DUPLICADO
+            // ====================================================
+
+            if (loginJaExiste(
+                    bd,
+                    usuario.getLogin(),
+                    usuario.getId())) {
+
+                return "Já existe outro usuário com este login.";
+            }
+
+
+            // ====================================================
+            // E-MAIL DUPLICADO
+            // ====================================================
+
+            if (emailJaExiste(
+                    bd,
+                    usuario.getEmail(),
+                    usuario.getId())) {
+
+                return "Já existe outro usuário com este e-mail.";
+            }
+
+
+            /*
+             * O usuário carregado do banco normalmente já contém
+             * uma senha protegida.
+             *
+             * Caso ainda seja uma senha antiga em texto puro,
+             * aproveitamos a atualização para protegê-la.
+             */
+            String senha =
+                    usuario.getSenha();
+
+
+            if (senha != null
+                    && !senha.isBlank()
+                    && !senhaProtegida(senha)) {
+
+                senha =
+                        gerarHashSenha(
+                                senha
+                        );
+            }
+
+
+            String sql =
+                    "UPDATE usuario " +
+                    "SET nome = ?, " +
+                    "login = ?, " +
+                    "senha = ?, " +
+                    "email = ?, " +
+                    "tipo_acesso = ? " +
+                    "WHERE id_usuario = ?";
+
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+
+            bd.st.setString(
+                    1,
+                    usuario.getNome().trim()
+            );
+
+
+            bd.st.setString(
+                    2,
+                    usuario.getLogin().trim()
+            );
+
+
+            bd.st.setString(
+                    3,
+                    senha
+            );
+
+
+            bd.st.setString(
+                    4,
+                    usuario.getEmail().trim()
+            );
+
+
+            bd.st.setString(
+                    5,
+                    usuario.getTipo()
+            );
+
+
+            bd.st.setInt(
+                    6,
+                    usuario.getId()
+            );
+
+
+            int linhasAfetadas =
+                    bd.st.executeUpdate();
+
+
+            if (linhasAfetadas == 0) {
+
+                mensagem =
+                        "Usuário não encontrado.";
+            }
+
+
+        } catch (SQLException e) {
+
+            mensagem =
+                    tratarErroBanco(
+                            e,
+                            "Falha ao atualizar usuário."
+                    );
+
+            e.printStackTrace();
+
+
+        } catch (Exception e) {
+
+            mensagem =
+                    "Falha ao atualizar o usuário.";
+
+            e.printStackTrace();
+
+
+        } finally {
+
+            bd.close();
+        }
+
+
+        return mensagem;
+    }
+
+
+    // ============================================================
+    // DELETAR
+    // ============================================================
+
+    public String deletar(int id) {
+
+        String mensagem =
+                "Usuário deletado com sucesso!";
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+
+            String sql =
+                    "DELETE FROM usuario " +
+                    "WHERE id_usuario = ?";
+
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+
+            bd.st.setInt(
+                    1,
+                    id
+            );
+
+
+            int linhasAfetadas =
+                    bd.st.executeUpdate();
+
+
+            if (linhasAfetadas == 0) {
+
+                mensagem =
+                        "Usuário não encontrado.";
+            }
+
+
+        } catch (SQLException e) {
+
+            mensagem =
+                    "Falha ao deletar o usuário: "
+                    + e.getMessage();
+
+            e.printStackTrace();
+
+
+        } finally {
+
+            bd.close();
+        }
+
+
+        return mensagem;
+    }
+
+
+    // ============================================================
+    // LISTAR TODOS
+    // ============================================================
+
+    public List<Usuario> getAll() {
+
+        List<Usuario> usuarios =
+                new ArrayList<>();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+
+            String sql =
+                    "SELECT " +
+                    "id_usuario, " +
+                    "nome, " +
+                    "login, " +
+                    "senha, " +
+                    "email, " +
+                    "tipo_acesso " +
+                    "FROM usuario " +
+                    "ORDER BY nome";
+
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+
+            bd.rs =
+                    bd.st.executeQuery();
+
+
+            while (bd.rs.next()) {
+
+                int id =
+                        bd.rs.getInt(
+                                "id_usuario"
+                        );
+
+
+                String nome =
+                        bd.rs.getString(
+                                "nome"
+                        );
+
+
+                String login =
+                        bd.rs.getString(
+                                "login"
+                        );
+
+
+                String senha =
+                        bd.rs.getString(
+                                "senha"
+                        );
+
+
+                String email =
+                        bd.rs.getString(
+                                "email"
+                        );
+
+
+                String tipo =
+                        bd.rs.getString(
+                                "tipo_acesso"
+                        );
+
+
+                Usuario usuario =
+                        new Usuario(
+                                id,
+                                nome,
+                                login,
+                                senha,
+                                email,
+                                tipo
+                        );
+
+
+                usuarios.add(
+                        usuario
+                );
+            }
+
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro em UsuarioDAO.getAll(): "
+                    + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+
+        } finally {
+
+            bd.close();
+        }
+
+
+        System.out.println(
+                "UsuarioDAO.getAll() retornou "
+                + usuarios.size()
+                + " registros."
+        );
+
+
+        return usuarios;
+    }
+
+
+    // ============================================================
+    // AUTENTICAÇÃO
+    // ============================================================
+
+    public Usuario autenticar(
+            String login,
+            String senhaInformada) {
+
+        Usuario usuario = null;
+
+        BD bd = new BD();
+
+
+        if (login == null
+                || login.isBlank()
+                || senhaInformada == null
+                || senhaInformada.isBlank()) {
+
+            return null;
+        }
+
+
+        try {
+
+            bd.getConnection();
+
+
+            /*
+             * Agora buscamos somente pelo login.
+             *
+             * A senha não é mais comparada diretamente no SQL,
+             * pois ela fica armazenada como hash.
+             */
+            String sql =
+                    "SELECT " +
+                    "id_usuario, " +
+                    "nome, " +
+                    "login, " +
+                    "senha, " +
+                    "email, " +
+                    "tipo_acesso " +
+                    "FROM usuario " +
+                    "WHERE LOWER(login) = LOWER(?)";
+
+
+            bd.st = bd.con.prepareStatement(
+                    sql
+            );
+
+
+            bd.st.setString(
+                    1,
+                    login.trim()
+            );
+
+
+            bd.rs =
+                    bd.st.executeQuery();
+
+
+            if (bd.rs.next()) {
+
+                int id =
+                        bd.rs.getInt(
+                                "id_usuario"
+                        );
+
+
+                String nome =
+                        bd.rs.getString(
+                                "nome"
+                        );
+
+
+                String loginBanco =
+                        bd.rs.getString(
+                                "login"
+                        );
+
+
+                String senhaBanco =
+                        bd.rs.getString(
+                                "senha"
+                        );
+
+
+                String email =
+                        bd.rs.getString(
+                                "email"
+                        );
+
+
+                String tipo =
+                        bd.rs.getString(
+                                "tipo_acesso"
+                        );
+
+
+                boolean senhaCorreta;
+
+
+                // =================================================
+                // SENHA NOVA COM HASH
+                // =================================================
+
+                if (senhaProtegida(
+                        senhaBanco)) {
+
+                    senhaCorreta =
+                            verificarSenha(
+                                    senhaInformada,
+                                    senhaBanco
+                            );
+
+                } else {
+
+                    // =============================================
+                    // COMPATIBILIDADE COM USUÁRIOS ANTIGOS
+                    // =============================================
+
+                    senhaCorreta =
+                            senhaBanco != null
+                            && MessageDigest.isEqual(
+                                    senhaBanco.getBytes(),
+                                    senhaInformada.getBytes()
+                            );
+
+
+                    /*
+                     * Se o login antigo estiver correto,
+                     * substituímos automaticamente a senha em
+                     * texto puro por uma senha protegida.
+                     */
+                    if (senhaCorreta) {
+
+                        atualizarSenhaAntiga(
+                                bd,
+                                id,
+                                senhaInformada
+                        );
+                    }
+                }
+
+
+                if (senhaCorreta) {
+
+                    /*
+                     * Evitamos carregar a senha real no objeto
+                     * retornado após autenticar.
+                     */
+                    usuario =
+                            new Usuario(
+                                    id,
+                                    nome,
+                                    loginBanco,
+                                    senhaBanco,
+                                    email,
+                                    tipo
+                            );
+                }
+            }
+
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(
+                    "Falha na conexão com o banco de dados.",
+                    e
+            );
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "Erro ao verificar senha: "
+                    + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+
+        } finally {
+
+            bd.close();
+        }
+
+
+        return usuario;
+    }
+
+
+    // ============================================================
+    // USUÁRIO PADRÃO
+    // ============================================================
+
+    public void criarUsuarioPadrao() {
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+
+            String sqlCheck =
+                    "SELECT COUNT(*) " +
+                    "FROM usuario " +
+                    "WHERE LOWER(login) = LOWER(?)";
+
+
+            bd.st = bd.con.prepareStatement(
+                    sqlCheck
+            );
+
+
+            bd.st.setString(
+                    1,
+                    "admin"
+            );
+
+
+            bd.rs =
+                    bd.st.executeQuery();
+
+
+            boolean existeAdmin =
+                    false;
+
+
+            if (bd.rs.next()) {
+
+                existeAdmin =
+                        bd.rs.getInt(1) > 0;
+            }
+
+
+            if (!existeAdmin) {
+
+                String senhaPadrao =
+                        gerarHashSenha(
+                                "admin123"
+                        );
+
+
+                String sqlInsert =
+                        "INSERT INTO usuario " +
+                        "(nome, login, senha, email, tipo_acesso) " +
+                        "VALUES (?, ?, ?, ?, ?)";
+
+
+                bd.st = bd.con.prepareStatement(
+                        sqlInsert
+                );
+
+
+                bd.st.setString(
+                        1,
+                        "Administrador"
+                );
+
+
+                bd.st.setString(
+                        2,
+                        "admin"
+                );
+
+
+                bd.st.setString(
+                        3,
+                        senhaPadrao
+                );
+
+
+                bd.st.setString(
+                        4,
+                        "admin@sistema.com"
+                );
+
+
+                bd.st.setString(
+                        5,
+                        "Administrador"
+                );
+
+
+                int resultado =
+                        bd.st.executeUpdate();
+
+
+                if (resultado > 0) {
+
+                    System.out.println(
+                            "Usuário administrador padrão criado."
+                    );
+
+                    System.out.println(
+                            "Login inicial: admin"
+                    );
+
+                    System.out.println(
+                            "Altere a senha padrão após o primeiro acesso."
+                    );
+                }
+
+            } else {
+
+                System.out.println(
+                        "Usuário administrador padrão já existe."
+                );
+            }
+
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Erro ao criar usuário padrão: "
+                    + e.getMessage()
+            );
+
+            e.printStackTrace();
+
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "Erro ao proteger a senha do administrador."
+            );
+
+            e.printStackTrace();
+
+
+        } finally {
+
+            bd.close();
+        }
+    }
+
+
+    // ============================================================
+    // LOGIN DUPLICADO
+    // ============================================================
+
+    private boolean loginJaExiste(
+            BD bd,
+            String login,
+            int idIgnorar)
+            throws SQLException {
+
+        String sql =
+                "SELECT COUNT(*) " +
+                "FROM usuario " +
+                "WHERE LOWER(login) = LOWER(?) " +
+                "AND id_usuario <> ?";
+
+
+        bd.st = bd.con.prepareStatement(
+                sql
+        );
+
+
+        bd.st.setString(
+                1,
+                login.trim()
+        );
+
+
+        bd.st.setInt(
+                2,
+                idIgnorar
+        );
+
+
+        bd.rs =
+                bd.st.executeQuery();
+
+
+        return bd.rs.next()
+                && bd.rs.getInt(1) > 0;
+    }
+
+
+    // ============================================================
+    // E-MAIL DUPLICADO
+    // ============================================================
+
+    private boolean emailJaExiste(
+            BD bd,
+            String email,
+            int idIgnorar)
+            throws SQLException {
+
+        String sql =
+                "SELECT COUNT(*) " +
+                "FROM usuario " +
+                "WHERE LOWER(email) = LOWER(?) " +
+                "AND id_usuario <> ?";
+
+
+        bd.st = bd.con.prepareStatement(
+                sql
+        );
+
+
+        bd.st.setString(
+                1,
+                email.trim()
+        );
+
+
+        bd.st.setInt(
+                2,
+                idIgnorar
+        );
+
+
+        bd.rs =
+                bd.st.executeQuery();
+
+
+        return bd.rs.next()
+                && bd.rs.getInt(1) > 0;
+    }
+
+
+    // ============================================================
+    // HASH DA SENHA
+    // ============================================================
+
+    private String gerarHashSenha(
+            String senha)
+            throws Exception {
+
+        SecureRandom random =
+                new SecureRandom();
+
+
+        byte[] salt =
+                new byte[TAMANHO_SALT];
+
+
+        random.nextBytes(
+                salt
+        );
+
+
+        PBEKeySpec spec =
+                new PBEKeySpec(
+                        senha.toCharArray(),
+                        salt,
+                        ITERACOES,
+                        TAMANHO_HASH
+                );
+
+
+        SecretKeyFactory factory =
+                SecretKeyFactory.getInstance(
+                        ALGORITMO
+                );
+
+
+        byte[] hash =
+                factory
+                        .generateSecret(spec)
+                        .getEncoded();
+
+
+        spec.clearPassword();
+
+
+        return "pbkdf2$"
+                + ITERACOES
+                + "$"
+                + Base64.getEncoder()
+                        .encodeToString(salt)
+                + "$"
+                + Base64.getEncoder()
+                        .encodeToString(hash);
+    }
+
+
+    // ============================================================
+    // VERIFICAR SENHA
+    // ============================================================
+
+    private boolean verificarSenha(
+            String senhaInformada,
+            String senhaSalva)
+            throws Exception {
+
+        String[] partes =
+                senhaSalva.split("\\$");
+
+
+        if (partes.length != 4
+                || !"pbkdf2".equals(
+                        partes[0])) {
+
+            return false;
+        }
+
+
+        int iteracoes =
+                Integer.parseInt(
+                        partes[1]
+                );
+
+
+        byte[] salt =
+                Base64.getDecoder()
+                        .decode(
+                                partes[2]
+                        );
+
+
+        byte[] hashSalvo =
+                Base64.getDecoder()
+                        .decode(
+                                partes[3]
+                        );
+
+
+        PBEKeySpec spec =
+                new PBEKeySpec(
+                        senhaInformada.toCharArray(),
+                        salt,
+                        iteracoes,
+                        hashSalvo.length * 8
+                );
+
+
+        SecretKeyFactory factory =
+                SecretKeyFactory.getInstance(
+                        ALGORITMO
+                );
+
+
+        byte[] hashInformado =
+                factory
+                        .generateSecret(spec)
+                        .getEncoded();
+
+
+        spec.clearPassword();
+
+
+        return MessageDigest.isEqual(
+                hashSalvo,
+                hashInformado
+        );
+    }
+
+
+    // ============================================================
+    // IDENTIFICA SE É HASH
+    // ============================================================
+
+    private boolean senhaProtegida(
+            String senha) {
+
+        return senha != null
+                && senha.startsWith(
+                        "pbkdf2$"
+                );
+    }
+
+
+    // ============================================================
+    // MIGRA SENHA ANTIGA
+    // ============================================================
+
+    private void atualizarSenhaAntiga(
+            BD bd,
+            int idUsuario,
+            String senha)
+            throws Exception {
+
+        String senhaSegura =
+                gerarHashSenha(
+                        senha
+                );
+
+
+        String sql =
+                "UPDATE usuario " +
+                "SET senha = ? " +
+                "WHERE id_usuario = ?";
+
+
+        bd.st = bd.con.prepareStatement(
+                sql
+        );
+
+
+        bd.st.setString(
+                1,
+                senhaSegura
+        );
+
+
+        bd.st.setInt(
+                2,
+                idUsuario
+        );
+
+
+        bd.st.executeUpdate();
+
+
+        System.out.println(
+                "Senha antiga convertida para armazenamento seguro - usuário "
+                + idUsuario
+        );
+    }
+
+
+    // ============================================================
+    // TRATAMENTO DE ERRO DO POSTGRESQL
+    // ============================================================
+
+    private String tratarErroBanco(
+            SQLException e,
+            String mensagemPadrao) {
+
+        /*
+         * PostgreSQL:
+         * 23505 = unique_violation
+         */
+        if ("23505".equals(
+                e.getSQLState())) {
+
+            return "Já existe um usuário com estes dados.";
+        }
+
+
+        return mensagemPadrao;
+    }
 }
